@@ -1,0 +1,13 @@
+{
+    "name": "printingbruno/ecommerce",
+    "description": "PrintingBruno - E-commerce 3D Printing",
+    "type": "project",
+    "require": {
+        "php": ">=8.0",
+        "mercadopago/dx-php": "^3.0",
+        "phpmailer/phpmailer": "^7.0"
+    },
+    "config": {
+        "optimize-autoloader": true
+    }
+}

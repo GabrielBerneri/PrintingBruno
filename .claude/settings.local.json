@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(for f in *.jpeg)",
+      "Bash(do echo \"$f\")",
+      "Bash(done)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(dir /b /a \"E:\\\\programacion\\\\web\\\\printingbruno\")"
+    ]
+  }
+}

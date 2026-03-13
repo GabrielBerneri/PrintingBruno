@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin | PrintingBruno</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="icon" type="image/png" href="assets/logo/logo.png">
+    <style>
+        /* ===== Admin Dashboard Styles ===== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-lg);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-xl);
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-base);
+        }
+
+        .kpi-card:hover {
+            border-color: var(--border-accent);
+            transform: translateY(-2px);
+        }
+
+        .kpi-card .kpi-icon {
+            font-size: 1.8rem;
+            margin-bottom: var(--space-sm);
+        }
+
+        .kpi-card .kpi-value {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .kpi-card .kpi-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: var(--space-xs);
+        }
+
+        .kpi-card.accent .kpi-value {
+            color: var(--accent);
+        }
+
+        .kpi-card.success .kpi-value {
+            color: #25D366;
+        }
+
+        .kpi-card.warning .kpi-value {
+            color: #fbbf24;
+        }
+
+        .kpi-card.danger .kpi-value {
+            color: #e74c3c;
+        }
+
+        /* Dashboard panels */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            margin-bottom: var(--space-2xl);
+        }
+
+        .dashboard-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-xl);
+        }
+
+        .dashboard-panel h3 {
+            font-family: var(--font-heading);
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: var(--space-lg);
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .dashboard-panel .mini-table {
+            width: 100%;
+            font-size: 0.85rem;
+        }
+
+        .dashboard-panel .mini-table td {
+            padding: var(--space-sm) var(--space-xs);
+            border-bottom: 1px solid var(--border-subtle);
+            vertical-align: middle;
+        }
+
+        .dashboard-panel .mini-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .dashboard-panel .mini-table img {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--border-radius-sm);
+            object-fit: cover;
+        }
+
+        .mini-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: var(--border-radius-full);
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .mini-badge.low {
+            background: rgba(231, 76, 60, 0.15);
+            color: #e74c3c;
+        }
+
+        .mini-badge.ok {
+            background: rgba(37, 211, 102, 0.15);
+            color: #25D366;
+        }
+
+        /* Search & Filters bar */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-md);
+            align-items: center;
+            margin-bottom: var(--space-xl);
+            padding: var(--space-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-lg);
+        }
+
+        .toolbar .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.6rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: border-color var(--transition-fast);
+        }
+
+        .toolbar .search-input:focus {
+            border-color: var(--accent);
+            outline: none;
+        }
+
+        .toolbar .search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .toolbar select {
+            padding: 0.6rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+        }
+
+        .toolbar .result-count {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: var(--space-sm);
+            margin-top: var(--space-xl);
+        }
+
+        .pagination button {
+            padding: 0.4rem 0.8rem;
+            border-radius: var(--border-radius-sm);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .pagination button:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .pagination button.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        /* Sortable headers */
+        .admin-table th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: color var(--transition-fast);
+        }
+
+        .admin-table th.sortable:hover {
+            color: var(--accent);
+        }
+
+        .admin-table th.sortable .sort-icon {
+            margin-left: 4px;
+            font-size: 0.7rem;
+            opacity: 0.4;
+        }
+
+        .admin-table th.sortable.asc .sort-icon,
+        .admin-table th.sortable.desc .sort-icon {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        /* Order detail modal */
+        .order-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(6px);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--space-lg);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--transition-base);
+        }
+
+        .order-modal-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .order-modal {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-2xl);
+            width: 100%;
+            max-width: 600px;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+
+        .order-modal h2 {
+            font-family: var(--font-heading);
+            font-size: 1.3rem;
+            margin-bottom: var(--space-lg);
+        }
+
+        /* Product form modal */
+        .product-modal-overlay {
+            position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px);
+            z-index: 3000; display: flex; align-items: center; justify-content: center;
+            padding: var(--space-lg); opacity: 0; pointer-events: none; transition: opacity var(--transition-base);
+        }
+        .product-modal-overlay.active { opacity: 1; pointer-events: all; }
+        .product-modal {
+            background: var(--bg-secondary); border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-lg); padding: var(--space-2xl);
+            width: 100%; max-width: 750px; max-height: 90vh; overflow-y: auto;
+        }
+
+        .order-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.9rem;
+        }
+
+        .order-detail-row .label {
+            color: var(--text-muted);
+        }
+
+        .order-items-list {
+            margin-top: var(--space-lg);
+        }
+
+        .order-item-row {
+            display: flex;
+            gap: var(--space-md);
+            align-items: center;
+            padding: var(--space-sm) 0;
+            border-bottom: 1px solid var(--border-subtle);
+            font-size: 0.88rem;
+        }
+
+        .order-item-row img {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--border-radius-sm);
+            object-fit: cover;
+        }
+
+        /* Tab badge */
+        .tab-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: var(--accent);
+            border-radius: 10px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: #fff;
+            margin-left: 6px;
+        }
+
+        /* Admin table clickable rows */
+        .admin-table tr.clickable {
+            cursor: pointer;
+            transition: background var(--transition-fast);
+        }
+
+        .admin-table tr.clickable:hover td {
+            background: rgba(255, 107, 43, 0.04);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .toolbar .result-count {
+                margin-left: 0;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Login View -->
+    <div class="admin-login" id="loginView">
+        <div class="admin-login-card">
+            <div class="logo" style="justify-content:center;margin-bottom:var(--space-xl)">
+                <img class="logo-icon" src="assets/logo/logo.png" alt="PrintingBruno">Printing<span>Bruno</span>
+            </div>
+            <h1>Panel de Administración</h1>
+            <form id="loginForm">
+                <div class="form-group"><input type="text" class="form-input" id="loginUser" placeholder="Usuario" autocomplete="username" required></div>
+                <div class="form-group"><input type="password" class="form-input" id="loginPass" placeholder="Contraseña" autocomplete="current-password" required></div>
+                <button type="submit" class="btn btn-primary btn-lg" style="width:100%" id="loginBtn">Ingresar</button>
+                <p id="loginError" style="color:#e74c3c;font-size:0.85rem;margin-top:var(--space-md);display:none"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Panel View -->
+    <div class="admin-layout" id="adminView" style="display:none">
+        <header class="header scrolled">
+            <div class="container">
+                <a href="index.html" class="logo">
+                    <img class="logo-icon" src="assets/logo/logo.png" alt="PrintingBruno">Printing<span>Bruno</span>
+                </a>
+                <div style="display:flex;align-items:center;gap:var(--space-md)">
+                    <span style="color:var(--text-secondary);font-size:0.9rem" id="adminUsername"></span>
+                    <button class="btn btn-secondary btn-sm" id="logoutBtn">Cerrar Sesión</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="container" style="padding-top:calc(var(--header-height) + var(--space-2xl));padding-bottom:var(--space-3xl)">
+            <h1 style="font-family:var(--font-heading);font-size:1.8rem;font-weight:800;margin-bottom:var(--space-xl)">
+                Panel de Administración</h1>
+
+            <div class="admin-tabs">
+                <button class="admin-tab active" data-tab="dashboard">📊 Dashboard</button>
+                <button class="admin-tab" data-tab="products">📦 Productos</button>
+                <button class="admin-tab" data-tab="orders">🧾 Pedidos <span class="tab-badge" id="pendingBadge" style="display:none">0</span></button>
+                <button class="admin-tab" data-tab="emails">📧 Correos</button>
+            </div>
+
+            <!-- Dashboard Tab -->
+            <div class="admin-panel" id="dashboardPanel">
+                <div class="kpi-grid" id="kpiGrid">
+                    <div class="kpi-card accent"><div class="kpi-icon">💰</div><div class="kpi-value" id="kpiRevenue">—</div><div class="kpi-label">Ventas Aprobadas</div></div>
+                    <div class="kpi-card success"><div class="kpi-icon">✅</div><div class="kpi-value" id="kpiApproved">—</div><div class="kpi-label">Pedidos Aprobados</div></div>
+                    <div class="kpi-card warning"><div class="kpi-icon">⏳</div><div class="kpi-value" id="kpiPending">—</div><div class="kpi-label">Pedidos Pendientes</div></div>
+                    <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-value" id="kpiProducts">—</div><div class="kpi-label">Productos Activos</div></div>
+                    <div class="kpi-card danger"><div class="kpi-icon">⚠️</div><div class="kpi-value" id="kpiLowStock">—</div><div class="kpi-label">Stock Bajo (&lt;5)</div></div>
+                    <div class="kpi-card"><div class="kpi-icon">📋</div><div class="kpi-value" id="kpiTotalOrders">—</div><div class="kpi-label">Pedidos Totales</div></div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-panel">
+                        <h3>🏆 Más Vendidos</h3>
+                        <table class="mini-table" id="topProductsTable">
+                            <tr><td colspan="3" style="text-align:center;color:var(--text-muted)">Cargando...</td></tr>
+                        </table>
+                    </div>
+                    <div class="dashboard-panel">
+                        <h3>⚠️ Stock Bajo</h3>
+                        <table class="mini-table" id="lowStockTable">
+                            <tr><td colspan="3" style="text-align:center;color:var(--text-muted)">Cargando...</td></tr>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="dashboard-panel">
+                    <h3>🕐 Últimos Pedidos</h3>
+                    <table class="mini-table" id="recentOrdersTable">
+                        <tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Cargando...</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Products Tab -->
+            <div class="admin-panel" id="productsPanel" style="display:none">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
+                    <h2 style="font-family:var(--font-heading);font-size:1.2rem">Productos</h2>
+                    <button class="btn btn-primary btn-sm" id="addProductBtn">+ Agregar Producto</button>
+                </div>
+
+                <!-- Toolbar -->
+                <div class="toolbar">
+                    <input type="text" class="search-input" id="productSearch" placeholder="🔍 Buscar por nombre...">
+                    <select id="filterCategory">
+                        <option value="">Todas las categorías</option>
+                        <option value="figuras">Figuras</option>
+                        <option value="decoracion">Decoración</option>
+                        <option value="funcional">Funcional</option>
+                        <option value="personalizado">Personalizado</option>
+                        <option value="mates">Mates</option>
+                        <option value="filamentos">Filamentos</option>
+                    </select>
+                    <select id="filterStatus">
+                        <option value="">Todos los estados</option>
+                        <option value="1">Activos</option>
+                        <option value="0">Inactivos</option>
+                    </select>
+                    <span class="result-count" id="productResultCount"></span>
+                </div>
+
+                <!-- Product Form Modal -->
+                <div id="productFormOverlay" class="product-modal-overlay">
+                    <div class="product-modal">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
+                            <h3 style="font-family:var(--font-heading);font-size:1.3rem;margin:0" id="productFormTitle">Nuevo Producto</h3>
+                            <button class="btn btn-secondary btn-sm" id="closeProductBtn" type="button" onclick="closeProductModal()">✕</button>
+                        </div>
+                        <form id="productForm">
+                            <input type="hidden" id="productId">
+                            <div style="display:flex;gap:var(--space-xl);align-items:flex-start;flex-wrap:wrap">
+                                <!-- Left Column: Image -->
+                                <div style="width: 220px;flex-shrink:0;display:flex;flex-direction:column;gap:var(--space-md)">
+                                    <div id="imageUploadArea" style="border:2px dashed var(--border-subtle);border-radius:var(--border-radius);padding:var(--space-lg) var(--space-sm);text-align:center;cursor:pointer;transition:border-color 0.2s;position:relative;background:var(--bg-card)">
+                                        <img id="imagePreview" src="" alt="Preview" style="max-height:160px;max-width:100%;display:none;margin:0 auto var(--space-sm);border-radius:var(--border-radius);object-fit:cover">
+                                        <div id="imageUploadPlaceholder">
+                                            <div style="font-size:2rem;margin-bottom:var(--space-sm)">🖼️</div>
+                                            <div style="color:var(--text-secondary);font-size:0.85rem;line-height:1.4">Arrastrá o<br><strong>hacé click</strong></div>
+                                        </div>
+                                        <div id="imageUploadStatus" style="display:none;font-size:0.8rem;margin-top:var(--space-sm)"></div>
+                                        <input type="file" id="pImageFile" accept="image/jpeg,image/png,image/webp,image/gif" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
+                                    </div>
+                                    <input type="hidden" id="pImage">
+                                    
+                                    <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--border-radius);padding:var(--space-md);display:flex;flex-direction:column;gap:var(--space-md)">
+                                        <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pActive" checked> Activo</label>
+                                        <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pFeatured"> Destacado ⭐</label>
+                                    </div>
+                                </div>
+                                
+                                <!-- Right Column: Data -->
+                                <div style="flex:1;min-width:300px;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
+                                    <div class="form-group" style="grid-column:1/-1"><label class="form-label">Nombre *</label><input type="text" class="form-input" id="pName" required></div>
+                                    <div class="form-group"><label class="form-label">Precio *</label><input type="number" class="form-input" id="pPrice" step="0.01" required></div>
+                                    <div class="form-group"><label class="form-label">Categoría *</label>
+                                        <select class="form-select" id="pCategory" required>
+                                            <option value="figuras">Figuras</option>
+                                            <option value="decoracion">Decoración</option>
+                                            <option value="funcional">Funcional</option>
+                                            <option value="personalizado">Personalizado</option>
+                                            <option value="mates">Mates</option>
+                                            <option value="filamentos">Filamentos</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group"><label class="form-label">Material</label><input type="text" class="form-input" id="pMaterial" value="PLA"></div>
+                                    <div class="form-group"><label class="form-label">Stock</label><input type="number" class="form-input" id="pStock" value="0"></div>
+                                    <div class="form-group" style="grid-column:1/-1"><label class="form-label">Badge</label><input type="text" class="form-input" id="pBadge" placeholder="Ej: Nuevo, Edición Limitada"></div>
+                                </div>
+                            </div>
+                            <div class="form-group" style="margin-top:var(--space-md)"><label class="form-label">Descripción</label><textarea class="form-textarea" id="pDescription" rows="4"></textarea></div>
+                            <div style="display:flex;justify-content:flex-end;gap:var(--space-md);margin-top:var(--space-xl);padding-top:var(--space-md);border-top:1px solid var(--border-subtle)">
+                                <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancelar</button>
+                                <button type="submit" class="btn btn-primary" style="min-width:140px">Guardar Producto</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div style="overflow-x:auto">
+                    <table class="admin-table" id="productsTable">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th class="sortable" data-sort="name">Nombre <span class="sort-icon">↕</span></th>
+                                <th class="sortable" data-sort="category">Categoría <span class="sort-icon">↕</span></th>
+                                <th class="sortable" data-sort="price">Precio <span class="sort-icon">↕</span></th>
+                                <th class="sortable" data-sort="stock">Stock <span class="sort-icon">↕</span></th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <tr><td colspan="7" style="text-align:center;padding:var(--space-2xl);color:var(--text-muted)">Cargando productos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="productsPagination"></div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div class="admin-panel" id="ordersPanel" style="display:none">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-xl)">
+                    <h2 style="font-family:var(--font-heading);font-size:1.2rem">Pedidos</h2>
+                    <select class="form-select" id="orderStatusFilter" style="width:auto">
+                        <option value="">Todos</option>
+                        <option value="pending">Pendientes</option>
+                        <option value="approved">Aprobados</option>
+                        <option value="rejected">Rechazados</option>
+                    </select>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>N° Orden</th>
+                                <th>Cliente</th>
+                                <th>Email</th>
+                                <th>Total</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <tr><td colspan="6" style="text-align:center;padding:var(--space-2xl);color:var(--text-muted)">Cargando pedidos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Emails Tab -->
+            <div class="admin-panel" id="emailsPanel" style="display:none">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-xl)">
+                    <h2 style="font-family:var(--font-heading);font-size:1.2rem">Historial de Correos</h2>
+                    <select class="form-select" id="emailStatusFilter" style="width:auto">
+                        <option value="">Todos</option>
+                        <option value="sent">Enviados (✅)</option>
+                        <option value="failed">Fallidos (❌)</option>
+                    </select>
+                </div>
+                <div style="overflow-x:auto">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>N° Orden</th>
+                                <th>Destinatario</th>
+                                <th>Asunto</th>
+                                <th>Estado</th>
+                                <th>Fecha</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="emailsTableBody">
+                            <tr><td colspan="6" style="text-align:center;padding:var(--space-2xl);color:var(--text-muted)">Cargando correos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination" id="emailsPagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Detail Modal -->
+    <div class="order-modal-overlay" id="orderModalOverlay">
+        <div class="order-modal">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
+                <h2 id="orderModalTitle">Pedido #</h2>
+                <button class="btn btn-secondary btn-sm" onclick="closeOrderModal()">✕</button>
+            </div>
+            <div id="orderModalContent">Cargando...</div>
+        </div>
+    </div>
+
+    <!-- Email Detail Modal (Sandboxed) -->
+    <div class="order-modal-overlay" id="emailModalOverlay">
+        <div class="order-modal" style="max-width:800px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
+                <h2 id="emailModalTitle">Asunto del Correo</h2>
+                <button class="btn btn-secondary btn-sm" onclick="closeEmailModal()">✕</button>
+            </div>
+            <div id="emailModalMeta" style="margin-bottom:var(--space-md);font-size:0.9rem;color:var(--text-muted);background:var(--bg-card);padding:var(--space-md);border-radius:var(--border-radius-sm);border:1px solid var(--border-subtle)">
+                Cargando metadatos...
+            </div>
+            <!-- iFrame is strictly sandboxed for security against XSS -->
+            <iframe id="emailModalIframe" style="width:100%;height:500px;border:1px solid var(--border-subtle);border-radius:var(--border-radius-sm);background:#fff" sandbox=""></iframe>
+        </div>
+    </div>
+
+    <script>
+        const API = 'api/admin';
+        const ITEMS_PER_PAGE = 20;
+
+        function esc(str) {
+            if (str == null) return '';
+            const div = document.createElement('div');
+            div.textContent = String(str);
+            return div.innerHTML;
+        }
+
+        // ═══════════════════════════════════════════════
+        //  AUTH
+        // ═══════════════════════════════════════════════
+        async function checkAuth() {
+            try {
+                const res = await fetch(`${API}/login.php`);
+                const data = await res.json();
+                if (data.authenticated) { showAdmin(data.user); return true; }
+            } catch (e) { }
+            return false;
+        }
+
+        function showAdmin(username) {
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('adminView').style.display = 'block';
+            document.getElementById('adminUsername').textContent = username;
+            loadDashboard();
+            loadProducts();
+            loadOrders();
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            btn.textContent = 'Ingresando...'; btn.disabled = true;
+            try {
+                const res = await fetch(`${API}/login.php`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: document.getElementById('loginUser').value, password: document.getElementById('loginPass').value })
+                });
+                const data = await res.json();
+                if (data.success) showAdmin(data.user);
+                else { document.getElementById('loginError').textContent = data.error || 'Credenciales inválidas'; document.getElementById('loginError').style.display = 'block'; }
+            } catch (err) { document.getElementById('loginError').textContent = 'Error de conexión'; document.getElementById('loginError').style.display = 'block'; }
+            btn.textContent = 'Ingresar'; btn.disabled = false;
+        });
+
+        document.getElementById('logoutBtn').addEventListener('click', async () => {
+            await fetch(`${API}/login.php`, { method: 'DELETE' });
+            document.getElementById('loginView').style.display = '';
+            document.getElementById('adminView').style.display = 'none';
+        });
+
+        // ═══════════════════════════════════════════════
+        //  TABS
+        // ═══════════════════════════════════════════════
+        document.querySelectorAll('.admin-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                const t = tab.dataset.tab;
+                document.getElementById('dashboardPanel').style.display = t === 'dashboard' ? '' : 'none';
+                document.getElementById('productsPanel').style.display = t === 'products' ? '' : 'none';
+                document.getElementById('ordersPanel').style.display = t === 'orders' ? '' : 'none';
+                document.getElementById('emailsPanel').style.display = t === 'emails' ? '' : 'none';
+                
+                if (t === 'emails') loadEmails();
+            });
+        });
+
+        // ═══════════════════════════════════════════════
+        //  DASHBOARD
+        // ═══════════════════════════════════════════════
+        async function loadDashboard() {
+            try {
+                const res = await fetch(`${API}/dashboard.php`);
+                const d = await res.json();
+
+                document.getElementById('kpiRevenue').textContent = '$' + d.revenue.toLocaleString('es-AR');
+                document.getElementById('kpiApproved').textContent = d.approved_orders;
+                document.getElementById('kpiPending').textContent = d.pending_orders;
+                document.getElementById('kpiProducts').textContent = d.active_products;
+                document.getElementById('kpiLowStock').textContent = d.low_stock_count;
+                document.getElementById('kpiTotalOrders').textContent = d.total_orders;
+
+                // Pending badge
+                const badge = document.getElementById('pendingBadge');
+                if (d.pending_orders > 0) {
+                    badge.textContent = d.pending_orders;
+                    badge.style.display = 'inline-flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+
+                // Top products
+                const topTable = document.getElementById('topProductsTable');
+                if (d.top_products.length > 0) {
+                    topTable.innerHTML = d.top_products.map((p, i) => `
+                        <tr>
+                            <td style="width:40px"><img src="${esc(p.image_url)}" onerror="this.style.display='none'"></td>
+                            <td><strong>${esc(p.name)}</strong></td>
+                            <td style="text-align:right;color:var(--accent);font-weight:600">${p.total_sold} vendidos</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    topTable.innerHTML = '<tr><td style="text-align:center;color:var(--text-muted)">Sin ventas aún</td></tr>';
+                }
+
+                // Low stock
+                const lowTable = document.getElementById('lowStockTable');
+                if (d.low_stock.length > 0) {
+                    lowTable.innerHTML = d.low_stock.map(p => `
+                        <tr>
+                            <td><strong>${esc(p.name)}</strong></td>
+                            <td style="text-align:right">
+                                <span class="mini-badge ${p.stock == 0 ? 'low' : 'ok'}">${p.stock} uds</span>
+                            </td>
+                        </tr>
+                    `).join('');
+                } else {
+                    lowTable.innerHTML = '<tr><td style="text-align:center;color:#25D366">✓ Todo en stock</td></tr>';
+                }
+
+                // Recent orders
+                const recentTable = document.getElementById('recentOrdersTable');
+                if (d.recent_orders.length > 0) {
+                    const statusLabels = { pending: '⏳ Pendiente', approved: '✅ Aprobado', in_process: '🔄 En proceso', shipped: '🚚 Enviado', delivered: '📦 Entregado', cancelled: '❌ Cancelado', rejected: '⛔ Rechazado', refunded: '💸 Reembolsado' };
+                    function timeAgo(dateStr) {
+                        const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+                        if (diff < 60) return 'hace un momento';
+                        if (diff < 3600) return `hace ${Math.floor(diff/60)} min`;
+                        if (diff < 86400) return `hace ${Math.floor(diff/3600)}h`;
+                        return `hace ${Math.floor(diff/86400)}d`;
+                    }
+                    recentTable.innerHTML = d.recent_orders.map(o => `
+                        <tr class="clickable" onclick="viewOrder(${parseInt(o.id)})" style="transition:all 0.2s">
+                            <td style="width:auto">
+                                <div style="display:flex;flex-direction:column;gap:2px">
+                                    <span style="font-family:monospace;font-size:0.75rem;color:var(--accent);font-weight:600;background:rgba(255,107,43,0.1);padding:2px 8px;border-radius:4px;display:inline-block;width:fit-content">${esc(o.order_number || '#' + o.id)}</span>
+                                    <span style="font-size:0.7rem;color:var(--text-muted)">${timeAgo(o.created_at)}</span>
+                                </div>
+                            </td>
+                            <td>
+                                <div style="font-weight:600;font-size:0.9rem">${esc(o.customer_name)}</div>
+                            </td>
+                            <td style="text-align:center"><span class="status-badge ${esc(o.status)}" style="font-size:0.7rem">${statusLabels[o.status] || o.status}</span></td>
+                            <td style="text-align:right">
+                                <div style="font-weight:700;color:var(--accent);font-size:1rem">$${o.total.toLocaleString('es-AR')}</div>
+                            </td>
+                            <td style="width:24px;text-align:right;color:var(--text-muted);font-size:0.8rem">→</td>
+                        </tr>
+                    `).join('');
+                } else {
+                    recentTable.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Sin pedidos</td></tr>';
+                }
+
+            } catch (e) {
+                console.error('Dashboard error:', e);
+            }
+        }
+
+        // ═══════════════════════════════════════════════
+        //  PRODUCTS (with search, filter, sort, pagination)
+        // ═══════════════════════════════════════════════
+        let allProducts = [];
+        let filteredProducts = [];
+        let currentPage = 1;
+        let currentSort = { key: null, dir: 'asc' };
+
+        async function loadProducts() {
+            try {
+                const res = await fetch(`${API}/products.php`);
+                const data = await res.json();
+                allProducts = data.products || [];
+                applyFilters();
+            } catch (e) {
+                document.getElementById('productsTableBody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c">Error cargando productos</td></tr>';
+            }
+        }
+
+        function applyFilters() {
+            const search = document.getElementById('productSearch').value.toLowerCase().trim();
+            const category = document.getElementById('filterCategory').value;
+            const status = document.getElementById('filterStatus').value;
+
+            filteredProducts = allProducts.filter(p => {
+                if (search && !p.name.toLowerCase().includes(search)) return false;
+                if (category && p.category !== category) return false;
+                if (status !== '' && String(p.active) !== status) return false;
+                return true;
+            });
+
+            if (currentSort.key) sortProducts();
+            currentPage = 1;
+            renderProducts();
+        }
+
+        function sortProducts() {
+            const key = currentSort.key;
+            const dir = currentSort.dir === 'asc' ? 1 : -1;
+            filteredProducts.sort((a, b) => {
+                let va = a[key], vb = b[key];
+                if (key === 'price' || key === 'stock') { va = parseFloat(va) || 0; vb = parseFloat(vb) || 0; }
+                else { va = String(va).toLowerCase(); vb = String(vb).toLowerCase(); }
+                if (va < vb) return -1 * dir;
+                if (va > vb) return 1 * dir;
+                return 0;
+            });
+        }
+
+        function renderProducts() {
+            const tbody = document.getElementById('productsTableBody');
+            const totalPages = Math.ceil(filteredProducts.length / ITEMS_PER_PAGE) || 1;
+            if (currentPage > totalPages) currentPage = totalPages;
+
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const pageItems = filteredProducts.slice(start, start + ITEMS_PER_PAGE);
+
+            document.getElementById('productResultCount').textContent =
+                `Mostrando ${pageItems.length} de ${filteredProducts.length} producto${filteredProducts.length !== 1 ? 's' : ''}`;
+
+            if (pageItems.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted)">No se encontraron productos</td></tr>';
+            } else {
+                tbody.innerHTML = pageItems.map(p => `
+                    <tr>
+                        <td><img src="${esc(p.image_url)}" alt="${esc(p.name)}" onerror="this.style.display='none'"></td>
+                        <td><strong>${esc(p.name)}</strong>${p.featured == 1 ? ' ⭐' : ''}</td>
+                        <td>${esc(p.category)}</td>
+                        <td>$${parseFloat(p.price).toLocaleString('es-AR')}</td>
+                        <td>${parseInt(p.stock) < 5 ? '<span style="color:#e74c3c;font-weight:600">' + esc(p.stock) + '</span>' : esc(p.stock)}</td>
+                        <td><span class="status-badge ${p.active == 1 ? 'approved' : 'rejected'}">${p.active == 1 ? 'Activo' : 'Inactivo'}</span></td>
+                        <td>
+                            <div class="admin-actions">
+                                <button onclick="editProduct(${parseInt(p.id)})">Editar</button>
+                                <button class="delete" onclick="deleteProduct(${parseInt(p.id)})">Eliminar</button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+
+            renderPagination(totalPages);
+        }
+
+        function renderPagination(totalPages) {
+            const container = document.getElementById('productsPagination');
+            if (totalPages <= 1) { container.innerHTML = ''; return; }
+
+            let html = `<button ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">← Anterior</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (totalPages > 7 && i > 3 && i < totalPages - 2 && Math.abs(i - currentPage) > 1) {
+                    if (i === 4) html += '<button disabled>…</button>';
+                    continue;
+                }
+                html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">Siguiente →</button>`;
+            container.innerHTML = html;
+        }
+
+        window.goToPage = function (page) {
+            currentPage = page;
+            renderProducts();
+            document.getElementById('productsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        // Search & filter listeners
+        document.getElementById('productSearch').addEventListener('input', applyFilters);
+        document.getElementById('filterCategory').addEventListener('change', applyFilters);
+        document.getElementById('filterStatus').addEventListener('change', applyFilters);
+
+        // Sortable headers
+        document.querySelectorAll('.admin-table th.sortable').forEach(th => {
+            th.addEventListener('click', () => {
+                const key = th.dataset.sort;
+                if (currentSort.key === key) {
+                    currentSort.dir = currentSort.dir === 'asc' ? 'desc' : 'asc';
+                } else {
+                    currentSort = { key, dir: 'asc' };
+                }
+                // Update header visuals
+                document.querySelectorAll('.admin-table th.sortable').forEach(h => {
+                    h.classList.remove('asc', 'desc');
+                    h.querySelector('.sort-icon').textContent = '↕';
+                });
+                th.classList.add(currentSort.dir);
+                th.querySelector('.sort-icon').textContent = currentSort.dir === 'asc' ? '↑' : '↓';
+                sortProducts();
+                currentPage = 1;
+                renderProducts();
+            });
+        });
+
+        // Product form modal
+        const formOverlay = document.getElementById('productFormOverlay');
+        
+        window.closeProductModal = function() {
+            formOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        };
+
+        formOverlay.addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeProductModal();
+        });
+
+        document.getElementById('addProductBtn').addEventListener('click', () => {
+            document.getElementById('productId').value = '';
+            document.getElementById('productForm').reset();
+            document.getElementById('pActive').checked = true;
+            document.getElementById('productFormTitle').textContent = 'Nuevo Producto';
+            resetImageUploader();
+            formOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        window.editProduct = function (id) {
+            const p = allProducts.find(pr => pr.id == id);
+            if (!p) return;
+            document.getElementById('productId').value = p.id;
+            document.getElementById('pName').value = p.name;
+            document.getElementById('pPrice').value = p.price;
+            document.getElementById('pCategory').value = p.category;
+            document.getElementById('pMaterial').value = p.material || 'PLA';
+            document.getElementById('pStock').value = p.stock;
+            document.getElementById('pBadge').value = p.badge || '';
+            document.getElementById('pDescription').value = p.description || '';
+            setImagePreview(p.image_url || '');
+            document.getElementById('pActive').checked = p.active == 1;
+            document.getElementById('pFeatured').checked = p.featured == 1;
+            document.getElementById('productFormTitle').textContent = 'Editar Producto';
+            formOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        };
+
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('productId').value;
+            const body = {
+                name: document.getElementById('pName').value,
+                price: parseFloat(document.getElementById('pPrice').value),
+                category: document.getElementById('pCategory').value,
+                material: document.getElementById('pMaterial').value,
+                stock: parseInt(document.getElementById('pStock').value),
+                badge: document.getElementById('pBadge').value || null,
+                image_url: document.getElementById('pImage').value,
+                description: document.getElementById('pDescription').value,
+                active: document.getElementById('pActive').checked ? 1 : 0,
+                featured: document.getElementById('pFeatured').checked ? 1 : 0,
+            };
+            const url = id ? `${API}/products.php?id=${id}` : `${API}/products.php`;
+            const method = id ? 'PUT' : 'POST';
+            try {
+                await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                closeProductModal();
+                loadProducts();
+                loadDashboard();
+            } catch (e) { alert('Error guardando producto'); }
+        });
+
+        // Image uploader
+        function resetImageUploader() {
+            document.getElementById('pImage').value = '';
+            document.getElementById('imagePreview').style.display = 'none';
+            document.getElementById('imagePreview').src = '';
+            document.getElementById('imageUploadPlaceholder').style.display = 'block';
+            document.getElementById('imageUploadStatus').style.display = 'none';
+            document.getElementById('pImageFile').value = '';
+        }
+
+        function setImagePreview(url) {
+            document.getElementById('pImage').value = url;
+            if (url) {
+                document.getElementById('imagePreview').src = url;
+                document.getElementById('imagePreview').style.display = 'block';
+                document.getElementById('imageUploadPlaceholder').style.display = 'none';
+            } else { resetImageUploader(); }
+        }
+
+        document.getElementById('pImageFile').addEventListener('change', async function () {
+            const file = this.files[0]; if (!file) return;
+            const status = document.getElementById('imageUploadStatus');
+            status.style.display = 'block'; status.style.color = 'var(--text-secondary)';
+            status.textContent = '⏳ Subiendo imagen...'; this.disabled = true;
+            const formData = new FormData(); formData.append('file', file);
+            try {
+                const res = await fetch('api/admin/upload.php', { method: 'POST', body: formData });
+                const data = await res.json();
+                if (data.url) { setImagePreview(data.url); status.style.color = '#27ae60'; status.textContent = '✓ Imagen subida correctamente'; }
+                else { status.style.color = '#e74c3c'; status.textContent = '✗ ' + (data.error || 'Error desconocido'); }
+            } catch (err) { status.style.color = '#e74c3c'; status.textContent = '✗ Error de red al subir la imagen'; }
+            finally { this.disabled = false; }
+        });
+
+        window.deleteProduct = async function (id) {
+            if (!confirm('¿Eliminar este producto?')) return;
+            try {
+                await fetch(`${API}/products.php?id=${id}`, { method: 'DELETE' });
+                loadProducts();
+                loadDashboard();
+            } catch (e) { alert('Error eliminando producto'); }
+        };
+
+        // ═══════════════════════════════════════════════
+        //  ORDERS
+        // ═══════════════════════════════════════════════
+        async function loadOrders(status = '') {
+            try {
+                const url = status ? `${API}/orders.php?status=${status}` : `${API}/orders.php`;
+                const res = await fetch(url);
+                const data = await res.json();
+                renderOrders(data.orders || []);
+            } catch (e) {
+                document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e74c3c">Error cargando pedidos</td></tr>';
+            }
+        }
+
+        function renderOrders(orders) {
+            const tbody = document.getElementById('ordersTableBody');
+            if (orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No hay pedidos</td></tr>';
+                return;
+            }
+            tbody.innerHTML = orders.map(o => `
+                <tr class="clickable" onclick="viewOrder(${parseInt(o.id)})">
+                    <td style="font-family:monospace;font-size:0.85rem;color:var(--accent)">${esc(o.order_number || '#' + o.id)}</td>
+                    <td>${esc(o.customer_name)}</td>
+                    <td>${esc(o.customer_email)}</td>
+                    <td>$${parseFloat(o.total).toLocaleString('es-AR')}</td>
+                    <td><span class="status-badge ${esc(o.status)}">${esc(o.status)}</span></td>
+                    <td>${new Date(o.created_at).toLocaleDateString('es-AR')}</td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById('orderStatusFilter').addEventListener('change', (e) => {
+            loadOrders(e.target.value);
+        });
+
+        // Order Detail Modal
+        window.viewOrder = async function (id) {
+            const overlay = document.getElementById('orderModalOverlay');
+            document.getElementById('orderModalTitle').textContent = `Pedido #${id}`; // updated after fetch
+            document.getElementById('orderModalContent').textContent = 'Cargando...';
+            overlay.classList.add('active');
+
+            try {
+                const res = await fetch(`${API}/orders.php?id=${id}`);
+                const o = await res.json();
+                if (o.error) throw new Error(o.error);
+
+                let itemsHtml = '';
+                if (o.items && o.items.length > 0) {
+                    itemsHtml = '<div class="order-items-list"><strong style="font-size:0.9rem;color:var(--text-muted)">Productos:</strong>' +
+                        o.items.map(item => `
+                            <div class="order-item-row">
+                                <img src="${esc(item.image_url)}" onerror="this.style.display='none'">
+                                <div style="flex:1">${esc(item.product_name)}</div>
+                                <div style="color:var(--text-muted)">x${item.quantity}</div>
+                                <div style="font-weight:600">$${parseFloat(item.unit_price).toLocaleString('es-AR')}</div>
+                            </div>
+                        `).join('') + '</div>';
+                }
+
+                const statusOptions = ['pending', 'approved', 'in_process', 'shipped', 'delivered', 'cancelled', 'rejected', 'refunded'];
+                const statusLabels = { pending: '⏳ Pendiente', approved: '✅ Aprobado', in_process: '🔄 En proceso', shipped: '🚚 Enviado', delivered: '📦 Entregado', cancelled: '❌ Cancelado', rejected: '⛔ Rechazado', refunded: '💸 Reembolsado' };
+                const statusSelect = statusOptions.map(s =>
+                    `<option value="${s}" ${o.status === s ? 'selected' : ''}>${statusLabels[s] || s}</option>`
+                ).join('');
+
+                document.getElementById('orderModalTitle').textContent = o.order_number || `Pedido #${id}`;
+
+                document.getElementById('orderModalContent').innerHTML = `
+                    <div class="order-detail-row"><span class="label">N° Orden</span><span style="font-family:monospace;font-weight:700;color:var(--accent)">${esc(o.order_number || '#' + o.id)}</span></div>
+                    <div class="order-detail-row"><span class="label">Cliente</span><span>${esc(o.customer_name)}</span></div>
+                    <div class="order-detail-row"><span class="label">Email</span><span>${esc(o.customer_email)}</span></div>
+                    <div class="order-detail-row"><span class="label">Teléfono</span><span>${esc(o.customer_phone) || '—'}</span></div>
+                    <div class="order-detail-row" style="align-items:center">
+                        <span class="label">Estado</span>
+                        <div style="display:flex;align-items:center;gap:var(--space-sm)">
+                            <select id="orderStatusSelect" onchange="updateOrderStatus(${parseInt(o.id)}, this.value)"
+                                style="padding:0.4rem 0.8rem;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--border-radius-sm);color:var(--text-primary);font-size:0.85rem;cursor:pointer">
+                                ${statusSelect}
+                            </select>
+                            <span id="orderStatusFeedback" style="font-size:0.8rem;display:none"></span>
+                        </div>
+                    </div>
+                    <div class="order-detail-row"><span class="label">Total</span><span style="font-weight:700;color:var(--accent);font-size:1.1rem">$${parseFloat(o.total).toLocaleString('es-AR')}</span></div>
+                    <div class="order-detail-row"><span class="label">Fecha</span><span>${new Date(o.created_at).toLocaleString('es-AR')}</span></div>
+                    <div class="order-detail-row"><span class="label">MercadoPago ID</span><span style="font-family:monospace;font-size:0.85rem">${esc(o.mp_payment_id) || '—'}</span></div>
+                    ${o.notes ? `<div class="order-detail-row"><span class="label">Notas</span><span>${esc(o.notes)}</span></div>` : ''}
+                    ${itemsHtml}
+                `;
+            } catch (e) {
+                document.getElementById('orderModalContent').innerHTML = '<p style="color:#e74c3c">Error cargando detalle del pedido</p>';
+            }
+        };
+
+        window.updateOrderStatus = async function (orderId, newStatus) {
+            const feedback = document.getElementById('orderStatusFeedback');
+            const select = document.getElementById('orderStatusSelect');
+            feedback.style.display = 'inline';
+            feedback.style.color = 'var(--text-muted)';
+            feedback.textContent = '⏳ Guardando...';
+            select.disabled = true;
+
+            try {
+                const res = await fetch(`${API}/orders.php?id=${orderId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    feedback.style.color = '#25D366';
+                    feedback.textContent = '✓ Actualizado';
+                    loadOrders(document.getElementById('orderStatusFilter').value);
+                    loadDashboard();
+                    setTimeout(() => { feedback.style.display = 'none'; }, 2000);
+                } else {
+                    feedback.style.color = '#e74c3c';
+                    feedback.textContent = '✗ Error';
+                }
+            } catch (e) {
+                feedback.style.color = '#e74c3c';
+                feedback.textContent = '✗ Error de red';
+            } finally {
+                select.disabled = false;
+            }
+        };
+
+        window.closeOrderModal = function () {
+            document.getElementById('orderModalOverlay').classList.remove('active');
+        };
+
+        document.getElementById('orderModalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) closeOrderModal();
+        });
+
+        // ═══════════════════════════════════════════════
+        //  EMAILS (LOGS)
+        // ═══════════════════════════════════════════════
+        let currentEmailsPage = 1;
+
+        document.getElementById('emailStatusFilter').addEventListener('change', () => {
+            currentEmailsPage = 1;
+            window.loadEmails();
+        });
+
+        window.loadEmails = async function(page = 1) {
+            currentEmailsPage = page;
+            const status = document.getElementById('emailStatusFilter').value;
+            try {
+                const res = await fetch(`${API}/emails.php?page=${page}&status=${status}`);
+                const data = await res.json();
+                
+                const tbody = document.getElementById('emailsTableBody');
+                if (!data.logs || data.logs.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:var(--space-2xl)">No hay correos registrados</td></tr>`;
+                } else {
+                    tbody.innerHTML = data.logs.map(log => `
+                        <tr>
+                            <td><strong>${esc(log.order_number || ('#' + log.order_id))}</strong></td>
+                            <td style="color:var(--text-secondary)">${esc(log.recipient_email)}</td>
+                            <td>${esc(log.subject)}</td>
+                            <td>${log.status === 'sent' ? '<span style="background:rgba(46,204,113,0.1);color:#2ecc71;padding:4px 8px;border-radius:12px;font-size:0.8rem">Enviado</span>' : '<span style="background:rgba(231,76,60,0.1);color:#e74c3c;padding:4px 8px;border-radius:12px;font-size:0.8rem">Fallido</span>'}</td>
+                            <td style="color:var(--text-muted);font-size:0.85rem">${new Date(log.created_at).toLocaleString('es-AR')}</td>
+                            <td style="text-align:right">
+                                <button class="btn btn-secondary btn-sm" onclick="viewEmail(${log.id})">Detalle</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                // Render Pagination
+                const pag = document.getElementById('emailsPagination');
+                let pHTML = '';
+                for (let i = 1; i <= data.total_pages; i++) {
+                    pHTML += `<button class="page-btn ${i === data.page ? 'active' : ''}" onclick="window.loadEmails(${i})">${i}</button>`;
+                }
+                pag.innerHTML = pHTML;
+
+            } catch (err) {
+                console.error(err);
+            }
+        };
+
+        window.viewEmail = async function(id) {
+            try {
+                const res = await fetch(`${API}/emails.php?id=${id}`);
+                const log = await res.json();
+                
+                document.getElementById('emailModalTitle').textContent = log.subject;
+                document.getElementById('emailModalMeta').innerHTML = `
+                    <strong>Destinatario:</strong> ${esc(log.recipient_email)} <br>
+                    <strong>Fecha:</strong> ${new Date(log.created_at).toLocaleString('es-AR')} <br>
+                    <strong>Estado:</strong> ${log.status === 'sent' ? '✅ Enviado' : '❌ Fallido'}<br>
+                    ${log.error_message ? `<strong style="color:#e74c3c">Error:</strong> ${esc(log.error_message)}` : ''}
+                `;
+                
+                document.getElementById('emailModalIframe').srcdoc = log.body_html || '';
+                
+                document.body.style.overflow = 'hidden';
+                document.getElementById('emailModalOverlay').classList.add('active');
+            } catch (e) {
+                alert('No se pudo cargar el detalle del correo.');
+            }
+        };
+
+        window.closeEmailModal = function() {
+            document.body.style.overflow = '';
+            document.getElementById('emailModalOverlay').classList.remove('active');
+            document.getElementById('emailModalIframe').srcdoc = '';
+        };
+
+        document.getElementById('emailModalOverlay').addEventListener('click', (e) => {
+            if (e.target === e.currentTarget) window.closeEmailModal();
+        });
+
+        // Init
+        checkAuth();
+    </script>
+</body>
+
+</html>

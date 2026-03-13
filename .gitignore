@@ -1,0 +1,28 @@
+# === Secrets & Config ===
+.env
+*.env
+
+# === Logs ===
+logs/
+
+# === Vendor (install via composer) ===
+vendor/
+
+# === OS & IDE ===
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# === Sensitive utilities ===
+sql/change_admin_password.php
+
+# === Session & temp files ===
+*.log
+admin_cookies.txt
+
+# === Credentials & Private files ===
+credenciales.md
+PREPARADO_PARA_HOSTINGER/
+*.sqlite
+*.db
