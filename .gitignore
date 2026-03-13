@@ -1,6 +1,7 @@
 # === Secrets & Config ===
 .env
 *.env
+.env.*
 
 # === Logs ===
 logs/
@@ -20,6 +21,7 @@ sql/change_admin_password.php
 # === Session & temp files ===
 *.log
 admin_cookies.txt
+admin-login.json
 
 # === Credentials & Private files ===
 credenciales.md

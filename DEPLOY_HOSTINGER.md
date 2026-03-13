@@ -7,18 +7,14 @@
 
 ---
 
-## PASO 1 — Editar `api/config.php` (en local, antes de subir)
+## PASO 1 — Preparar archivo `.env` (en local, antes de subir)
 
-Abrí el archivo `api/config.php` y reemplazá estas 4 líneas con tus datos reales:
+1. Tomá `.env.production` como plantilla.
+2. Copialo como `.env`.
+3. Reemplazá placeholders con tus credenciales reales (DB, SMTP, MercadoPago, dominio).
 
-```php
-define('DB_NAME', 'u123456789_printingbruno');  // ← el nombre que creaste en hPanel
-define('DB_USER', 'u123456789_pbadmin');         // ← usuario MySQL de hPanel
-define('DB_PASS', 'TU_PASSWORD_AQUI');           // ← tu contraseña MySQL
-define('SITE_URL', 'https://tudominio.com');     // ← tu dominio real con https://
-```
-
-> Los nombres de DB y usuario en Hostinger tienen el prefijo `u{número}_`
+> Los nombres de DB y usuario en Hostinger tienen el prefijo `u{número}_`.
+> No subas credenciales reales al repositorio.
 
 ---
 

@@ -80,8 +80,8 @@ define('ADMIN_SESSION_LIFETIME', 3600 * 8); // 8 hours
 // ===== Email SMTP Configuration (Hostinger) =====
 define('SMTP_HOST', pbEnv('SMTP_HOST', 'smtp.hostinger.com'));
 define('SMTP_PORT', (int)pbEnv('SMTP_PORT', '465'));
-define('SMTP_USER', pbEnv('SMTP_USER', 'contacto@printingbruno.com'));
-define('SMTP_PASS', pbEnv('SMTP_PASS', 'INGprg2706!'));
+define('SMTP_USER', pbEnv('SMTP_USER', ''));
+define('SMTP_PASS', pbEnv('SMTP_PASS', ''));
 define('SMTP_FROM_NAME', pbEnv('SMTP_FROM_NAME', 'PrintingBruno'));
 
 // ===== CORS Headers (for API) =====
