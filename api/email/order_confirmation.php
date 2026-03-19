@@ -7,6 +7,7 @@
  */
 
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../product_variants.php';
 require_once __DIR__ . '/../../vendor/autoload.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
@@ -41,6 +42,7 @@ function sendOrderConfirmation(int $orderId): bool {
         $customerName = $order['customer_name'];
         $customerEmail = $order['customer_email'];
         $total = number_format((float)$order['total'], 0, ',', '.');
+        $safeCustomerName = htmlspecialchars($customerName, ENT_QUOTES, 'UTF-8');
 
         // Build items HTML
         $itemsHtml = '';
@@ -48,11 +50,16 @@ function sendOrderConfirmation(int $orderId): bool {
             $price = number_format((float)$item['unit_price'], 0, ',', '.');
             $subtotal = number_format((float)$item['unit_price'] * (int)$item['quantity'], 0, ',', '.');
             $imgUrl = SITE_URL . '/' . $item['image_url'];
+            $variantLabel = trim((string)($item['variant_label'] ?? ''));
+            $variantHtml = ($variantLabel !== '' && !pbIsDefaultVariantLabel($variantLabel))
+                ? "<div style='font-size:12px;color:#8a8aab;margin-top:4px'>Variante: " . htmlspecialchars($variantLabel) . "</div>"
+                : '';
             $itemsHtml .= "
                 <tr>
                     <td style='padding:12px 8px;border-bottom:1px solid #2a2a3e'>
                         <img src='{$imgUrl}' alt='' width='44' height='44' style='border-radius:8px;object-fit:cover;vertical-align:middle;margin-right:8px'>
                         " . htmlspecialchars($item['product_name']) . "
+                        {$variantHtml}
                     </td>
                     <td style='padding:12px 8px;border-bottom:1px solid #2a2a3e;text-align:center'>{$item['quantity']}</td>
                     <td style='padding:12px 8px;border-bottom:1px solid #2a2a3e;text-align:right'>\${$price}</td>
@@ -62,7 +69,7 @@ function sendOrderConfirmation(int $orderId): bool {
 
         // WhatsApp link with order number
         $waMessage = urlencode("Hola! Mi pedido es {$orderNumber}");
-        $waLink = "https://wa.me/5491125544248?text={$waMessage}";
+        $waLink = "https://wa.me/5491137022937?text={$waMessage}";
 
         // Build full email HTML
         $html = <<<HTML
@@ -85,7 +92,7 @@ function sendOrderConfirmation(int $orderId): bool {
 
         <!-- Greeting -->
         <div style="background:#12122a;border-radius:12px;padding:28px;margin-bottom:20px">
-            <p style="color:#ffffff;font-size:1.05rem;margin:0 0 12px">Hola <strong>{$customerName}</strong>, gracias por tu compra.</p>
+            <p style="color:#ffffff;font-size:1.05rem;margin:0 0 12px">Hola <strong>{$safeCustomerName}</strong>, gracias por tu compra.</p>
             <p style="color:#c0c0d8;font-size:0.95rem;margin:0;line-height:1.6">
                 Este es tu numero de orden para realizar el seguimiento de tu compra.
             </p>
@@ -171,6 +178,13 @@ HTML;
             error_log("Failed to log email success to DB: " . $dbEx->getMessage());
         }
 
+        try {
+            $db->prepare("UPDATE orders SET email_status = 'sent', email_error = NULL, updated_at = NOW() WHERE id = ?")
+               ->execute([$orderId]);
+        } catch (\Exception $dbEx) {
+            error_log("Failed to update email status on order {$orderId}: " . $dbEx->getMessage());
+        }
+
         return true;
 
     } catch (\Exception $e) {
@@ -192,6 +206,15 @@ HTML;
             }
         } catch (\Exception $dbEx) {
             error_log("Failed to log email failure to DB: " . $dbEx->getMessage());
+        }
+
+        try {
+            if (isset($db)) {
+                $db->prepare("UPDATE orders SET email_status = 'failed', email_error = ?, updated_at = NOW() WHERE id = ?")
+                   ->execute([$e->getMessage(), $orderId]);
+            }
+        } catch (\Exception $dbEx) {
+            error_log("Failed to update failed email status on order {$orderId}: " . $dbEx->getMessage());
         }
 
         return false;

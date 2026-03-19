@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Admin | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/styles.css?v=20260319-1">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <style>
         /* ===== Admin Dashboard Styles ===== */
@@ -131,6 +131,49 @@
         .mini-badge.ok {
             background: rgba(37, 211, 102, 0.15);
             color: #25D366;
+        }
+
+        .admin-subsection {
+            display: grid;
+            gap: var(--space-lg);
+            margin-top: var(--space-2xl);
+        }
+
+        .colors-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: var(--space-xl);
+        }
+
+        .color-swatch {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.08);
+        }
+
+        .color-swatch.dual {
+            background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary) 50%, var(--color-secondary) 50%, var(--color-secondary) 100%);
+        }
+
+        .admin-form-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-lg);
+            padding: var(--space-xl);
+        }
+
+        .admin-form-card h3 {
+            margin-bottom: var(--space-md);
+            font-family: var(--font-heading);
+            font-size: 1rem;
+        }
+
+        .color-status {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: var(--space-sm);
         }
 
         /* Search & Filters bar */
@@ -278,6 +321,291 @@
             margin-bottom: var(--space-lg);
         }
 
+        .admin-guide {
+            margin-bottom: var(--space-xl);
+            border: 1px solid rgba(255, 107, 43, 0.22);
+            background: linear-gradient(180deg, rgba(255, 107, 43, 0.1), rgba(255, 107, 43, 0.03));
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+        }
+
+        .admin-guide summary {
+            list-style: none;
+            cursor: pointer;
+            padding: var(--space-lg) var(--space-xl);
+            font-family: var(--font-heading);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: var(--space-sm);
+        }
+
+        .admin-guide summary::-webkit-details-marker {
+            display: none;
+        }
+
+        .admin-guide-content {
+            padding: 0 var(--space-xl) var(--space-xl);
+            color: var(--text-secondary);
+            display: grid;
+            gap: var(--space-lg);
+        }
+
+        .admin-guide-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .admin-guide-item,
+        .admin-help-card,
+        .state-summary-card {
+            background: rgba(10, 10, 14, 0.28);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius);
+            padding: var(--space-lg);
+        }
+
+        .admin-guide-item strong,
+        .admin-help-card strong,
+        .state-summary-card strong {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .admin-guide-item p,
+        .admin-help-card p,
+        .field-help,
+        .state-summary-meta {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        .admin-help-card {
+            margin-bottom: var(--space-lg);
+        }
+
+        .admin-help-kicker {
+            display: inline-block;
+            font-size: 0.75rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--accent-light);
+            margin-bottom: var(--space-sm);
+        }
+
+        .admin-help-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-md);
+            margin-top: var(--space-md);
+        }
+
+        .admin-help-examples {
+            margin-top: var(--space-lg);
+            display: grid;
+            gap: var(--space-sm);
+        }
+
+        .admin-help-examples ul {
+            margin: 0;
+            padding-left: 1.1rem;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            line-height: 1.7;
+        }
+
+        .admin-state-summary {
+            display: grid;
+            gap: 6px;
+        }
+
+        .admin-state-summary.compact {
+            justify-items: center;
+        }
+
+        .admin-state-meta {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .state-summary-card {
+            margin-bottom: var(--space-lg);
+        }
+
+        .state-summary-row {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: var(--space-md);
+        }
+
+        .order-toolbar {
+            display: grid;
+            gap: var(--space-md);
+            margin-bottom: var(--space-xl);
+            padding: var(--space-lg);
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-lg);
+        }
+
+        .order-toolbar-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: var(--space-sm);
+            align-items: center;
+        }
+
+        .order-toolbar-row input,
+        .order-toolbar-row select {
+            min-height: 42px;
+        }
+
+        .order-search {
+            flex: 1 1 280px;
+            min-width: 240px;
+            padding: 0.7rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+        }
+
+        .order-search:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .order-toolbar-meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            gap: var(--space-sm);
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+
+        .queue-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 0.18rem 0.6rem;
+            border-radius: var(--border-radius-full);
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            background: rgba(255, 107, 43, 0.1);
+            color: var(--accent-light);
+            border: 1px solid rgba(255, 107, 43, 0.12);
+        }
+
+        .queue-chip.manual_review {
+            background: rgba(251, 191, 36, 0.12);
+            color: #fbbf24;
+        }
+
+        .queue-chip.production {
+            background: rgba(59, 130, 246, 0.12);
+            color: #8ab4ff;
+        }
+
+        .queue-chip.ready {
+            background: rgba(37, 211, 102, 0.12);
+            color: #6eff9e;
+        }
+
+        .queue-chip.delivery,
+        .queue-chip.completed {
+            background: rgba(148, 163, 184, 0.14);
+            color: #d0d7e3;
+        }
+
+        .order-client-cell {
+            display: grid;
+            gap: 3px;
+        }
+
+        .order-client-cell strong {
+            font-size: 0.92rem;
+        }
+
+        .order-client-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .order-action-cell {
+            text-align: right;
+        }
+
+        .order-quick-action {
+            min-width: 148px;
+        }
+
+        .order-form-stack {
+            display: grid;
+            gap: var(--space-md);
+            margin-top: var(--space-lg);
+        }
+
+        .order-field-block {
+            display: grid;
+            gap: 8px;
+        }
+
+        .order-field-block label {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .order-field-input,
+        .order-field-textarea {
+            width: 100%;
+            padding: 0.75rem 0.9rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            font: inherit;
+            resize: vertical;
+        }
+
+        .order-field-input:focus,
+        .order-field-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .manual-payment-card {
+            display: grid;
+            gap: var(--space-sm);
+            padding: var(--space-lg);
+            margin-top: var(--space-lg);
+            border: 1px solid rgba(255, 107, 43, 0.18);
+            border-radius: var(--border-radius);
+            background: linear-gradient(180deg, rgba(255, 107, 43, 0.08), rgba(255, 107, 43, 0.03));
+        }
+
+        .manual-payment-card strong {
+            margin: 0;
+        }
+
+        .manual-payment-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: var(--space-md);
+        }
+
         /* Product form modal */
         .product-modal-overlay {
             position: fixed; inset: 0; background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(6px);
@@ -354,6 +682,10 @@
                 grid-template-columns: 1fr;
             }
 
+            .colors-layout {
+                grid-template-columns: 1fr;
+            }
+
             .kpi-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -367,6 +699,19 @@
                 margin-left: 0;
                 text-align: center;
             }
+
+            .state-summary-row {
+                flex-direction: column;
+            }
+
+            .order-action-cell {
+                text-align: left;
+            }
+
+            .order-quick-action {
+                min-width: 100%;
+            }
+
         }
     </style>
 </head>
@@ -385,6 +730,9 @@
                 <div class="form-group"><input type="password" class="form-input" id="loginPass" placeholder="Contraseña" autocomplete="current-password" required></div>
                 <button type="submit" class="btn btn-primary btn-lg" style="width:100%" id="loginBtn">Ingresar</button>
                 <p id="loginError" style="color:#e74c3c;font-size:0.85rem;margin-top:var(--space-md);display:none"></p>
+                <p style="margin-top:var(--space-md);text-align:center">
+                    <a href="admin-reset.php" style="color:var(--text-secondary);font-size:0.85rem">Olvidé mi contraseña</a>
+                </p>
             </form>
         </div>
     </div>
@@ -407,9 +755,35 @@
             <h1 style="font-family:var(--font-heading);font-size:1.8rem;font-weight:800;margin-bottom:var(--space-xl)">
                 Panel de Administración</h1>
 
+            <details class="admin-guide" open>
+                <summary>Guía rápida del panel</summary>
+                <div class="admin-guide-content">
+                    <p>El panel separa cada decisión importante para que no se mezcle lo comercial con lo operativo. Las vistas generales muestran un resumen simple; el detalle de cada pedido te deja ver y editar cada dimensión por separado.</p>
+                    <div class="admin-guide-grid">
+                        <div class="admin-guide-item">
+                            <strong>Dashboard</strong>
+                            <p>Te muestra el estado general del negocio: ventas cobradas, cobros pendientes, stock bajo y últimos movimientos.</p>
+                        </div>
+                        <div class="admin-guide-item">
+                            <strong>Pedidos</strong>
+                            <p>Administrás el cobro y la operación. El cobro dice si está pago; la operación dice en qué etapa va el trabajo.</p>
+                        </div>
+                        <div class="admin-guide-item">
+                            <strong>Productos</strong>
+                            <p>Gestionás catálogo, imágenes y stock físico. El stock reservado se calcula aparte cuando entra un pedido.</p>
+                        </div>
+                        <div class="admin-guide-item">
+                            <strong>Correos</strong>
+                            <p>Revisás el historial de emails enviados o fallidos. Sirve para control y soporte, no para cambiar estados.</p>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
             <div class="admin-tabs">
                 <button class="admin-tab active" data-tab="dashboard">📊 Dashboard</button>
                 <button class="admin-tab" data-tab="products">📦 Productos</button>
+                <button class="admin-tab" data-tab="colors">🎨 Colores</button>
                 <button class="admin-tab" data-tab="orders">🧾 Pedidos <span class="tab-badge" id="pendingBadge" style="display:none">0</span></button>
                 <button class="admin-tab" data-tab="emails">📧 Correos</button>
             </div>
@@ -417,9 +791,9 @@
             <!-- Dashboard Tab -->
             <div class="admin-panel" id="dashboardPanel">
                 <div class="kpi-grid" id="kpiGrid">
-                    <div class="kpi-card accent"><div class="kpi-icon">💰</div><div class="kpi-value" id="kpiRevenue">—</div><div class="kpi-label">Ventas Aprobadas</div></div>
-                    <div class="kpi-card success"><div class="kpi-icon">✅</div><div class="kpi-value" id="kpiApproved">—</div><div class="kpi-label">Pedidos Aprobados</div></div>
-                    <div class="kpi-card warning"><div class="kpi-icon">⏳</div><div class="kpi-value" id="kpiPending">—</div><div class="kpi-label">Pedidos Pendientes</div></div>
+                    <div class="kpi-card accent"><div class="kpi-icon">💰</div><div class="kpi-value" id="kpiRevenue">—</div><div class="kpi-label">Ventas Cobradas</div></div>
+                    <div class="kpi-card success"><div class="kpi-icon">✅</div><div class="kpi-value" id="kpiApproved">—</div><div class="kpi-label">Cobros Confirmados</div></div>
+                    <div class="kpi-card warning"><div class="kpi-icon">⏳</div><div class="kpi-value" id="kpiPending">—</div><div class="kpi-label">Cobros Pendientes</div></div>
                     <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-value" id="kpiProducts">—</div><div class="kpi-label">Productos Activos</div></div>
                     <div class="kpi-card danger"><div class="kpi-icon">⚠️</div><div class="kpi-value" id="kpiLowStock">—</div><div class="kpi-label">Stock Bajo (&lt;5)</div></div>
                     <div class="kpi-card"><div class="kpi-icon">📋</div><div class="kpi-value" id="kpiTotalOrders">—</div><div class="kpi-label">Pedidos Totales</div></div>
@@ -443,7 +817,7 @@
                 <div class="dashboard-panel">
                     <h3>🕐 Últimos Pedidos</h3>
                     <table class="mini-table" id="recentOrdersTable">
-                        <tr><td colspan="4" style="text-align:center;color:var(--text-muted)">Cargando...</td></tr>
+                        <tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Cargando...</td></tr>
                     </table>
                 </div>
             </div>
@@ -466,6 +840,10 @@
                         <option value="personalizado">Personalizado</option>
                         <option value="mates">Mates</option>
                         <option value="filamentos">Filamentos</option>
+                        <option value="jarras">Jarras</option>
+                        <option value="insumos">Insumos</option>
+                        <option value="impresoras">Impresoras</option>
+                        <option value="llaveros">Llaveros</option>
                     </select>
                     <select id="filterStatus">
                         <option value="">Todos los estados</option>
@@ -491,12 +869,15 @@
                                         <img id="imagePreview" src="" alt="Preview" style="max-height:160px;max-width:100%;display:none;margin:0 auto var(--space-sm);border-radius:var(--border-radius);object-fit:cover">
                                         <div id="imageUploadPlaceholder">
                                             <div style="font-size:2rem;margin-bottom:var(--space-sm)">🖼️</div>
-                                            <div style="color:var(--text-secondary);font-size:0.85rem;line-height:1.4">Arrastrá o<br><strong>hacé click</strong></div>
+                                            <div style="color:var(--text-secondary);font-size:0.85rem;line-height:1.4">Arrastrá o<br><strong>hacé click</strong><br>para agregar imágenes</div>
                                         </div>
                                         <div id="imageUploadStatus" style="display:none;font-size:0.8rem;margin-top:var(--space-sm)"></div>
-                                        <input type="file" id="pImageFile" accept="image/jpeg,image/png,image/webp,image/gif" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
+                                        <input type="file" id="pImageFile" accept="image/jpeg,image/png,image/webp,image/gif" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
                                     </div>
                                     <input type="hidden" id="pImage">
+                                    <input type="hidden" id="pImages" value="[]">
+                                    <div id="imageThumbs" style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-xs)"></div>
+                                    <small style="color:var(--text-muted);font-size:0.75rem">La primera imagen queda como portada.</small>
                                     
                                     <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--border-radius);padding:var(--space-md);display:flex;flex-direction:column;gap:var(--space-md)">
                                         <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pActive" checked> Activo</label>
@@ -516,14 +897,28 @@
                                             <option value="personalizado">Personalizado</option>
                                             <option value="mates">Mates</option>
                                             <option value="filamentos">Filamentos</option>
+                                            <option value="jarras">Jarras</option>
+                                            <option value="insumos">Insumos</option>
+                                            <option value="impresoras">Impresoras</option>
+                                            <option value="llaveros">Llaveros</option>
                                         </select>
                                     </div>
                                     <div class="form-group"><label class="form-label">Material</label><input type="text" class="form-input" id="pMaterial" value="PLA"></div>
-                                    <div class="form-group"><label class="form-label">Stock</label><input type="number" class="form-input" id="pStock" value="0"></div>
+                                    <div class="form-group"><label class="form-label">Stock total</label><input type="number" class="form-input" id="pStock" value="0" readonly></div>
                                     <div class="form-group" style="grid-column:1/-1"><label class="form-label">Badge</label><input type="text" class="form-input" id="pBadge" placeholder="Ej: Nuevo, Edición Limitada"></div>
                                 </div>
                             </div>
                             <div class="form-group" style="margin-top:var(--space-md)"><label class="form-label">Descripción</label><textarea class="form-textarea" id="pDescription" rows="4"></textarea></div>
+                            <div class="form-group" style="margin-top:var(--space-xl)">
+                                <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-md);margin-bottom:var(--space-md);flex-wrap:wrap">
+                                    <div>
+                                        <label class="form-label" style="margin-bottom:0">Variantes de color</label>
+                                        <div class="field-help">Cada variante define sus colores, stock y fotos. Si tiene más de una, el cliente deberá elegir una opción en la ficha del producto.</div>
+                                    </div>
+                                    <button type="button" class="btn btn-secondary btn-sm" id="addVariantBtn">+ Agregar variante</button>
+                                </div>
+                                <div id="variantBlocks" style="display:grid;gap:var(--space-md)"></div>
+                            </div>
                             <div style="display:flex;justify-content:flex-end;gap:var(--space-md);margin-top:var(--space-xl);padding-top:var(--space-md);border-top:1px solid var(--border-subtle)">
                                 <button type="button" class="btn btn-secondary" onclick="closeProductModal()">Cancelar</button>
                                 <button type="submit" class="btn btn-primary" style="min-width:140px">Guardar Producto</button>
@@ -553,16 +948,150 @@
                 <div class="pagination" id="productsPagination"></div>
             </div>
 
+            <!-- Colors Tab -->
+            <div class="admin-panel" id="colorsPanel" style="display:none">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg);gap:var(--space-md);flex-wrap:wrap">
+                    <h2 style="font-family:var(--font-heading);font-size:1.2rem;margin:0">Colores</h2>
+                    <button class="btn btn-primary btn-sm" type="button" id="newColorBtn">+ Nuevo color</button>
+                </div>
+
+                <div class="colors-layout">
+                    <div class="dashboard-panel">
+                        <h3>Lista de colores</h3>
+                        <table class="mini-table" id="colorsTable">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Nombre</th>
+                                    <th>Slug</th>
+                                    <th>Hex</th>
+                                    <th>Estado</th>
+                                    <th>Orden</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="colorsTableBody">
+                                <tr><td colspan="7" style="text-align:center;color:var(--text-muted)">Cargando colores...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="admin-form-card">
+                        <h3 id="colorFormTitle">Nuevo color</h3>
+                        <form id="colorForm">
+                            <input type="hidden" id="colorId">
+                            <div class="form-group">
+                                <label class="form-label">Nombre *</label>
+                                <input type="text" class="form-input" id="colorName" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Slug</label>
+                                <input type="text" class="form-input" id="colorSlug" placeholder="se completa solo si lo dejás vacío">
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
+                                <div class="form-group">
+                                    <label class="form-label">Hex principal *</label>
+                                    <input type="text" class="form-input" id="colorHexPrimary" placeholder="#ff6600" required>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">Hex secundario</label>
+                                    <input type="text" class="form-input" id="colorHexSecondary" placeholder="#111111">
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
+                                <div class="form-group">
+                                    <label class="form-label">Orden</label>
+                                    <input type="number" class="form-input" id="colorSortOrder" value="0">
+                                </div>
+                                <div class="form-group" style="display:flex;align-items:flex-end">
+                                    <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="colorActive" checked> Activo</label>
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:var(--space-md);justify-content:flex-end;margin-top:var(--space-lg)">
+                                <button type="button" class="btn btn-secondary" id="resetColorFormBtn">Limpiar</button>
+                                <button type="submit" class="btn btn-primary">Guardar color</button>
+                            </div>
+                            <div class="color-status" id="colorFormStatus"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
             <!-- Orders Tab -->
             <div class="admin-panel" id="ordersPanel" style="display:none">
-                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-xl)">
+                <div class="admin-help-card">
+                    <span class="admin-help-kicker">Cómo leer pedidos</span>
+                    <strong>Las listas te muestran un estado resumido. El detalle separa cobro y operación.</strong>
+                    <p>Usá el resumen para entender rápido qué está pasando. Entrá al detalle cuando necesites cambiar el cobro o avanzar el trabajo.</p>
+                    <div class="admin-help-grid">
+                        <div>
+                            <strong>Cobro</strong>
+                            <p>Indica si el pago está pendiente, en revisión, aprobado, rechazado, cancelado o reembolsado.</p>
+                        </div>
+                        <div>
+                            <strong>Operación</strong>
+                            <p>Indica la etapa del trabajo: en cola, en producción, listo, enviado o entregado.</p>
+                        </div>
+                    </div>
+                    <div class="admin-help-examples">
+                        <span class="admin-help-kicker">Ejemplos</span>
+                        <ul>
+                            <li><strong>Pendiente de pago:</strong> todavía no hay cobro confirmado.</li>
+                            <li><strong>Pagado · En producción:</strong> ya se cobró y el pedido se está haciendo.</li>
+                            <li><strong>Cancelado:</strong> el pedido no sigue activo.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-md);margin-bottom:var(--space-lg);flex-wrap:wrap">
                     <h2 style="font-family:var(--font-heading);font-size:1.2rem">Pedidos</h2>
-                    <select class="form-select" id="orderStatusFilter" style="width:auto">
-                        <option value="">Todos</option>
-                        <option value="pending">Pendientes</option>
-                        <option value="approved">Aprobados</option>
-                        <option value="rejected">Rechazados</option>
-                    </select>
+                </div>
+                <div class="order-toolbar">
+                    <div class="order-toolbar-row">
+                        <input class="order-search" id="orderSearch" type="search" placeholder="Buscar por orden, cliente, mail o teléfono">
+                        <select class="form-select" id="orderQueueFilter" style="width:auto">
+                            <option value="">Todas las colas</option>
+                            <option value="requires_action">Requiere acción</option>
+                            <option value="manual_review">Cobros manuales</option>
+                            <option value="production">Producción</option>
+                            <option value="ready">Listos</option>
+                            <option value="delivery">En entrega</option>
+                            <option value="completed">Cerrados</option>
+                        </select>
+                        <select class="form-select" id="orderMethodFilter" style="width:auto">
+                            <option value="">Todos los medios</option>
+                            <option value="mercadopago">Mercado Pago</option>
+                            <option value="transferencia">Transferencia</option>
+                            <option value="efectivo">Efectivo</option>
+                        </select>
+                        <button class="btn btn-secondary btn-sm" type="button" id="clearOrderFiltersBtn">Limpiar filtros</button>
+                    </div>
+                    <div class="order-toolbar-row">
+                        <select class="form-select" id="orderPaymentFilter" style="width:auto">
+                            <option value="">Todos los cobros</option>
+                            <option value="pending">Pendiente</option>
+                            <option value="under_review">En revisión</option>
+                            <option value="approved">Aprobado</option>
+                            <option value="rejected">Rechazado</option>
+                            <option value="cancelled">Cancelado</option>
+                            <option value="refunded">Reembolsado</option>
+                            <option value="charged_back">Chargeback</option>
+                        </select>
+                        <select class="form-select" id="orderFulfillmentFilter" style="width:auto">
+                            <option value="">Toda la operación</option>
+                            <option value="queued">En cola</option>
+                            <option value="in_production">En producción</option>
+                            <option value="ready">Listo</option>
+                            <option value="shipped">Enviado</option>
+                            <option value="delivered">Entregado</option>
+                            <option value="cancelled">Cancelado</option>
+                        </select>
+                        <input class="form-select" id="orderDateFrom" type="date" style="width:auto">
+                        <input class="form-select" id="orderDateTo" type="date" style="width:auto">
+                    </div>
+                    <div class="order-toolbar-meta">
+                        <span id="orderResultCount">Cargando pedidos...</span>
+                        <span>Usá la cola para entrar por tarea y el detalle para confirmar cobros o avanzar producción.</span>
+                    </div>
                 </div>
                 <div style="overflow-x:auto">
                     <table class="admin-table">
@@ -570,17 +1099,19 @@
                             <tr>
                                 <th>N° Orden</th>
                                 <th>Cliente</th>
-                                <th>Email</th>
-                                <th>Total</th>
                                 <th>Estado</th>
+                                <th>Medio</th>
+                                <th>Total</th>
                                 <th>Fecha</th>
+                                <th>Acción rápida</th>
                             </tr>
                         </thead>
                         <tbody id="ordersTableBody">
-                            <tr><td colspan="6" style="text-align:center;padding:var(--space-2xl);color:var(--text-muted)">Cargando pedidos...</td></tr>
+                            <tr><td colspan="7" style="text-align:center;padding:var(--space-2xl);color:var(--text-muted)">Cargando pedidos...</td></tr>
                         </tbody>
                     </table>
                 </div>
+                <div class="pagination" id="ordersPagination"></div>
             </div>
 
             <!-- Emails Tab -->
@@ -652,14 +1183,180 @@
             return div.innerHTML;
         }
 
+        function escAttr(str) {
+            return esc(str).replace(/"/g, '&quot;');
+        }
+
+        const paymentStatusLabels = {
+            pending: 'Pendiente',
+            under_review: 'En revisión',
+            approved: 'Aprobado',
+            rejected: 'Rechazado',
+            cancelled: 'Cancelado',
+            refunded: 'Reembolsado',
+            charged_back: 'Chargeback',
+        };
+
+        const fulfillmentStatusLabels = {
+            queued: 'En cola',
+            in_production: 'En producción',
+            ready: 'Listo',
+            shipped: 'Enviado',
+            delivered: 'Entregado',
+            cancelled: 'Cancelado',
+        };
+
+        const paymentMethodLabels = {
+            mercadopago: 'Mercado Pago',
+            transferencia: 'Transferencia',
+            efectivo: 'Efectivo',
+        };
+
+        function paymentMethodLabel(method) {
+            return paymentMethodLabels[method] || method || '—';
+        }
+
+        function getOrderStateSummary(order) {
+            const paymentStatus = order.payment_status || 'pending';
+            const fulfillmentStatus = order.fulfillment_status || 'queued';
+
+            if (paymentStatus === 'cancelled') {
+                return {
+                    label: 'Cancelado',
+                    className: 'cancelled',
+                    detail: 'El pedido fue cancelado y ya no sigue activo.',
+                };
+            }
+
+            if (paymentStatus === 'rejected') {
+                return {
+                    label: 'Pago rechazado',
+                    className: 'rejected',
+                    detail: 'El cobro no fue aceptado. Revisá si hay que contactar al cliente o cerrar el pedido.',
+                };
+            }
+
+            if (paymentStatus === 'refunded') {
+                return {
+                    label: 'Reembolsado',
+                    className: 'refunded',
+                    detail: 'El cobro fue devuelto al cliente.',
+                };
+            }
+
+            if (paymentStatus === 'charged_back') {
+                return {
+                    label: 'Chargeback',
+                    className: 'charged_back',
+                    detail: 'El cobro fue revertido o desconocido por el cliente.',
+                };
+            }
+
+            if (paymentStatus === 'under_review') {
+                return {
+                    label: 'Cobro en revisión',
+                    className: 'in_process',
+                    detail: 'El pago todavía no está confirmado. No conviene avanzar la operación final hasta validar el cobro.',
+                };
+            }
+
+            if (paymentStatus === 'pending') {
+                const label = (order.payment_method === 'transferencia' || order.payment_method === 'efectivo')
+                    ? 'Esperando confirmación de cobro'
+                    : 'Pendiente de pago';
+
+                return {
+                    label,
+                    className: 'pending',
+                    detail: 'Todavía no hay cobro confirmado.',
+                };
+            }
+
+            const approvedStates = {
+                queued: {
+                    label: 'Pagado · En cola',
+                    className: 'approved',
+                    detail: 'El cobro está confirmado y el pedido todavía está esperando turno de trabajo.',
+                },
+                in_production: {
+                    label: 'Pagado · En producción',
+                    className: 'in_process',
+                    detail: 'El cobro está confirmado y el pedido ya se está produciendo.',
+                },
+                ready: {
+                    label: 'Pagado · Listo',
+                    className: 'approved',
+                    detail: 'El pedido está terminado y listo para retiro o envío.',
+                },
+                shipped: {
+                    label: 'Pagado · Enviado',
+                    className: 'shipped',
+                    detail: 'El pedido ya salió hacia el cliente.',
+                },
+                delivered: {
+                    label: 'Pagado · Entregado',
+                    className: 'delivered',
+                    detail: 'El pedido ya fue entregado.',
+                },
+                cancelled: {
+                    label: 'Pagado · Cancelado',
+                    className: 'cancelled',
+                    detail: 'El pedido se canceló después de haber sido cobrado.',
+                },
+            };
+
+            return approvedStates[fulfillmentStatus] || {
+                label: 'Pagado',
+                className: 'approved',
+                detail: 'El cobro ya está confirmado.',
+            };
+        }
+
+        function renderOrderStateSummary(order, options = {}) {
+            const { compact = false, showMeta = false } = options;
+            const summary = getOrderStateSummary(order);
+            const meta = `Cobro: ${paymentStatusLabels[order.payment_status] || order.payment_status} · Operación: ${fulfillmentStatusLabels[order.fulfillment_status] || order.fulfillment_status}`;
+
+            return `
+                <div class="admin-state-summary ${compact ? 'compact' : ''}">
+                    <span class="status-badge ${esc(summary.className)}">${esc(summary.label)}</span>
+                    ${showMeta ? `<div class="admin-state-meta">${esc(meta)}</div>` : ''}
+                </div>
+            `;
+        }
+
         // ═══════════════════════════════════════════════
         //  AUTH
         // ═══════════════════════════════════════════════
+        let csrfToken = '';
+        const DEFAULT_COLOR_OPTIONS = ['Rojo', 'Blanco', 'Negro', 'Gris', 'Azul', 'Verde', 'Dorado', 'Celeste', 'Rosa'];
+        let allColors = [];
+        function authHeaders(extra = {}) {
+            return csrfToken ? { ...extra, 'X-CSRF-Token': csrfToken } : extra;
+        }
+
+        function isUnauthorizedResponse(res, data) {
+            return res.status === 401 || (data && data.error === 'Unauthorized');
+        }
+
+        function handleAdminUnauthorized(message = 'La sesión de admin venció. Volvé a iniciar sesión.') {
+            csrfToken = '';
+            document.getElementById('adminView').style.display = 'none';
+            document.getElementById('loginView').style.display = '';
+            const loginError = document.getElementById('loginError');
+            loginError.textContent = message;
+            loginError.style.display = 'block';
+        }
+
         async function checkAuth() {
             try {
-                const res = await fetch(`${API}/login.php`);
+                const res = await fetch(`${API}/login.php`, { credentials: 'same-origin' });
                 const data = await res.json();
-                if (data.authenticated) { showAdmin(data.user); return true; }
+                if (data.authenticated) {
+                    csrfToken = data.csrf_token || '';
+                    showAdmin(data.user);
+                    return true;
+                }
             } catch (e) { }
             return false;
         }
@@ -668,6 +1365,7 @@
             document.getElementById('loginView').style.display = 'none';
             document.getElementById('adminView').style.display = 'block';
             document.getElementById('adminUsername').textContent = username;
+            loadColors();
             loadDashboard();
             loadProducts();
             loadOrders();
@@ -679,18 +1377,24 @@
             btn.textContent = 'Ingresando...'; btn.disabled = true;
             try {
                 const res = await fetch(`${API}/login.php`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ username: document.getElementById('loginUser').value, password: document.getElementById('loginPass').value })
                 });
                 const data = await res.json();
-                if (data.success) showAdmin(data.user);
+                if (res.ok && data.success) {
+                    const confirmed = await checkAuth();
+                    if (!confirmed) {
+                        throw new Error('No se pudo confirmar la sesión. Intentá nuevamente.');
+                    }
+                }
                 else { document.getElementById('loginError').textContent = data.error || 'Credenciales inválidas'; document.getElementById('loginError').style.display = 'block'; }
-            } catch (err) { document.getElementById('loginError').textContent = 'Error de conexión'; document.getElementById('loginError').style.display = 'block'; }
+            } catch (err) { document.getElementById('loginError').textContent = err.message || 'Error de conexión'; document.getElementById('loginError').style.display = 'block'; }
             btn.textContent = 'Ingresar'; btn.disabled = false;
         });
 
         document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await fetch(`${API}/login.php`, { method: 'DELETE' });
+            await fetch(`${API}/login.php`, { method: 'DELETE', credentials: 'same-origin', headers: authHeaders() });
+            csrfToken = '';
             document.getElementById('loginView').style.display = '';
             document.getElementById('adminView').style.display = 'none';
         });
@@ -705,9 +1409,10 @@
                 const t = tab.dataset.tab;
                 document.getElementById('dashboardPanel').style.display = t === 'dashboard' ? '' : 'none';
                 document.getElementById('productsPanel').style.display = t === 'products' ? '' : 'none';
+                document.getElementById('colorsPanel').style.display = t === 'colors' ? '' : 'none';
                 document.getElementById('ordersPanel').style.display = t === 'orders' ? '' : 'none';
                 document.getElementById('emailsPanel').style.display = t === 'emails' ? '' : 'none';
-                
+                if (t === 'colors') loadColors();
                 if (t === 'emails') loadEmails();
             });
         });
@@ -717,8 +1422,15 @@
         // ═══════════════════════════════════════════════
         async function loadDashboard() {
             try {
-                const res = await fetch(`${API}/dashboard.php`);
+                const res = await fetch(`${API}/dashboard.php`, { credentials: 'same-origin' });
                 const d = await res.json();
+                if (isUnauthorizedResponse(res, d)) {
+                    handleAdminUnauthorized();
+                    return;
+                }
+                if (!res.ok) {
+                    throw new Error(d.error || 'Error cargando dashboard');
+                }
 
                 document.getElementById('kpiRevenue').textContent = '$' + d.revenue.toLocaleString('es-AR');
                 document.getElementById('kpiApproved').textContent = d.approved_orders;
@@ -768,7 +1480,6 @@
                 // Recent orders
                 const recentTable = document.getElementById('recentOrdersTable');
                 if (d.recent_orders.length > 0) {
-                    const statusLabels = { pending: '⏳ Pendiente', approved: '✅ Aprobado', in_process: '🔄 En proceso', shipped: '🚚 Enviado', delivered: '📦 Entregado', cancelled: '❌ Cancelado', rejected: '⛔ Rechazado', refunded: '💸 Reembolsado' };
                     function timeAgo(dateStr) {
                         const diff = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
                         if (diff < 60) return 'hace un momento';
@@ -787,7 +1498,9 @@
                             <td>
                                 <div style="font-weight:600;font-size:0.9rem">${esc(o.customer_name)}</div>
                             </td>
-                            <td style="text-align:center"><span class="status-badge ${esc(o.status)}" style="font-size:0.7rem">${statusLabels[o.status] || o.status}</span></td>
+                            <td style="text-align:center">
+                                ${renderOrderStateSummary(o, { compact: true })}
+                            </td>
                             <td style="text-align:right">
                                 <div style="font-weight:700;color:var(--accent);font-size:1rem">$${o.total.toLocaleString('es-AR')}</div>
                             </td>
@@ -813,8 +1526,15 @@
 
         async function loadProducts() {
             try {
-                const res = await fetch(`${API}/products.php`);
+                const res = await fetch(`${API}/products.php`, { credentials: 'same-origin' });
                 const data = await res.json();
+                if (isUnauthorizedResponse(res, data)) {
+                    handleAdminUnauthorized();
+                    return;
+                }
+                if (!res.ok) {
+                    throw new Error(data.error || 'Error cargando productos');
+                }
                 allProducts = data.products || [];
                 applyFilters();
             } catch (e) {
@@ -869,10 +1589,16 @@
                 tbody.innerHTML = pageItems.map(p => `
                     <tr>
                         <td><img src="${esc(p.image_url)}" alt="${esc(p.name)}" onerror="this.style.display='none'"></td>
-                        <td><strong>${esc(p.name)}</strong>${p.featured == 1 ? ' ⭐' : ''}</td>
+                        <td>
+                            <strong>${esc(p.name)}</strong>${p.featured == 1 ? ' ⭐' : ''}
+                            <div style="font-size:0.72rem;color:var(--text-muted)">${parseInt(p.variant_count || 0)} variante${parseInt(p.variant_count || 0) === 1 ? '' : 's'}</div>
+                        </td>
                         <td>${esc(p.category)}</td>
                         <td>$${parseFloat(p.price).toLocaleString('es-AR')}</td>
-                        <td>${parseInt(p.stock) < 5 ? '<span style="color:#e74c3c;font-weight:600">' + esc(p.stock) + '</span>' : esc(p.stock)}</td>
+                        <td>
+                            ${parseInt(p.available_stock) < 5 ? '<span style="color:#e74c3c;font-weight:600">' + esc(p.available_stock) + '</span>' : esc(p.available_stock)}
+                            <div style="font-size:0.72rem;color:var(--text-muted)">fisico: ${esc(p.stock)} | reservado: ${esc(p.reserved_stock || 0)}</div>
+                        </td>
                         <td><span class="status-badge ${p.active == 1 ? 'approved' : 'rejected'}">${p.active == 1 ? 'Activo' : 'Inactivo'}</span></td>
                         <td>
                             <div class="admin-actions">
@@ -938,6 +1664,7 @@
 
         // Product form modal
         const formOverlay = document.getElementById('productFormOverlay');
+        let variantBlockCounter = 0;
         
         window.closeProductModal = function() {
             formOverlay.classList.remove('active');
@@ -952,8 +1679,10 @@
             document.getElementById('productId').value = '';
             document.getElementById('productForm').reset();
             document.getElementById('pActive').checked = true;
+            document.getElementById('pStock').value = 0;
             document.getElementById('productFormTitle').textContent = 'Nuevo Producto';
             resetImageUploader();
+            resetVariantBlocks();
             formOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         });
@@ -966,10 +1695,18 @@
             document.getElementById('pPrice').value = p.price;
             document.getElementById('pCategory').value = p.category;
             document.getElementById('pMaterial').value = p.material || 'PLA';
-            document.getElementById('pStock').value = p.stock;
             document.getElementById('pBadge').value = p.badge || '';
             document.getElementById('pDescription').value = p.description || '';
-            setImagePreview(p.image_url || '');
+            if (Array.isArray(p.image_urls) && p.image_urls.length > 0) {
+                setImagePreviews(p.image_urls);
+            } else {
+                setImagePreview(p.image_url || '');
+            }
+            resetVariantBlocks(Array.isArray(p.variants) && p.variants.length > 0 ? p.variants : [{
+                stock: p.stock || 0,
+                image_urls: Array.isArray(p.image_urls) ? p.image_urls : (p.image_url ? [p.image_url] : []),
+                active: 1
+            }]);
             document.getElementById('pActive').checked = p.active == 1;
             document.getElementById('pFeatured').checked = p.featured == 1;
             document.getElementById('productFormTitle').textContent = 'Editar Producto';
@@ -980,22 +1717,26 @@
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const id = document.getElementById('productId').value;
+            const imageUrls = getImageUrlsFromHidden();
+            const variants = collectVariantBlocks();
             const body = {
                 name: document.getElementById('pName').value,
                 price: parseFloat(document.getElementById('pPrice').value),
                 category: document.getElementById('pCategory').value,
                 material: document.getElementById('pMaterial').value,
-                stock: parseInt(document.getElementById('pStock').value),
+                stock: calculateVariantStockTotal(),
                 badge: document.getElementById('pBadge').value || null,
-                image_url: document.getElementById('pImage').value,
+                image_url: imageUrls[0] || '',
+                image_urls: imageUrls,
                 description: document.getElementById('pDescription').value,
                 active: document.getElementById('pActive').checked ? 1 : 0,
                 featured: document.getElementById('pFeatured').checked ? 1 : 0,
+                variants,
             };
             const url = id ? `${API}/products.php?id=${id}` : `${API}/products.php`;
             const method = id ? 'PUT' : 'POST';
             try {
-                await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+                await fetch(url, { method, headers: authHeaders({ 'Content-Type': 'application/json' }), body: JSON.stringify(body) });
                 closeProductModal();
                 loadProducts();
                 loadDashboard();
@@ -1003,43 +1744,671 @@
         });
 
         // Image uploader
+        function getImageUrlsFromHidden() {
+            try {
+                const parsed = JSON.parse(document.getElementById('pImages').value || '[]');
+                if (!Array.isArray(parsed)) return [];
+                return parsed.filter(Boolean).map(v => String(v).trim()).filter(Boolean);
+            } catch (_) {
+                return [];
+            }
+        }
+
+        function setImageUrls(urls) {
+            const normalized = Array.from(new Set((urls || []).filter(Boolean).map(v => String(v).trim()).filter(Boolean))).slice(0, 10);
+            document.getElementById('pImages').value = JSON.stringify(normalized);
+            document.getElementById('pImage').value = normalized[0] || '';
+
+            const preview = document.getElementById('imagePreview');
+            const placeholder = document.getElementById('imageUploadPlaceholder');
+            if (normalized.length > 0) {
+                preview.src = normalized[0];
+                preview.style.display = 'block';
+                placeholder.style.display = 'none';
+            } else {
+                preview.src = '';
+                preview.style.display = 'none';
+                placeholder.style.display = 'block';
+            }
+
+            renderImageThumbs(normalized);
+        }
+
+        function renderImageThumbs(urls) {
+            const thumbs = document.getElementById('imageThumbs');
+            if (!urls || urls.length === 0) {
+                thumbs.innerHTML = '';
+                return;
+            }
+
+            thumbs.innerHTML = urls.map((url, idx) => `
+                <div style="position:relative;border:1px solid var(--border-subtle);border-radius:var(--border-radius-sm);overflow:hidden;background:var(--bg-card)">
+                    <img src="${esc(url)}" alt="Imagen ${idx + 1}" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:pointer" onclick="setPrimaryImage(${idx})" title="Usar como portada">
+                    ${idx === 0 ? '<span style="position:absolute;top:4px;left:4px;background:var(--accent);color:#fff;font-size:0.62rem;padding:2px 5px;border-radius:999px;font-weight:700">Portada</span>' : ''}
+                    <button type="button" onclick="removeImageAt(${idx})" style="position:absolute;top:4px;right:4px;width:18px;height:18px;border:none;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;line-height:18px;cursor:pointer">×</button>
+                </div>
+            `).join('');
+        }
+
+        window.setPrimaryImage = function (index) {
+            const urls = getImageUrlsFromHidden();
+            if (index < 0 || index >= urls.length) return;
+            const [selected] = urls.splice(index, 1);
+            urls.unshift(selected);
+            setImageUrls(urls);
+        };
+
+        window.removeImageAt = function (index) {
+            const urls = getImageUrlsFromHidden();
+            if (index < 0 || index >= urls.length) return;
+            urls.splice(index, 1);
+            setImageUrls(urls);
+        };
+
         function resetImageUploader() {
-            document.getElementById('pImage').value = '';
-            document.getElementById('imagePreview').style.display = 'none';
-            document.getElementById('imagePreview').src = '';
-            document.getElementById('imageUploadPlaceholder').style.display = 'block';
+            setImageUrls([]);
             document.getElementById('imageUploadStatus').style.display = 'none';
             document.getElementById('pImageFile').value = '';
         }
 
         function setImagePreview(url) {
-            document.getElementById('pImage').value = url;
-            if (url) {
-                document.getElementById('imagePreview').src = url;
-                document.getElementById('imagePreview').style.display = 'block';
-                document.getElementById('imageUploadPlaceholder').style.display = 'none';
-            } else { resetImageUploader(); }
+            setImageUrls(url ? [url] : []);
+        }
+
+        function setImagePreviews(urls) {
+            setImageUrls(urls || []);
+        }
+
+        function nextVariantBlockKey() {
+            variantBlockCounter += 1;
+            return `variant-${Date.now()}-${variantBlockCounter}`;
+        }
+
+        function slugifyColor(value) {
+            return String(value || '')
+                .trim()
+                .toLowerCase()
+                .normalize('NFD')
+                .replace(/[\u0300-\u036f]/g, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+
+        function normalizeHexColor(value) {
+            const normalized = String(value || '').trim();
+            if (!normalized) return '';
+            const withHash = normalized.startsWith('#') ? normalized : `#${normalized}`;
+            return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(withHash) ? withHash.toLowerCase() : '';
+        }
+
+        function guessColorHex(colorName) {
+            const colors = {
+                rojo: '#d83b3b',
+                blanco: '#f4f4f1',
+                negro: '#1a1a1a',
+                gris: '#8c8f96',
+                azul: '#2f63d8',
+                verde: '#2f9d63',
+                dorado: '#c9a227',
+                celeste: '#6bbef0',
+                rosa: '#ef7ca8',
+            };
+            return colors[String(colorName || '').trim().toLowerCase()] || '#ffffff';
+        }
+
+        function getColorRecords() {
+            if (Array.isArray(allColors) && allColors.length > 0) {
+                return allColors.slice().sort((a, b) => {
+                    const sortA = Number(a.sort_order ?? 0);
+                    const sortB = Number(b.sort_order ?? 0);
+                    if (sortA !== sortB) return sortA - sortB;
+                    return String(a.name || '').localeCompare(String(b.name || ''), 'es');
+                });
+            }
+
+            return DEFAULT_COLOR_OPTIONS.map((name, index) => ({
+                id: name,
+                name,
+                slug: slugifyColor(name),
+                hex_primary: guessColorHex(name),
+                hex_secondary: '',
+                active: 1,
+                sort_order: index,
+            }));
+        }
+
+        function getColorRecordByValue(value) {
+            const normalized = String(value || '').trim();
+            if (!normalized) return null;
+            const lower = normalized.toLowerCase();
+            return getColorRecords().find(color => {
+                const colorId = String(color.id ?? '').trim();
+                const colorSlug = String(color.slug ?? '').trim().toLowerCase();
+                const colorName = String(color.name ?? '').trim().toLowerCase();
+                return colorId === normalized || colorSlug === lower || colorName === lower;
+            }) || null;
+        }
+
+        function getColorSelectValue(value) {
+            const color = getColorRecordByValue(value);
+            return color ? String(color.id ?? color.slug ?? color.name ?? '') : String(value || '');
+        }
+
+        function buildColorOptions(selectedValue, includeEmpty = false) {
+            const options = [];
+            const selectedRecord = getColorRecordByValue(selectedValue);
+            const selectedKey = selectedRecord ? String(selectedRecord.id ?? selectedRecord.slug ?? selectedRecord.name ?? '') : String(selectedValue || '');
+            if (includeEmpty) {
+                options.push('<option value="">Sin definir</option>');
+            }
+            getColorRecords().forEach(color => {
+                const optionValue = String(color.id ?? color.slug ?? color.name ?? '');
+                const label = `${color.name}${color.hex_primary ? ` (${color.hex_primary})` : ''}`;
+                const isSelected = selectedKey && (selectedKey === optionValue || selectedKey === String(color.slug ?? '').trim() || selectedKey.toLowerCase() === String(color.name ?? '').trim().toLowerCase());
+                options.push(`<option value="${escAttr(optionValue)}" ${isSelected ? 'selected' : ''}>${esc(label)}</option>`);
+            });
+            return options.join('');
+        }
+
+        function refreshVariantColorSelects() {
+            document.querySelectorAll('#variantBlocks .variant-block').forEach(block => {
+                const primary = block.querySelector('.variant-primary');
+                const secondary = block.querySelector('.variant-secondary');
+                if (!primary || !secondary) return;
+                const primaryValue = getColorSelectValue(primary.value);
+                const secondaryValue = getColorSelectValue(secondary.value);
+                primary.innerHTML = buildColorOptions(primaryValue, true);
+                secondary.innerHTML = buildColorOptions(secondaryValue, true);
+            });
+        }
+
+        function resolveColorSelection(selectEl) {
+            if (!selectEl) {
+                return {
+                    id: null,
+                    name: '',
+                    slug: '',
+                    hex_primary: '',
+                    hex_secondary: '',
+                };
+            }
+
+            const record = getColorRecordByValue(selectEl.value);
+            if (record) {
+                return {
+                    id: record.id ?? null,
+                    name: record.name || '',
+                    slug: record.slug || '',
+                    hex_primary: record.hex_primary || '',
+                    hex_secondary: record.hex_secondary || '',
+                };
+            }
+
+            return {
+                id: null,
+                name: String(selectEl.options?.[selectEl.selectedIndex]?.text || selectEl.value || '').replace(/\s*\(#.*\)$/, '').trim(),
+                slug: slugifyColor(selectEl.value),
+                hex_primary: '',
+                hex_secondary: '',
+            };
+        }
+
+        async function loadColors() {
+            const tbody = document.getElementById('colorsTableBody');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted)">Cargando colores...</td></tr>';
+            }
+
+            try {
+                const res = await fetch(`${API}/colors.php`, { credentials: 'same-origin' });
+                const data = await res.json();
+                if (isUnauthorizedResponse(res, data)) {
+                    handleAdminUnauthorized();
+                    return;
+                }
+                if (!res.ok) {
+                    throw new Error(data.error || 'Error cargando colores');
+                }
+
+                allColors = Array.isArray(data.colors) ? data.colors : [];
+                renderColors();
+                refreshVariantColorSelects();
+            } catch (e) {
+                console.error('Colors error:', e);
+                if (tbody) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c">Error cargando colores</td></tr>';
+                }
+            }
+        }
+
+        function resetColorForm(color = null) {
+            document.getElementById('colorId').value = color?.id ?? '';
+            document.getElementById('colorName').value = color?.name ?? '';
+            document.getElementById('colorSlug').value = color?.slug ?? '';
+            document.getElementById('colorHexPrimary').value = color?.hex_primary ?? '';
+            document.getElementById('colorHexSecondary').value = color?.hex_secondary ?? '';
+            document.getElementById('colorSortOrder').value = color?.sort_order ?? 0;
+            document.getElementById('colorActive').checked = color ? Number(color.active ?? 1) === 1 : true;
+            document.getElementById('colorFormTitle').textContent = color ? 'Editar color' : 'Nuevo color';
+            document.getElementById('colorFormStatus').textContent = '';
+        }
+
+        function renderColors() {
+            const tbody = document.getElementById('colorsTableBody');
+            if (!tbody) return;
+
+            if (!Array.isArray(allColors) || allColors.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted)">No hay colores cargados</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = getColorRecords().map(color => {
+                const primary = normalizeHexColor(color.hex_primary) || '#999999';
+                const secondary = normalizeHexColor(color.hex_secondary);
+                const swatchStyle = secondary
+                    ? `--color-primary:${primary};--color-secondary:${secondary}`
+                    : `background:${primary}`;
+                return `
+                    <tr>
+                        <td><div class="color-swatch${secondary ? ' dual' : ''}" style="${swatchStyle}"></div></td>
+                        <td><strong>${esc(color.name)}</strong></td>
+                        <td><code style="font-size:0.76rem">${esc(color.slug || '')}</code></td>
+                        <td style="font-size:0.8rem">${esc(primary)}${secondary ? `<br><span style="color:var(--text-muted)">${esc(secondary)}</span>` : ''}</td>
+                        <td><span class="status-badge ${Number(color.active ?? 1) === 1 ? 'approved' : 'rejected'}">${Number(color.active ?? 1) === 1 ? 'Activo' : 'Inactivo'}</span></td>
+                        <td>${esc(color.sort_order ?? 0)}</td>
+                        <td>
+                            <div class="admin-actions">
+                                <button type="button" onclick='editColor(${JSON.stringify(String(color.id ?? ''))})'>Editar</button>
+                                <button type="button" class="delete" onclick='deleteColor(${JSON.stringify(String(color.id ?? ''))})'>Eliminar</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.editColor = function (id) {
+            const color = getColorRecords().find(item => String(item.id ?? '') === String(id)) || null;
+            if (!color) return;
+            resetColorForm(color);
+        };
+
+        window.deleteColor = async function (id) {
+            if (!id || !confirm('¿Eliminar este color?')) return;
+            try {
+                const res = await fetch(`${API}/colors.php?id=${encodeURIComponent(id)}`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin',
+                    headers: authHeaders(),
+                });
+                const data = await res.json();
+                if (isUnauthorizedResponse(res, data)) {
+                    handleAdminUnauthorized();
+                    return;
+                }
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || 'Error eliminando color');
+                }
+                await loadColors();
+                refreshVariantColorSelects();
+            } catch (e) {
+                alert('Error eliminando color');
+            }
+        };
+
+        document.getElementById('newColorBtn').addEventListener('click', () => resetColorForm());
+        document.getElementById('resetColorFormBtn').addEventListener('click', () => resetColorForm());
+        document.getElementById('colorForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('colorId').value.trim();
+            const payload = {
+                name: document.getElementById('colorName').value.trim(),
+                slug: document.getElementById('colorSlug').value.trim() || undefined,
+                hex_primary: normalizeHexColor(document.getElementById('colorHexPrimary').value),
+                hex_secondary: normalizeHexColor(document.getElementById('colorHexSecondary').value) || undefined,
+                active: document.getElementById('colorActive').checked ? 1 : 0,
+                sort_order: parseInt(document.getElementById('colorSortOrder').value || '0', 10) || 0,
+            };
+
+            if (!payload.slug) {
+                delete payload.slug;
+            }
+            if (!payload.hex_secondary) {
+                delete payload.hex_secondary;
+            }
+            if (!payload.name || !payload.hex_primary) {
+                document.getElementById('colorFormStatus').textContent = 'Completá nombre y hex principal.';
+                return;
+            }
+
+            const status = document.getElementById('colorFormStatus');
+            status.textContent = 'Guardando...';
+            try {
+                const res = await fetch(id ? `${API}/colors.php?id=${encodeURIComponent(id)}` : `${API}/colors.php`, {
+                    method: id ? 'PUT' : 'POST',
+                    credentials: 'same-origin',
+                    headers: authHeaders({ 'Content-Type': 'application/json' }),
+                    body: JSON.stringify(payload),
+                });
+                const data = await res.json();
+                if (isUnauthorizedResponse(res, data)) {
+                    handleAdminUnauthorized();
+                    return;
+                }
+                if (!res.ok || !data.success) {
+                    throw new Error(data.error || 'Error guardando color');
+                }
+
+                status.textContent = 'Color guardado.';
+                await loadColors();
+                resetColorForm();
+            } catch (err) {
+                status.textContent = err.message || 'Error guardando color';
+            }
+        });
+
+        function computeVariantLabel(primaryColor, secondaryColor, fallback = '') {
+            const primary = String(primaryColor || '').trim();
+            const secondary = String(secondaryColor || '').trim();
+            if (primary && secondary) return `${primary} + ${secondary}`;
+            if (primary) return primary;
+            if (secondary) return secondary;
+            return String(fallback || 'Base').trim() || 'Base';
+        }
+
+        function parseVariantImages(block) {
+            const input = block.querySelector('.variant-images');
+            if (!input) return [];
+            try {
+                const parsed = JSON.parse(input.value || '[]');
+                if (!Array.isArray(parsed)) return [];
+                return parsed.filter(Boolean).map(v => String(v).trim()).filter(Boolean);
+            } catch (_) {
+                return [];
+            }
+        }
+
+        function setVariantImages(block, urls) {
+            const normalized = Array.from(new Set((urls || []).filter(Boolean).map(v => String(v).trim()).filter(Boolean))).slice(0, 10);
+            const hidden = block.querySelector('.variant-images');
+            if (hidden) hidden.value = JSON.stringify(normalized);
+            renderVariantThumbs(block, normalized);
+        }
+
+        function renderVariantThumbs(block, urls = parseVariantImages(block)) {
+            const thumbs = block.querySelector('.variant-thumbs');
+            if (!thumbs) return;
+            if (!urls || urls.length === 0) {
+                thumbs.innerHTML = '';
+                return;
+            }
+
+            thumbs.innerHTML = urls.map((url, idx) => `
+                <div style="position:relative;border:1px solid var(--border-subtle);border-radius:var(--border-radius-sm);overflow:hidden;background:var(--bg-card)">
+                    <img src="${escAttr(url)}" alt="Imagen variante ${idx + 1}" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block">
+                    ${idx === 0 ? '<span style="position:absolute;top:4px;left:4px;background:var(--accent);color:#fff;font-size:0.62rem;padding:2px 5px;border-radius:999px;font-weight:700">Portada</span>' : ''}
+                    <div style="position:absolute;right:4px;top:4px;display:flex;gap:4px">
+                        ${idx > 0 ? `<button type="button" class="variant-thumb-primary" data-index="${idx}" style="width:20px;height:20px;border:none;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;font-size:10px;line-height:20px;cursor:pointer" title="Usar como portada">↑</button>` : ''}
+                        <button type="button" class="variant-thumb-remove" data-index="${idx}" style="width:20px;height:20px;border:none;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;line-height:20px;cursor:pointer" title="Eliminar imagen">×</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateVariantHeader(block) {
+            const primarySelect = block.querySelector('.variant-primary');
+            const secondarySelect = block.querySelector('.variant-secondary');
+            const primary = resolveColorSelection(primarySelect).name || primarySelect?.options?.[primarySelect.selectedIndex]?.text || '';
+            const secondary = resolveColorSelection(secondarySelect).name || secondarySelect?.options?.[secondarySelect.selectedIndex]?.text || '';
+            const title = computeVariantLabel(primary, secondary, block.dataset.fallbackLabel || 'Base');
+            const titleEl = block.querySelector('.variant-title');
+            if (titleEl) titleEl.textContent = title;
+        }
+
+        function calculateVariantStockTotal() {
+            return Array.from(document.querySelectorAll('#variantBlocks .variant-block')).reduce((sum, block) => {
+                const active = block.querySelector('.variant-active')?.checked !== false;
+                const stock = parseInt(block.querySelector('.variant-stock')?.value || '0', 10) || 0;
+                return sum + (active ? Math.max(0, stock) : 0);
+            }, 0);
+        }
+
+        function syncVariantStockTotal() {
+            document.getElementById('pStock').value = calculateVariantStockTotal();
+        }
+
+        function buildVariantBlockMarkup(variant = {}) {
+            const key = nextVariantBlockKey();
+            const primary = String(variant.primary_color_name || variant.primary_color || '').trim();
+            const secondary = String(variant.secondary_color_name || variant.secondary_color || '').trim();
+            const primarySelection = String(variant.primary_color_id || variant.primary_color || '').trim();
+            const secondarySelection = String(variant.secondary_color_id || variant.secondary_color || '').trim();
+            const label = computeVariantLabel(primary, secondary, variant.label || 'Base');
+            const price = variant.price == null || variant.price === '' ? '' : variant.price;
+            const stock = Number.isFinite(Number(variant.stock)) ? Number(variant.stock) : 0;
+            const active = variant.active === undefined ? true : Number(variant.active) === 1 || variant.active === true;
+
+            return `
+                <div class="variant-block" data-variant-key="${escAttr(key)}" data-fallback-label="${escAttr(label)}" style="border:1px solid var(--border-subtle);border-radius:var(--border-radius);padding:var(--space-lg);background:var(--bg-card)">
+                    <input type="hidden" class="variant-id" value="${variant.id ? escAttr(variant.id) : ''}">
+                    <input type="hidden" class="variant-images" value="[]">
+                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-md);flex-wrap:wrap">
+                        <div>
+                            <strong class="variant-title" style="display:block;font-size:1rem">${esc(label)}</strong>
+                            <span style="display:block;color:var(--text-muted);font-size:0.8rem;margin-top:4px">El cliente va a elegir esta combinación dentro del producto.</span>
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm variant-remove-btn">Quitar</button>
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:var(--space-md);margin-top:var(--space-md)">
+                        <div class="form-group">
+                            <label class="form-label">Color principal</label>
+                            <select class="form-select variant-primary">${buildColorOptions(primarySelection, true)}</select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Color secundario</label>
+                            <select class="form-select variant-secondary">${buildColorOptions(secondarySelection, true)}</select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Precio variante</label>
+                            <input type="number" class="form-input variant-price" step="0.01" min="0" placeholder="Usa el precio base" value="${escAttr(price)}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Stock</label>
+                            <input type="number" class="form-input variant-stock" min="0" value="${escAttr(stock)}">
+                        </div>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-md);margin-top:var(--space-sm);flex-wrap:wrap">
+                        <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.9rem">
+                            <input type="checkbox" class="variant-active" ${active ? 'checked' : ''}> Variante activa
+                        </label>
+                        <span style="color:var(--text-muted);font-size:0.78rem">Si no subís fotos, usa las imágenes principales del producto.</span>
+                    </div>
+                    <div style="margin-top:var(--space-md);display:grid;gap:var(--space-sm)">
+                        <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-md);flex-wrap:wrap">
+                            <label class="form-label" style="margin:0">Fotos de la variante</label>
+                            <input type="file" class="variant-image-file" accept="image/jpeg,image/png,image/webp,image/gif" multiple>
+                        </div>
+                        <div class="variant-image-status" style="display:none;font-size:0.8rem;color:var(--text-secondary)"></div>
+                        <div class="variant-thumbs" style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:var(--space-xs)"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function appendVariantBlock(variant = {}) {
+            const container = document.getElementById('variantBlocks');
+            container.insertAdjacentHTML('beforeend', buildVariantBlockMarkup(variant));
+            const block = container.lastElementChild;
+            setVariantImages(block, Array.isArray(variant.image_urls) ? variant.image_urls : []);
+            updateVariantHeader(block);
+            syncVariantStockTotal();
+        }
+
+        function resetVariantBlocks(variants = []) {
+            const container = document.getElementById('variantBlocks');
+            container.innerHTML = '';
+            const source = Array.isArray(variants) && variants.length > 0 ? variants : [{ active: 1, stock: 0 }];
+            source.forEach(variant => appendVariantBlock(variant));
+            syncVariantStockTotal();
+        }
+
+        function collectVariantBlocks() {
+            const blocks = Array.from(document.querySelectorAll('#variantBlocks .variant-block'));
+            if (blocks.length === 0) {
+                return [{ stock: 0, active: 1 }];
+            }
+
+            return blocks.map((block, index) => {
+                const primarySelection = resolveColorSelection(block.querySelector('.variant-primary'));
+                const secondarySelection = resolveColorSelection(block.querySelector('.variant-secondary'));
+                const priceRaw = block.querySelector('.variant-price')?.value ?? '';
+                return {
+                    id: block.querySelector('.variant-id')?.value || null,
+                    label: computeVariantLabel(primarySelection.name, secondarySelection.name, block.dataset.fallbackLabel || `Variante ${index + 1}`),
+                    primary_color_id: primarySelection.id,
+                    secondary_color_id: secondarySelection.id,
+                    primary_color_hex: primarySelection.hex_primary || null,
+                    secondary_color_hex: secondarySelection.hex_primary || null,
+                    primary_color_name: primarySelection.name || null,
+                    secondary_color_name: secondarySelection.name || null,
+                    primary_color: primarySelection.name || null,
+                    secondary_color: secondarySelection.name || null,
+                    price: priceRaw === '' ? null : parseFloat(priceRaw),
+                    stock: Math.max(0, parseInt(block.querySelector('.variant-stock')?.value || '0', 10) || 0),
+                    active: block.querySelector('.variant-active')?.checked ? 1 : 0,
+                    sort_order: index,
+                    image_urls: parseVariantImages(block),
+                };
+            });
+        }
+
+        document.getElementById('addVariantBtn').addEventListener('click', () => {
+            appendVariantBlock({ active: 1, stock: 0 });
+        });
+
+        document.getElementById('variantBlocks').addEventListener('input', (e) => {
+            const block = e.target.closest('.variant-block');
+            if (!block) return;
+            if (e.target.classList.contains('variant-primary') || e.target.classList.contains('variant-secondary')) {
+                updateVariantHeader(block);
+            }
+            if (e.target.classList.contains('variant-stock')) {
+                syncVariantStockTotal();
+            }
+        });
+
+        document.getElementById('variantBlocks').addEventListener('change', async (e) => {
+            const block = e.target.closest('.variant-block');
+            if (!block) return;
+
+            if (e.target.classList.contains('variant-active')) {
+                syncVariantStockTotal();
+                return;
+            }
+
+            if (!e.target.classList.contains('variant-image-file')) {
+                return;
+            }
+
+            const files = Array.from(e.target.files || []);
+            if (files.length === 0) return;
+
+            const status = block.querySelector('.variant-image-status');
+            status.style.display = 'block';
+            status.style.color = 'var(--text-secondary)';
+            status.textContent = files.length > 1 ? `⏳ Subiendo ${files.length} imágenes...` : '⏳ Subiendo imagen...';
+            e.target.disabled = true;
+
+            try {
+                const current = parseVariantImages(block);
+                const uploaded = [];
+                for (const file of files) {
+                    uploaded.push(await uploadProductImage(file));
+                }
+                setVariantImages(block, [...current, ...uploaded]);
+                status.style.color = '#27ae60';
+                status.textContent = uploaded.length > 1 ? `✓ ${uploaded.length} imágenes subidas correctamente` : '✓ Imagen subida correctamente';
+            } catch (_) {
+                status.style.color = '#e74c3c';
+                status.textContent = '✗ Error de red al subir la imagen';
+            } finally {
+                e.target.disabled = false;
+                e.target.value = '';
+            }
+        });
+
+        document.getElementById('variantBlocks').addEventListener('click', (e) => {
+            const block = e.target.closest('.variant-block');
+            if (!block) return;
+
+            if (e.target.classList.contains('variant-remove-btn')) {
+                const blocks = document.querySelectorAll('#variantBlocks .variant-block');
+                if (blocks.length <= 1) {
+                    resetVariantBlocks();
+                } else {
+                    block.remove();
+                    syncVariantStockTotal();
+                }
+                return;
+            }
+
+            if (e.target.classList.contains('variant-thumb-remove')) {
+                const index = parseInt(e.target.dataset.index || '-1', 10);
+                const urls = parseVariantImages(block);
+                if (index >= 0 && index < urls.length) {
+                    urls.splice(index, 1);
+                    setVariantImages(block, urls);
+                }
+                return;
+            }
+
+            if (e.target.classList.contains('variant-thumb-primary')) {
+                const index = parseInt(e.target.dataset.index || '-1', 10);
+                const urls = parseVariantImages(block);
+                if (index >= 0 && index < urls.length) {
+                    const [selected] = urls.splice(index, 1);
+                    urls.unshift(selected);
+                    setVariantImages(block, urls);
+                }
+            }
+        });
+
+        async function uploadProductImage(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            const res = await fetch('api/admin/upload.php', { method: 'POST', headers: authHeaders(), body: formData });
+            const data = await res.json();
+            if (!res.ok || !data.url) {
+                throw new Error(data.error || 'Error al subir imagen');
+            }
+            return data.url;
         }
 
         document.getElementById('pImageFile').addEventListener('change', async function () {
-            const file = this.files[0]; if (!file) return;
+            const files = Array.from(this.files || []);
+            if (files.length === 0) return;
             const status = document.getElementById('imageUploadStatus');
             status.style.display = 'block'; status.style.color = 'var(--text-secondary)';
-            status.textContent = '⏳ Subiendo imagen...'; this.disabled = true;
-            const formData = new FormData(); formData.append('file', file);
+            status.textContent = files.length > 1 ? `⏳ Subiendo ${files.length} imágenes...` : '⏳ Subiendo imagen...';
+            this.disabled = true;
             try {
-                const res = await fetch('api/admin/upload.php', { method: 'POST', body: formData });
-                const data = await res.json();
-                if (data.url) { setImagePreview(data.url); status.style.color = '#27ae60'; status.textContent = '✓ Imagen subida correctamente'; }
-                else { status.style.color = '#e74c3c'; status.textContent = '✗ ' + (data.error || 'Error desconocido'); }
+                const current = getImageUrlsFromHidden();
+                const uploaded = [];
+                for (const file of files) {
+                    const url = await uploadProductImage(file);
+                    uploaded.push(url);
+                }
+                setImagePreviews([...current, ...uploaded]);
+                status.style.color = '#27ae60';
+                status.textContent = uploaded.length > 1 ? `✓ ${uploaded.length} imágenes subidas correctamente` : '✓ Imagen subida correctamente';
             } catch (err) { status.style.color = '#e74c3c'; status.textContent = '✗ Error de red al subir la imagen'; }
-            finally { this.disabled = false; }
+            finally { this.disabled = false; this.value = ''; }
         });
 
         window.deleteProduct = async function (id) {
             if (!confirm('¿Eliminar este producto?')) return;
             try {
-                const res = await fetch(`${API}/products.php?id=${id}`, { method: 'DELETE' });
+                const res = await fetch(`${API}/products.php?id=${id}`, { method: 'DELETE', headers: authHeaders() });
                 const data = await res.json();
                 
                 if (data.note) {
@@ -1057,50 +2426,320 @@
         // ═══════════════════════════════════════════════
         //  ORDERS
         // ═══════════════════════════════════════════════
-        async function loadOrders(status = '') {
-            try {
-                const url = status ? `${API}/orders.php?status=${status}` : `${API}/orders.php`;
-                const res = await fetch(url);
-                const data = await res.json();
-                renderOrders(data.orders || []);
-            } catch (e) {
-                document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e74c3c">Error cargando pedidos</td></tr>';
+        let currentOrdersPage = 1;
+        let orderSearchDebounceId = null;
+
+        const orderQueueLabels = {
+            requires_action: 'Requiere acción',
+            manual_review: 'Cobro manual',
+            production: 'Producción',
+            ready: 'Listo',
+            delivery: 'Entrega',
+            completed: 'Cerrado',
+        };
+
+        const orderQuickActionDefinitions = {
+            confirm_payment: { label: 'Confirmar cobro', payload: { payment_status: 'approved' } },
+            start_production: { label: 'Iniciar producción', payload: { fulfillment_status: 'in_production' } },
+            mark_ready: { label: 'Marcar listo', payload: { fulfillment_status: 'ready' } },
+            mark_shipped: { label: 'Marcar enviado', payload: { fulfillment_status: 'shipped' } },
+            mark_delivered: { label: 'Marcar entregado', payload: { fulfillment_status: 'delivered' } },
+        };
+
+        function formatDateTime(value, withTime = false) {
+            if (!value) return '—';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return '—';
+            return withTime ? date.toLocaleString('es-AR') : date.toLocaleDateString('es-AR');
+        }
+
+        function timeAgo(value) {
+            if (!value) return 'sin fecha';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return 'sin fecha';
+            const diff = Math.floor((Date.now() - date.getTime()) / 1000);
+            if (diff < 60) return 'hace un momento';
+            if (diff < 3600) return `hace ${Math.floor(diff / 60)} min`;
+            if (diff < 86400) return `hace ${Math.floor(diff / 3600)}h`;
+            return `hace ${Math.floor(diff / 86400)}d`;
+        }
+
+        function queueLabel(queue) {
+            return orderQueueLabels[queue] || 'Cola';
+        }
+
+        function getOrderQuickAction(order) {
+            const paymentStatus = order.payment_status || 'pending';
+            const fulfillmentStatus = order.fulfillment_status || 'queued';
+            const isManualPayment = order.payment_method === 'transferencia' || order.payment_method === 'efectivo';
+
+            if (isManualPayment && (paymentStatus === 'pending' || paymentStatus === 'under_review')) {
+                return { code: 'confirm_payment', ...orderQuickActionDefinitions.confirm_payment };
+            }
+
+            if (paymentStatus !== 'approved') {
+                return null;
+            }
+
+            switch (fulfillmentStatus) {
+                case 'queued':
+                    return { code: 'start_production', ...orderQuickActionDefinitions.start_production };
+                case 'in_production':
+                    return { code: 'mark_ready', ...orderQuickActionDefinitions.mark_ready };
+                case 'ready':
+                    return { code: 'mark_shipped', ...orderQuickActionDefinitions.mark_shipped };
+                case 'shipped':
+                    return { code: 'mark_delivered', ...orderQuickActionDefinitions.mark_delivered };
+                default:
+                    return null;
             }
         }
 
-        function renderOrders(orders) {
+        function buildOrdersQuery(page = 1) {
+            const params = new URLSearchParams();
+            const search = document.getElementById('orderSearch').value.trim();
+            const queue = document.getElementById('orderQueueFilter').value;
+            const paymentMethod = document.getElementById('orderMethodFilter').value;
+            const paymentStatus = document.getElementById('orderPaymentFilter').value;
+            const fulfillmentStatus = document.getElementById('orderFulfillmentFilter').value;
+            const dateFrom = document.getElementById('orderDateFrom').value;
+            const dateTo = document.getElementById('orderDateTo').value;
+
+            if (search) params.set('q', search);
+            if (queue) params.set('queue', queue);
+            if (paymentMethod) params.set('payment_method', paymentMethod);
+            if (paymentStatus) params.set('payment_status', paymentStatus);
+            if (fulfillmentStatus) params.set('fulfillment_status', fulfillmentStatus);
+            if (dateFrom) params.set('date_from', dateFrom);
+            if (dateTo) params.set('date_to', dateTo);
+            params.set('page', String(page));
+            params.set('limit', String(ITEMS_PER_PAGE));
+
+            return params;
+        }
+
+        async function loadOrders(page = 1) {
+            currentOrdersPage = page;
             const tbody = document.getElementById('ordersTableBody');
-            if (orders.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted)">No hay pedidos</td></tr>';
+            document.getElementById('orderResultCount').textContent = 'Cargando pedidos...';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:var(--space-2xl);color:var(--text-muted)">Cargando pedidos...</td></tr>';
+
+            try {
+                const params = buildOrdersQuery(page);
+                const res = await fetch(`${API}/orders.php?${params.toString()}`, { credentials: 'same-origin' });
+                const data = await res.json();
+                if (isUnauthorizedResponse(res, data)) {
+                    handleAdminUnauthorized();
+                    return;
+                }
+                if (!res.ok) {
+                    throw new Error(data.error || 'Error cargando pedidos');
+                }
+                renderOrders(data.orders || [], data);
+            } catch (e) {
+                document.getElementById('orderResultCount').textContent = 'No se pudo cargar la cola de pedidos';
+                document.getElementById('ordersTableBody').innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;padding:var(--space-2xl)">Error cargando pedidos</td></tr>';
+                document.getElementById('ordersPagination').innerHTML = '';
+            }
+        }
+
+        function renderOrders(orders, meta = {}) {
+            const tbody = document.getElementById('ordersTableBody');
+            const total = parseInt(meta.total || 0, 10);
+            const page = parseInt(meta.page || 1, 10);
+            const limit = parseInt(meta.limit || ITEMS_PER_PAGE, 10);
+            const from = total === 0 ? 0 : ((page - 1) * limit) + 1;
+            const to = total === 0 ? 0 : Math.min(page * limit, total);
+
+            document.getElementById('orderResultCount').textContent = total > 0
+                ? `Mostrando ${from}-${to} de ${total} pedido${total !== 1 ? 's' : ''}`
+                : 'No hay pedidos para esos filtros';
+
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:var(--space-2xl)">No hay pedidos para esa cola</td></tr>';
+                renderOrdersPagination(1, 1);
                 return;
             }
-            tbody.innerHTML = orders.map(o => `
-                <tr class="clickable" onclick="viewOrder(${parseInt(o.id)})">
-                    <td style="font-family:monospace;font-size:0.85rem;color:var(--accent)">${esc(o.order_number || '#' + o.id)}</td>
-                    <td>${esc(o.customer_name)}</td>
-                    <td>${esc(o.customer_email)}</td>
-                    <td>$${parseFloat(o.total).toLocaleString('es-AR')}</td>
-                    <td><span class="status-badge ${esc(o.status)}">${esc(o.status)}</span></td>
-                    <td>${new Date(o.created_at).toLocaleDateString('es-AR')}</td>
-                </tr>
-            `).join('');
+
+            tbody.innerHTML = orders.map(o => {
+                const quickAction = getOrderQuickAction(o);
+                const phone = o.customer_phone ? ` · ${esc(o.customer_phone)}` : '';
+
+                return `
+                    <tr class="clickable" onclick="viewOrder(${parseInt(o.id)})">
+                        <td>
+                            <div style="display:grid;gap:6px">
+                                <span style="font-family:monospace;font-size:0.78rem;color:var(--accent);font-weight:700">${esc(o.order_number || '#' + o.id)}</span>
+                                <span class="queue-chip ${esc(o.queue_bucket || '')}">${esc(queueLabel(o.queue_bucket))}</span>
+                                <span style="font-size:0.74rem;color:var(--text-muted)">${esc(timeAgo(o.created_at))}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="order-client-cell">
+                                <strong>${esc(o.customer_name)}</strong>
+                                <div class="order-client-meta">${esc(o.customer_email)}${phone}</div>
+                            </div>
+                        </td>
+                        <td>${renderOrderStateSummary(o, { showMeta: true })}</td>
+                        <td>
+                            <div style="display:grid;gap:6px">
+                                <span style="font-weight:600">${esc(paymentMethodLabel(o.payment_method))}</span>
+                                ${o.payment_reference ? `<span class="order-client-meta">Ref: ${esc(o.payment_reference)}</span>` : ''}
+                            </div>
+                        </td>
+                        <td style="font-weight:700;color:var(--accent)">$${parseFloat(o.total).toLocaleString('es-AR')}</td>
+                        <td>
+                            <div style="display:grid;gap:4px">
+                                <span>${esc(formatDateTime(o.created_at))}</span>
+                                <span class="order-client-meta">${esc(timeAgo(o.created_at))}</span>
+                            </div>
+                        </td>
+                        <td class="order-action-cell">
+                            ${quickAction
+                                ? `<button class="btn btn-primary btn-sm order-quick-action" onclick="applyOrderQuickAction(${parseInt(o.id)}, '${esc(quickAction.code)}', event)">${esc(quickAction.label)}</button>`
+                                : `<button class="btn btn-secondary btn-sm order-quick-action" onclick="event.stopPropagation(); viewOrder(${parseInt(o.id)})">Ver detalle</button>`}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            renderOrdersPagination(meta.total_pages || 1, page);
         }
 
-        document.getElementById('orderStatusFilter').addEventListener('change', (e) => {
-            loadOrders(e.target.value);
+        function renderOrdersPagination(totalPages, page) {
+            const container = document.getElementById('ordersPagination');
+            if (!totalPages || totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+
+            let html = `<button ${page === 1 ? 'disabled' : ''} onclick="goToOrdersPage(${page - 1})">← Anterior</button>`;
+            for (let i = 1; i <= totalPages; i++) {
+                if (totalPages > 7 && i > 3 && i < totalPages - 2 && Math.abs(i - page) > 1) {
+                    if (i === 4) html += '<button disabled>…</button>';
+                    continue;
+                }
+                html += `<button class="${i === page ? 'active' : ''}" onclick="goToOrdersPage(${i})">${i}</button>`;
+            }
+            html += `<button ${page === totalPages ? 'disabled' : ''} onclick="goToOrdersPage(${page + 1})">Siguiente →</button>`;
+            container.innerHTML = html;
+        }
+
+        window.goToOrdersPage = function (page) {
+            loadOrders(page);
+            document.getElementById('ordersPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        };
+
+        function resetOrdersAndReload() {
+            currentOrdersPage = 1;
+            loadOrders(1);
+        }
+
+        document.getElementById('orderSearch').addEventListener('input', () => {
+            clearTimeout(orderSearchDebounceId);
+            orderSearchDebounceId = setTimeout(() => {
+                resetOrdersAndReload();
+            }, 250);
         });
+        document.getElementById('orderQueueFilter').addEventListener('change', resetOrdersAndReload);
+        document.getElementById('orderMethodFilter').addEventListener('change', resetOrdersAndReload);
+        document.getElementById('orderPaymentFilter').addEventListener('change', resetOrdersAndReload);
+        document.getElementById('orderFulfillmentFilter').addEventListener('change', resetOrdersAndReload);
+        document.getElementById('orderDateFrom').addEventListener('change', resetOrdersAndReload);
+        document.getElementById('orderDateTo').addEventListener('change', resetOrdersAndReload);
+        document.getElementById('clearOrderFiltersBtn').addEventListener('click', () => {
+            document.getElementById('orderSearch').value = '';
+            document.getElementById('orderQueueFilter').value = '';
+            document.getElementById('orderMethodFilter').value = '';
+            document.getElementById('orderPaymentFilter').value = '';
+            document.getElementById('orderFulfillmentFilter').value = '';
+            document.getElementById('orderDateFrom').value = '';
+            document.getElementById('orderDateTo').value = '';
+            resetOrdersAndReload();
+        });
+
+        async function sendOrderUpdate(orderId, payload) {
+            const res = await fetch(`${API}/orders.php?id=${orderId}`, {
+                method: 'PUT',
+                credentials: 'same-origin',
+                headers: authHeaders({ 'Content-Type': 'application/json' }),
+                body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+            if (isUnauthorizedResponse(res, data)) {
+                handleAdminUnauthorized();
+                throw new Error('Sesión vencida');
+            }
+            if (!res.ok || !data.success) {
+                throw new Error(data.error || 'No se pudo actualizar el pedido');
+            }
+            return data;
+        }
+
+        window.applyOrderQuickAction = async function (orderId, actionCode, event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            const action = orderQuickActionDefinitions[actionCode];
+            if (!action) return;
+
+            const button = event && event.currentTarget ? event.currentTarget : null;
+            if (button) {
+                button.disabled = true;
+                button.textContent = 'Actualizando...';
+            }
+
+            try {
+                await sendOrderUpdate(orderId, action.payload);
+                await loadOrders(currentOrdersPage);
+                await loadDashboard();
+
+                const overlay = document.getElementById('orderModalOverlay');
+                if (overlay.classList.contains('active') && parseInt(overlay.dataset.orderId || '0', 10) === orderId) {
+                    await viewOrder(orderId);
+                }
+            } catch (error) {
+                alert(error.message || 'No se pudo actualizar el pedido');
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = action.label;
+                }
+            }
+        };
 
         // Order Detail Modal
         window.viewOrder = async function (id) {
             const overlay = document.getElementById('orderModalOverlay');
-            document.getElementById('orderModalTitle').textContent = `Pedido #${id}`; // updated after fetch
+            overlay.dataset.orderId = String(id);
+            document.getElementById('orderModalTitle').textContent = `Pedido #${id}`;
             document.getElementById('orderModalContent').textContent = 'Cargando...';
             overlay.classList.add('active');
 
             try {
-                const res = await fetch(`${API}/orders.php?id=${id}`);
+                const res = await fetch(`${API}/orders.php?id=${id}`, { credentials: 'same-origin' });
                 const o = await res.json();
-                if (o.error) throw new Error(o.error);
+                if (isUnauthorizedResponse(res, o)) {
+                    handleAdminUnauthorized();
+                    return;
+                }
+                if (!res.ok || o.error) throw new Error(o.error || 'Error cargando pedido');
+
+                const quickAction = getOrderQuickAction(o);
+                const paymentStatusOptions = ['pending', 'under_review', 'approved', 'rejected', 'cancelled', 'refunded', 'charged_back'];
+                const fulfillmentStatusOptions = ['queued', 'in_production', 'ready', 'shipped', 'delivered', 'cancelled'];
+                const paymentStatusSelect = paymentStatusOptions.map(status =>
+                    `<option value="${status}" ${o.payment_status === status ? 'selected' : ''}>${paymentStatusLabels[status] || status}</option>`
+                ).join('');
+                const fulfillmentStatusSelect = fulfillmentStatusOptions.map(status =>
+                    `<option value="${status}" ${o.fulfillment_status === status ? 'selected' : ''}>${fulfillmentStatusLabels[status] || status}</option>`
+                ).join('');
+                const orderSummary = getOrderStateSummary(o);
+                const paymentVerifiedInfo = o.payment_verified_by_username && o.payment_verified_at
+                    ? `Verificado por ${o.payment_verified_by_username} el ${formatDateTime(o.payment_verified_at, true)}`
+                    : 'Todavía no hay verificación registrada.';
 
                 let itemsHtml = '';
                 if (o.items && o.items.length > 0) {
@@ -1108,40 +2747,92 @@
                         o.items.map(item => `
                             <div class="order-item-row">
                                 <img src="${esc(item.image_url)}" onerror="this.style.display='none'">
-                                <div style="flex:1">${esc(item.product_name)}</div>
+                                <div style="flex:1">
+                                    <div>${esc(item.product_name)}</div>
+                                    ${item.variant_label && !['base', 'única', 'unica'].includes(String(item.variant_label).toLowerCase()) ? `<div style="font-size:0.78rem;color:var(--text-muted)">Variante: ${esc(item.variant_label)}</div>` : ''}
+                                </div>
                                 <div style="color:var(--text-muted)">x${item.quantity}</div>
                                 <div style="font-weight:600">$${parseFloat(item.unit_price).toLocaleString('es-AR')}</div>
                             </div>
                         `).join('') + '</div>';
                 }
 
-                const statusOptions = ['pending', 'approved', 'in_process', 'shipped', 'delivered', 'cancelled', 'rejected', 'refunded'];
-                const statusLabels = { pending: '⏳ Pendiente', approved: '✅ Aprobado', in_process: '🔄 En proceso', shipped: '🚚 Enviado', delivered: '📦 Entregado', cancelled: '❌ Cancelado', rejected: '⛔ Rechazado', refunded: '💸 Reembolsado' };
-                const statusSelect = statusOptions.map(s =>
-                    `<option value="${s}" ${o.status === s ? 'selected' : ''}>${statusLabels[s] || s}</option>`
-                ).join('');
+                const manualPaymentCard = o.is_manual_payment ? `
+                    <div class="manual-payment-card">
+                        <span class="admin-help-kicker">Cobro manual</span>
+                        <strong>Este pedido no se confirma solo.</strong>
+                        <p>Usá referencia y notas para dejar asentado qué comprobante viste o qué acordaste. Cuando el dinero esté validado, cambiá <strong>Cobro</strong> a aprobado o usá la acción rápida.</p>
+                        <div class="manual-payment-grid">
+                            <div>
+                                <strong style="margin-bottom:4px">Medio</strong>
+                                <p>${esc(paymentMethodLabel(o.payment_method))}</p>
+                            </div>
+                            <div>
+                                <strong style="margin-bottom:4px">Verificación</strong>
+                                <p>${esc(paymentVerifiedInfo)}</p>
+                            </div>
+                        </div>
+                    </div>
+                ` : '';
 
                 document.getElementById('orderModalTitle').textContent = o.order_number || `Pedido #${id}`;
-
                 document.getElementById('orderModalContent').innerHTML = `
+                    <div class="state-summary-card">
+                        <span class="admin-help-kicker">Estado visible en listas</span>
+                        <div class="state-summary-row">
+                            ${renderOrderStateSummary(o)}
+                            <div class="state-summary-meta">${esc(orderSummary.detail)}</div>
+                        </div>
+                    </div>
                     <div class="order-detail-row"><span class="label">N° Orden</span><span style="font-family:monospace;font-weight:700;color:var(--accent)">${esc(o.order_number || '#' + o.id)}</span></div>
                     <div class="order-detail-row"><span class="label">Cliente</span><span>${esc(o.customer_name)}</span></div>
                     <div class="order-detail-row"><span class="label">Email</span><span>${esc(o.customer_email)}</span></div>
                     <div class="order-detail-row"><span class="label">Teléfono</span><span>${esc(o.customer_phone) || '—'}</span></div>
-                    <div class="order-detail-row" style="align-items:center">
-                        <span class="label">Estado</span>
-                        <div style="display:flex;align-items:center;gap:var(--space-sm)">
-                            <select id="orderStatusSelect" onchange="updateOrderStatus(${parseInt(o.id)}, this.value)"
-                                style="padding:0.4rem 0.8rem;background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--border-radius-sm);color:var(--text-primary);font-size:0.85rem;cursor:pointer">
-                                ${statusSelect}
-                            </select>
-                            <span id="orderStatusFeedback" style="font-size:0.8rem;display:none"></span>
+                    <div class="order-detail-row"><span class="label">Total</span><span style="font-weight:700;color:var(--accent);font-size:1.1rem">$${parseFloat(o.total).toLocaleString('es-AR')}</span></div>
+                    <div class="order-detail-row"><span class="label">Medio de P.</span><span style="font-weight:600">${esc(paymentMethodLabel(o.payment_method))}</span></div>
+                    <div class="order-detail-row"><span class="label">Fecha</span><span>${formatDateTime(o.created_at, true)}</span></div>
+                    <div class="order-detail-row"><span class="label">MercadoPago ID</span><span style="font-family:monospace;font-size:0.85rem">${esc(o.mp_payment_id) || '—'}</span></div>
+
+                    <div class="order-form-stack">
+                        <div class="order-detail-row" style="align-items:center">
+                            <span class="label">Cobro</span>
+                            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:320px;width:100%">
+                                <select id="orderPaymentStatusSelect" class="order-field-input">
+                                    ${paymentStatusSelect}
+                                </select>
+                                <div class="field-help">Define si el dinero está pendiente, en revisión o confirmado. Este cambio impacta reservas y stock.</div>
+                            </div>
+                        </div>
+                        <div class="order-detail-row" style="align-items:center">
+                            <span class="label">Operación</span>
+                            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:320px;width:100%">
+                                <select id="orderFulfillmentStatusSelect" class="order-field-input">
+                                    ${fulfillmentStatusSelect}
+                                </select>
+                                <div class="field-help">Marca el avance del trabajo: en cola, producción, listo, enviado o entregado. No reemplaza el estado del cobro.</div>
+                            </div>
+                        </div>
+                        ${manualPaymentCard}
+                        <div class="order-field-block">
+                            <label for="orderPaymentReferenceInput">Referencia o comprobante</label>
+                            <input id="orderPaymentReferenceInput" class="order-field-input" type="text" maxlength="120" placeholder="Alias, número de comprobante o detalle corto" value="${esc(o.payment_reference || '')}">
+                            <div class="field-help">Sirve para dejar un identificador rápido del cobro manual.</div>
+                        </div>
+                        <div class="order-field-block">
+                            <label for="orderPaymentNotesInput">Notas internas del cobro</label>
+                            <textarea id="orderPaymentNotesInput" class="order-field-textarea" rows="3" placeholder="Qué recibiste, qué falta validar o qué habló el cliente">${esc(o.payment_notes || '')}</textarea>
+                        </div>
+                        <div class="order-field-block">
+                            <label for="orderNotesInput">Notas operativas del pedido</label>
+                            <textarea id="orderNotesInput" class="order-field-textarea" rows="3" placeholder="Observaciones de producción, entrega o seguimiento">${esc(o.notes || '')}</textarea>
                         </div>
                     </div>
-                    <div class="order-detail-row"><span class="label">Total</span><span style="font-weight:700;color:var(--accent);font-size:1.1rem">$${parseFloat(o.total).toLocaleString('es-AR')}</span></div>
-                    <div class="order-detail-row"><span class="label">Fecha</span><span>${new Date(o.created_at).toLocaleString('es-AR')}</span></div>
-                    <div class="order-detail-row"><span class="label">MercadoPago ID</span><span style="font-family:monospace;font-size:0.85rem">${esc(o.mp_payment_id) || '—'}</span></div>
-                    ${o.notes ? `<div class="order-detail-row"><span class="label">Notas</span><span>${esc(o.notes)}</span></div>` : ''}
+
+                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:var(--space-sm);margin-top:var(--space-lg);flex-wrap:wrap">
+                        <span id="orderStatusFeedback" style="font-size:0.8rem;display:none"></span>
+                        ${quickAction ? `<button class="btn btn-secondary btn-sm" onclick="applyOrderQuickAction(${parseInt(o.id)}, '${esc(quickAction.code)}', event)">${esc(quickAction.label)}</button>` : ''}
+                        <button class="btn btn-primary btn-sm" onclick="updateOrderLifecycle(${parseInt(o.id)})">Guardar pedido</button>
+                    </div>
                     ${itemsHtml}
                 `;
             } catch (e) {
@@ -1149,41 +2840,60 @@
             }
         };
 
-        window.updateOrderStatus = async function (orderId, newStatus) {
+        window.updateOrderLifecycle = async function (orderId) {
             const feedback = document.getElementById('orderStatusFeedback');
-            const select = document.getElementById('orderStatusSelect');
+            const paymentSelect = document.getElementById('orderPaymentStatusSelect');
+            const fulfillmentSelect = document.getElementById('orderFulfillmentStatusSelect');
+            const paymentReferenceInput = document.getElementById('orderPaymentReferenceInput');
+            const paymentNotesInput = document.getElementById('orderPaymentNotesInput');
+            const orderNotesInput = document.getElementById('orderNotesInput');
+            const saveButton = feedback ? feedback.parentElement.querySelector('.btn.btn-primary') : null;
+
+            if (!feedback || !paymentSelect || !fulfillmentSelect) {
+                return;
+            }
+
             feedback.style.display = 'inline';
             feedback.style.color = 'var(--text-muted)';
             feedback.textContent = '⏳ Guardando...';
-            select.disabled = true;
+            paymentSelect.disabled = true;
+            fulfillmentSelect.disabled = true;
+            if (paymentReferenceInput) paymentReferenceInput.disabled = true;
+            if (paymentNotesInput) paymentNotesInput.disabled = true;
+            if (orderNotesInput) orderNotesInput.disabled = true;
+            if (saveButton) saveButton.disabled = true;
 
             try {
-                const res = await fetch(`${API}/orders.php?id=${orderId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ status: newStatus })
+                await sendOrderUpdate(orderId, {
+                    payment_status: paymentSelect.value,
+                    fulfillment_status: fulfillmentSelect.value,
+                    payment_reference: paymentReferenceInput ? paymentReferenceInput.value : '',
+                    payment_notes: paymentNotesInput ? paymentNotesInput.value : '',
+                    notes: orderNotesInput ? orderNotesInput.value : '',
                 });
-                const data = await res.json();
-                if (data.success) {
-                    feedback.style.color = '#25D366';
-                    feedback.textContent = '✓ Actualizado';
-                    loadOrders(document.getElementById('orderStatusFilter').value);
-                    loadDashboard();
-                    setTimeout(() => { feedback.style.display = 'none'; }, 2000);
-                } else {
-                    feedback.style.color = '#e74c3c';
-                    feedback.textContent = '✗ Error';
-                }
+
+                feedback.style.color = '#25D366';
+                feedback.textContent = '✓ Pedido actualizado';
+                await loadOrders(currentOrdersPage);
+                await loadDashboard();
+                await viewOrder(orderId);
             } catch (e) {
                 feedback.style.color = '#e74c3c';
-                feedback.textContent = '✗ Error de red';
+                feedback.textContent = `✗ ${e.message || 'Error'}`;
             } finally {
-                select.disabled = false;
+                paymentSelect.disabled = false;
+                fulfillmentSelect.disabled = false;
+                if (paymentReferenceInput) paymentReferenceInput.disabled = false;
+                if (paymentNotesInput) paymentNotesInput.disabled = false;
+                if (orderNotesInput) orderNotesInput.disabled = false;
+                if (saveButton) saveButton.disabled = false;
             }
         };
 
         window.closeOrderModal = function () {
-            document.getElementById('orderModalOverlay').classList.remove('active');
+            const overlay = document.getElementById('orderModalOverlay');
+            overlay.classList.remove('active');
+            delete overlay.dataset.orderId;
         };
 
         document.getElementById('orderModalOverlay').addEventListener('click', (e) => {
@@ -1204,8 +2914,15 @@
             currentEmailsPage = page;
             const status = document.getElementById('emailStatusFilter').value;
             try {
-                const res = await fetch(`${API}/emails.php?page=${page}&status=${status}`);
+                const res = await fetch(`${API}/emails.php?page=${page}&status=${status}`, { credentials: 'same-origin' });
                 const data = await res.json();
+                if (isUnauthorizedResponse(res, data)) {
+                    handleAdminUnauthorized();
+                    return;
+                }
+                if (!res.ok) {
+                    throw new Error(data.error || 'No se pudieron cargar los correos');
+                }
                 
                 const tbody = document.getElementById('emailsTableBody');
                 if (!data.logs || data.logs.length === 0) {
@@ -1240,8 +2957,15 @@
 
         window.viewEmail = async function(id) {
             try {
-                const res = await fetch(`${API}/emails.php?id=${id}`);
+                const res = await fetch(`${API}/emails.php?id=${id}`, { credentials: 'same-origin' });
                 const log = await res.json();
+                if (isUnauthorizedResponse(res, log)) {
+                    handleAdminUnauthorized();
+                    return;
+                }
+                if (!res.ok) {
+                    throw new Error(log.error || 'No se pudo cargar el correo');
+                }
                 
                 document.getElementById('emailModalTitle').textContent = log.subject;
                 document.getElementById('emailModalMeta').innerHTML = `

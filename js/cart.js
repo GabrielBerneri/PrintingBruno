@@ -5,6 +5,7 @@
 
 const Cart = {
     STORAGE_KEY: 'pb_cart',
+    CHECKOUT_TOKEN_KEY: 'pb_checkout_token',
     getApiBase() {
         const currentPath = window.location.pathname || '/';
         if (currentPath.includes('/printingbruno/')) {
@@ -13,47 +14,78 @@ const Cart = {
         return `${window.location.origin}/api`;
     },
 
+    itemKey(item) {
+        if (item && item.cart_key) {
+            return String(item.cart_key);
+        }
+        const variantId = Number(item?.variant_id || 0);
+        const productId = Number(item?.product_id || item?.id || 0);
+        return variantId > 0 ? `v:${variantId}` : `p:${productId}`;
+    },
+
+    normalizeItem(item) {
+        const productId = Number(item?.product_id || item?.id || 0);
+        if (!Number.isFinite(productId) || productId <= 0) {
+            return null;
+        }
+
+        const variantId = Number(item?.variant_id || 0);
+        return {
+            id: productId,
+            product_id: productId,
+            variant_id: variantId > 0 ? variantId : null,
+            variant_label: String(item?.variant_label || '').trim(),
+            cart_key: this.itemKey(item),
+            name: String(item?.name || ''),
+            price: Number(item?.price || 0),
+            image_url: String(item?.image_url || ''),
+            quantity: Math.max(1, Number(item?.quantity || 1) || 1),
+        };
+    },
+
     // ===== Cart Data Management =====
     getItems() {
         try {
-            return JSON.parse(localStorage.getItem(this.STORAGE_KEY)) || [];
+            const parsed = JSON.parse(localStorage.getItem(this.STORAGE_KEY)) || [];
+            if (!Array.isArray(parsed)) return [];
+            return parsed.map(item => this.normalizeItem(item)).filter(Boolean);
         } catch { return []; }
     },
 
     saveItems(items) {
-        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(items));
+        const normalized = (items || []).map(item => this.normalizeItem(item)).filter(Boolean);
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(normalized));
         this.updateBadge();
         this.renderCartDrawer();
     },
 
     addItem(product, quantity = 1) {
         const items = this.getItems();
-        const existing = items.find(i => i.id === product.id);
+        const incoming = this.normalizeItem({ ...product, quantity });
+        if (!incoming) return;
+        const incomingKey = this.itemKey(incoming);
+        const existing = items.find(i => this.itemKey(i) === incomingKey);
 
         if (existing) {
             existing.quantity += quantity;
         } else {
-            items.push({
-                id: product.id,
-                name: product.name,
-                price: product.price,
-                image_url: product.image_url,
-                quantity: quantity,
-            });
+            items.push(incoming);
         }
 
         this.saveItems(items);
-        this.showNotification(`${product.name} agregado al carrito`);
+        this.showNotification(`${incoming.name} agregado al carrito`);
     },
 
-    removeItem(productId) {
-        const items = this.getItems().filter(i => i.id !== productId);
+    removeItem(itemKey) {
+        const normalizedKey = String(itemKey);
+        const items = this.getItems().filter(i => this.itemKey(i) !== normalizedKey);
         this.saveItems(items);
     },
 
-    updateQuantity(productId, quantity) {
+    updateQuantity(itemKey, quantity) {
         const items = this.getItems();
-        const item = items.find(i => i.id === productId);
+        const normalizedKey = String(itemKey);
+        const item = items.find(i => this.itemKey(i) === normalizedKey);
         if (item) {
             item.quantity = Math.max(1, quantity);
             this.saveItems(items);
@@ -62,8 +94,18 @@ const Cart = {
 
     clear() {
         localStorage.removeItem(this.STORAGE_KEY);
+        sessionStorage.removeItem(this.CHECKOUT_TOKEN_KEY);
         this.updateBadge();
         this.renderCartDrawer();
+    },
+
+    getCheckoutToken() {
+        let token = sessionStorage.getItem(this.CHECKOUT_TOKEN_KEY);
+        if (!token) {
+            token = `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+            sessionStorage.setItem(this.CHECKOUT_TOKEN_KEY, token);
+        }
+        return token;
     },
 
     getTotal() {
@@ -147,20 +189,21 @@ const Cart = {
         if (footer) footer.style.display = 'block';
 
         itemsContainer.innerHTML = items.map(item => `
-      <div class="cart-item" data-id="${item.id}">
+      <div class="cart-item" data-key="${this.escapeAttr(this.itemKey(item))}">
         <div class="cart-item-image">
           <img src="${this.escapeAttr(item.image_url)}" alt="${this.escapeAttr(item.name)}">
         </div>
         <div class="cart-item-info">
           <h4 class="cart-item-name">${this.escapeHTML(item.name)}</h4>
+          ${item.variant_label ? `<div class="cart-item-variant">${this.escapeHTML(item.variant_label)}</div>` : ''}
           <div class="cart-item-price">$${item.price.toLocaleString('es-AR')}</div>
           <div class="cart-item-qty">
-            <button class="qty-btn qty-minus" data-id="${item.id}">−</button>
+            <button class="qty-btn qty-minus" data-key="${this.escapeAttr(this.itemKey(item))}">−</button>
             <span>${item.quantity}</span>
-            <button class="qty-btn qty-plus" data-id="${item.id}">+</button>
+            <button class="qty-btn qty-plus" data-key="${this.escapeAttr(this.itemKey(item))}">+</button>
           </div>
         </div>
-        <button class="cart-item-remove" data-id="${item.id}" aria-label="Eliminar">✕</button>
+        <button class="cart-item-remove" data-key="${this.escapeAttr(this.itemKey(item))}" aria-label="Eliminar">✕</button>
       </div>
     `).join('');
 
@@ -183,23 +226,23 @@ const Cart = {
         // Event listeners
         itemsContainer.querySelectorAll('.qty-minus').forEach(btn => {
             btn.addEventListener('click', () => {
-                const id = parseInt(btn.dataset.id);
-                const item = this.getItems().find(i => i.id === id);
-                if (item && item.quantity > 1) this.updateQuantity(id, item.quantity - 1);
-                else this.removeItem(id);
+                const key = btn.dataset.key;
+                const item = this.getItems().find(i => this.itemKey(i) === key);
+                if (item && item.quantity > 1) this.updateQuantity(key, item.quantity - 1);
+                else this.removeItem(key);
             });
         });
 
         itemsContainer.querySelectorAll('.qty-plus').forEach(btn => {
             btn.addEventListener('click', () => {
-                const id = parseInt(btn.dataset.id);
-                const item = this.getItems().find(i => i.id === id);
-                if (item) this.updateQuantity(id, item.quantity + 1);
+                const key = btn.dataset.key;
+                const item = this.getItems().find(i => this.itemKey(i) === key);
+                if (item) this.updateQuantity(key, item.quantity + 1);
             });
         });
 
         itemsContainer.querySelectorAll('.cart-item-remove').forEach(btn => {
-            btn.addEventListener('click', () => this.removeItem(parseInt(btn.dataset.id)));
+            btn.addEventListener('click', () => this.removeItem(btn.dataset.key));
         });
     },
 
@@ -257,6 +300,20 @@ const Cart = {
             <textarea class="form-input" id="checkoutNotes" placeholder=" " rows="2" style="resize: vertical; min-height: 50px;"></textarea>
             <label class="form-floating-label" for="checkoutNotes">Notas adicionales (opcional)</label>
           </div>
+          <div class="form-group" style="margin-bottom: var(--space-xl);">
+            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 500;">Medio de Pago *</label>
+            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem;">
+                <input type="radio" name="checkoutPayment" value="mercadopago" checked> MercadoPago
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem;">
+                <input type="radio" name="checkoutPayment" value="transferencia"> Transferencia
+              </label>
+              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem;">
+                <input type="radio" name="checkoutPayment" value="efectivo"> Efectivo
+              </label>
+            </div>
+          </div>
           <div class="checkout-summary">
             <div class="checkout-summary-row">
               <span>Subtotal (${this.getCount()} items)</span>
@@ -284,6 +341,34 @@ const Cart = {
 
         document.body.appendChild(overlay);
         requestAnimationFrame(() => overlay.classList.add('active'));
+
+        // Handle payment method change
+        const paymentRadios = document.querySelectorAll('input[name="checkoutPayment"]');
+        const submitBtn = document.getElementById('checkoutSubmitBtn');
+        const secureText = overlay.querySelector('p:last-of-type');
+        
+        paymentRadios.forEach(radio => {
+            radio.addEventListener('change', (e) => {
+                if (e.target.value === 'mercadopago') {
+                    submitBtn.innerHTML = `
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        Pagar con MercadoPago
+                    `;
+                    secureText.innerHTML = `
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        Pago 100% seguro a través de MercadoPago.
+                    `;
+                } else {
+                    submitBtn.textContent = 'Confirmar Pedido';
+                    secureText.textContent = e.target.value === 'transferencia' 
+                        ? 'Te enviaremos los datos bancarios para transferir.' 
+                        : 'Abonás en efectivo al retirar o recibir el pedido.';
+                }
+            });
+        });
 
         // Inline Validation for Email
         const emailInput = document.getElementById('checkoutEmail');
@@ -318,40 +403,65 @@ const Cart = {
             btn.disabled = true;
 
             try {
+                const paymentMethod = document.querySelector('input[name="checkoutPayment"]:checked').value;
                 const response = await fetch(`${this.getApiBase()}/create_preference.php`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        items: this.getItems().map(i => ({ id: i.id, quantity: i.quantity })),
+                        items: this.getItems().map(i => ({
+                            id: i.product_id,
+                            product_id: i.product_id,
+                            variant_id: i.variant_id || null,
+                            quantity: i.quantity
+                        })),
                         customer: {
                             name: document.getElementById('checkoutName').value,
                             email: document.getElementById('checkoutEmail').value,
                             phone: document.getElementById('checkoutPhone').value,
                         },
-                        notes: document.getElementById('checkoutNotes')?.value || ''
+                        notes: document.getElementById('checkoutNotes')?.value || '',
+                        payment_method: paymentMethod,
+                        idempotency_key: this.getCheckoutToken()
                     })
                 });
 
                 const contentType = response.headers.get('content-type') || '';
-                if (!response.ok || !contentType.includes('application/json')) {
+                if (!contentType.includes('application/json')) {
                     const raw = await response.text();
                     throw new Error(`Respuesta inválida del checkout (${response.status}): ${raw.slice(0, 120)}`);
                 }
 
                 const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || 'Error creating order');
+                }
 
                 if (data.init_point) {
                     this.clear();
                     // sandbox_init_point solo existe con credenciales TEST
                     // En producción, init_point es la URL correcta
                     window.location.href = data.init_point;
+                } else if (data.success_url) {
+                    this.clear();
+                    window.location.href = data.success_url;
                 } else {
-                    throw new Error(data.error || 'Error creating payment');
+                    throw new Error(data.error || 'Error creating order');
                 }
             } catch (err) {
-                btn.textContent = 'Pagar con MercadoPago';
+                const checkedPayment = document.querySelector('input[name="checkoutPayment"]:checked').value;
+                if (checkedPayment === 'mercadopago') {
+                    btn.innerHTML = `
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        Pagar con MercadoPago
+                    `;
+                } else {
+                    btn.textContent = 'Confirmar Pedido';
+                }
                 btn.disabled = false;
-                this.showNotification('Error al procesar. Intentá de nuevo.');
+                this.showNotification(err.message || 'Error al procesar. Intentá de nuevo.');
                 console.error('Checkout error:', err);
             }
         });

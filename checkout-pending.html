@@ -44,13 +44,13 @@
             <p id="paymentSyncStatus" style="color:var(--text-muted);font-size:0.95rem;margin:-0.5rem 0 var(--space-xl)"></p>
             <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap">
                 <a href="index.html" class="btn btn-primary btn-lg">Volver al Inicio</a>
-                <a id="waContactBtn" href="https://wa.me/5491125544248?text=Hola!%20Tengo%20un%20pago%20pendiente" target="_blank"
+                <a id="waContactBtn" href="https://wa.me/5491137022937?text=Hola!%20Tengo%20un%20pago%20pendiente" target="_blank"
                     class="btn btn-whatsapp btn-lg">Consultar Estado</a>
             </div>
         </div>
     </section>
 
-    <script src="js/cart.js?v=20260309-3"></script>
+    <script src="js/cart.js?v=20260316-2"></script>
     <script>Cart.clear();</script>
     <script>
         (async function syncPaymentReturn() {
@@ -61,7 +61,7 @@
             if (on) {
                 document.getElementById('orderNumberContainer').style.display = 'block';
                 document.getElementById('orderNumberDisplay').textContent = on;
-                document.getElementById('waContactBtn').href = `https://wa.me/5491125544248?text=Hola!%20Tengo%20un%20pago%20pendiente%20del%20pedido%20${on}`;
+                document.getElementById('waContactBtn').href = `https://wa.me/5491137022937?text=Hola!%20Tengo%20un%20pago%20pendiente%20del%20pedido%20${on}`;
             }
 
             if (!order) return;

@@ -8,13 +8,14 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception as MailException;
 
-// Catch fatal errors and output as JSON
+// Catch fatal errors and output as JSON (never expose internal details)
 register_shutdown_function(function() {
     $error = error_get_last();
     if ($error !== null && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        error_log('contact_fatal: ' . $error['message'] . ' in ' . $error['file'] . ':' . $error['line']);
         http_response_code(500);
         header('Content-Type: application/json; charset=utf-8');
-        echo json_encode(['error' => 'Fatal Error: ' . $error['message'] . ' in ' . basename($error['file']) . ':' . $error['line']]);
+        echo json_encode(['error' => 'Error interno del servidor.']);
         exit;
     }
 });
@@ -26,6 +27,7 @@ set_error_handler(function($severity, $message, $file, $line) {
 
 try {
     require_once __DIR__ . '/db.php';             // Includes config.php + jsonResponse()
+    require_once __DIR__ . '/security/rate_limit.php';
     require_once __DIR__ . '/../vendor/autoload.php';
 
     // Handle CORS preflight
@@ -44,8 +46,16 @@ try {
     $name    = trim($input['name'] ?? '');
     $email   = trim($input['email'] ?? '');
     $phone   = trim($input['phone'] ?? '');
+    $quantity = trim($input['quantity'] ?? '');
+    $timeline = trim($input['timeline'] ?? '');
     $subject = trim($input['subject'] ?? '');
     $message = trim($input['message'] ?? '');
+    $website = trim($input['website'] ?? '');
+
+    // Honeypot: bots usually fill hidden fields. Respond as success without sending anything.
+    if ($website !== '') {
+        jsonResponse(['success' => true, 'message' => '¡Consulta enviada! Te responderemos a la brevedad.']);
+    }
 
     if (empty($name) || empty($email) || empty($message)) {
         jsonResponse(['error' => 'Nombre, email y mensaje son obligatorios.'], 400);
@@ -55,24 +65,17 @@ try {
         jsonResponse(['error' => 'El email no es válido.'], 400);
     }
 
-    // Rate limiting: max 3 contact emails per IP per hour
-    $rateLimitDir = __DIR__ . '/../logs/';
-    if (!is_dir($rateLimitDir)) @mkdir($rateLimitDir, 0755, true);
-    $rateLimitFile = $rateLimitDir . 'contact_rate_' . md5($_SERVER['REMOTE_ADDR'] ?? 'unknown') . '.json';
-    $now = time();
-    $attempts = [];
-
-    if (file_exists($rateLimitFile)) {
-        $attempts = json_decode(file_get_contents($rateLimitFile), true) ?: [];
-        $attempts = array_filter($attempts, fn($t) => ($now - $t) < 3600);
+    if (mb_strlen($message) < 10) {
+        jsonResponse(['error' => 'Contanos un poco más sobre tu consulta para poder ayudarte mejor.'], 400);
     }
 
-    if (count($attempts) >= 3) {
-        jsonResponse(['error' => 'Demasiados mensajes enviados. Intentá nuevamente en una hora.'], 429);
-    }
-
-    $attempts[] = $now;
-    @file_put_contents($rateLimitFile, json_encode(array_values($attempts)));
+    checkAndIncrementRateLimit(
+        getRateLimitKey('contact'),
+        3,
+        3600,
+        3600,
+        'Demasiados mensajes enviados. Intentá nuevamente en una hora.'
+    );
 
     // Subject label mapping
     $subjectLabels = [
@@ -83,6 +86,30 @@ try {
         'otro'          => 'Otro',
     ];
     $subjectLabel = $subjectLabels[$subject] ?? ($subject ?: 'Sin especificar');
+
+    $timelineLabels = [
+        'esta-semana'    => 'Lo necesito esta semana',
+        'proxima-semana' => 'Lo necesito la próxima semana',
+        'este-mes'       => 'Lo necesito este mes',
+        'cotizar'        => 'Solo quiere cotizar',
+    ];
+    $timelineLabel = $timelineLabels[$timeline] ?? ($timeline ?: 'Flexible / sin apuro');
+
+    $detailRows = '';
+    if ($quantity !== '') {
+        $detailRows .= '
+            <tr>
+              <td style="padding:12px 16px; color:#999; font-size:13px; border-bottom:1px solid #2a2a2a;">Cantidad estimada</td>
+              <td style="padding:12px 16px; color:#f0f0f0; font-size:15px; border-bottom:1px solid #2a2a2a;">' . htmlspecialchars($quantity) . '</td>
+            </tr>';
+    }
+    if ($timelineLabel !== '') {
+        $detailRows .= '
+            <tr>
+              <td style="padding:12px 16px; color:#999; font-size:13px; border-bottom:1px solid #2a2a2a;">Urgencia</td>
+              <td style="padding:12px 16px; color:#f0f0f0; font-size:15px; border-bottom:1px solid #2a2a2a;">' . htmlspecialchars($timelineLabel) . '</td>
+            </tr>';
+    }
 
     // Build HTML email
     $htmlBody = '
@@ -114,6 +141,7 @@ try {
               <td style="padding:12px 16px; color:#999; font-size:13px; border-bottom:1px solid #2a2a2a;">Tipo de Consulta</td>
               <td style="padding:12px 16px; color:#f0f0f0; font-size:15px; border-bottom:1px solid #2a2a2a;">' . htmlspecialchars($subjectLabel) . '</td>
             </tr>
+            ' . $detailRows . '
           </table>
           <div style="margin-top:24px; padding:20px; background:#0d0d0d; border-radius:8px; border:1px solid #2a2a2a;">
             <p style="color:#999; font-size:12px; margin:0 0 8px 0; text-transform:uppercase; letter-spacing:1px;">Mensaje</p>
@@ -151,10 +179,12 @@ try {
     $mail->addAddress('contacto@printingbruno.com', 'PrintingBruno');
     $mail->addAddress('printingbruno.22@gmail.com', 'PrintingBruno Gmail');
 
+    // Strip CRLFs from name/subject to prevent email header injection
+    $safeSubjectName = str_replace(["\r", "\n", "\r\n"], '', $name);
     $mail->isHTML(true);
-    $mail->Subject = "Nueva consulta: $subjectLabel - $name";
+    $mail->Subject = "Nueva consulta: $subjectLabel - $safeSubjectName";
     $mail->Body    = $htmlBody;
-    $mail->AltBody = "Nueva consulta de $name ($email)\nTipo: $subjectLabel\nTeléfono: " . ($phone ?: 'N/A') . "\n\nMensaje:\n$message";
+    $mail->AltBody = "Nueva consulta de $name ($email)\nTipo: $subjectLabel\nTeléfono: " . ($phone ?: 'N/A') . "\nCantidad: " . ($quantity ?: 'N/A') . "\nUrgencia: $timelineLabel\n\nMensaje:\n$message";
 
     $mail->send();
 
@@ -173,12 +203,12 @@ try {
     error_log('contact_form_error: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
     http_response_code(500);
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['error' => 'Error al enviar: ' . $e->getMessage()]);
+    echo json_encode(['error' => 'Error al enviar el mensaje. Por favor intentá nuevamente.']);
     exit;
 } catch (\Error $e) {
     error_log('contact_form_fatal: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine());
     http_response_code(500);
     header('Content-Type: application/json; charset=utf-8');
-    echo json_encode(['error' => 'Error del servidor: ' . $e->getMessage()]);
+    echo json_encode(['error' => 'Error interno del servidor.']);
     exit;
 }

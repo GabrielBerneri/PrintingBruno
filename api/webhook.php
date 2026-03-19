@@ -6,6 +6,7 @@
  */
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/order_utils.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
 use MercadoPago\MercadoPagoConfig;
@@ -100,63 +101,69 @@ try {
             $paymentStatus = $payment->status;
             $externalRef   = $payment->external_reference; // nuestro order ID
             $merchantOrderId = $payment->order->id ?? null;
-
-            $statusMap = [
-                'approved'   => 'approved',
-                'pending'    => 'pending',
-                'in_process' => 'in_process',
-                'rejected'   => 'rejected',
-                'refunded'   => 'refunded',
-                'cancelled'  => 'cancelled',
-            ];
-
-            $ourStatus = $statusMap[$paymentStatus] ?? 'pending';
+            $ourPaymentStatus = pbMapMercadoPagoStatusToPaymentStatus($paymentStatus);
 
             $db   = getDB();
-            
-            // Check old status to handle stock restitution
-            $stmt = $db->prepare("SELECT status FROM orders WHERE id = ?");
+            pbExpireReservations($db);
+            $db->beginTransaction();
+
+            $stmt = $db->prepare("SELECT * FROM orders WHERE id = ? FOR UPDATE");
             $stmt->execute([(int)$externalRef]);
             $oldOrder = $stmt->fetch();
-            $oldStatus = $oldOrder['status'] ?? '';
-            
+            if (!$oldOrder) {
+                $db->rollBack();
+                file_put_contents(
+                    $logFile,
+                    date('Y-m-d H:i:s') . " | ORDER NOT FOUND order_id={$externalRef} payment_status={$paymentStatus}\n",
+                    FILE_APPEND | LOCK_EX
+                );
+                jsonResponse(['status' => 'ok']);
+                exit;
+            }
+
+            $nextLifecycle = pbResolveOrderLifecycle($oldOrder, [
+                'payment_status' => $ourPaymentStatus,
+            ]);
+            $transitionError = pbLifecycleTransitionError($oldOrder, $nextLifecycle);
+            if ($transitionError !== null) {
+                $db->rollBack();
+                file_put_contents(
+                    $logFile,
+                    date('Y-m-d H:i:s') . " | INVALID TRANSITION order_id={$externalRef} error={$transitionError}\n",
+                    FILE_APPEND | LOCK_EX
+                );
+                jsonResponse(['status' => 'ok']);
+                exit;
+            }
+
+            pbApplyLifecycleTransitionEffects($db, $oldOrder, $nextLifecycle);
+
             $stmt = $db->prepare(
-                "UPDATE orders SET status = ?, mp_payment_id = ?, mp_merchant_order_id = ?, updated_at = NOW() WHERE id = ?"
+                "UPDATE orders
+                 SET status = ?, payment_status = ?, fulfillment_status = ?, mp_payment_id = ?, mp_merchant_order_id = ?, checkout_status = ?,
+                     payment_verified_at = CASE
+                         WHEN ? = 'approved' AND payment_verified_at IS NULL THEN NOW()
+                         ELSE payment_verified_at
+                     END,
+                     updated_at = NOW()
+                 WHERE id = ?"
             );
             $stmt->execute([
-                $ourStatus,
+                $nextLifecycle['status'],
+                $nextLifecycle['payment_status'],
+                $nextLifecycle['fulfillment_status'],
                 (string)$dataId,
                 (string)$merchantOrderId,
+                $nextLifecycle['checkout_status'],
+                $nextLifecycle['payment_status'],
                 (int)$externalRef,
             ]);
 
-            // Descontar stock solo en pago aprobado
-            if ($ourStatus === 'approved') {
-                $stmt = $db->prepare("SELECT product_id, quantity FROM order_items WHERE order_id = ?");
-                $stmt->execute([(int)$externalRef]);
-                $items = $stmt->fetchAll();
-
-                foreach ($items as $item) {
-                    $db->prepare("UPDATE products SET stock = GREATEST(0, stock - ?) WHERE id = ?")
-                       ->execute([$item['quantity'], $item['product_id']]);
-                }
-            }
-            
-            // Restituir stock si era approved y ahora es refunded/cancelled
-            if ($oldStatus === 'approved' && in_array($ourStatus, ['refunded', 'cancelled'], true)) {
-                $stmt = $db->prepare("SELECT product_id, quantity FROM order_items WHERE order_id = ?");
-                $stmt->execute([(int)$externalRef]);
-                $items = $stmt->fetchAll();
-
-                foreach ($items as $item) {
-                    $db->prepare("UPDATE products SET stock = stock + ? WHERE id = ?")
-                       ->execute([$item['quantity'], $item['product_id']]);
-                }
-            }
+            $db->commit();
 
             file_put_contents(
                 $logFile,
-                date('Y-m-d H:i:s') . " | Order #{$externalRef} → {$ourStatus}\n",
+                date('Y-m-d H:i:s') . " | Order #{$externalRef} → payment={$nextLifecycle['payment_status']} legacy={$nextLifecycle['status']}\n",
                 FILE_APPEND | LOCK_EX
             );
         }
@@ -166,6 +173,9 @@ try {
     jsonResponse(['status' => 'ok']);
 
 } catch (Exception $e) {
+    if (isset($db) && $db instanceof PDO && $db->inTransaction()) {
+        $db->rollBack();
+    }
     $errorLog = __DIR__ . '/../logs/webhook_errors.log';
     $logDir   = dirname($errorLog);
     if (!is_dir($logDir)) mkdir($logDir, 0755, true);

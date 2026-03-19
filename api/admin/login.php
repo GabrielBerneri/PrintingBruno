@@ -9,6 +9,7 @@
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../security/rate_limit.php';
 require_once __DIR__ . '/session.php';  // session segura (HttpOnly, Secure, SameSite)
+require_once __DIR__ . '/audit.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -29,12 +30,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password_hash'])) {
-        // Login exitoso — regenerar ID de sesión para prevenir session fixation
-        session_regenerate_id(true);
+        // Si ya existía sesión, regenerar el ID para prevenir fixation.
+        // Si no existía, arrancarla recién ahora evita emitir dos Set-Cookie.
+        $hadActiveSession = session_status() === PHP_SESSION_ACTIVE;
+        adminEnsureSessionStarted();
+        if ($hadActiveSession) {
+            session_regenerate_id(true);
+        }
         $_SESSION['admin_id']   = $user['id'];
         $_SESSION['admin_user'] = $user['username'];
+        $_SESSION['admin_csrf_token'] = bin2hex(random_bytes(32));
         clearRateLimit($rateLimitKey);
-        jsonResponse(['success' => true, 'user' => $user['username']]);
+        adminAuditLog('login', 'admin_session', (int)$user['id'], ['username' => $user['username']]);
+        jsonResponse(['success' => true, 'user' => $user['username'], 'csrf_token' => adminCsrfToken()]);
     } else {
         recordFailedAttempt($rateLimitKey);
         // Mismo mensaje para usuario y contraseña → no revela cuál es incorrecto
@@ -44,12 +52,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     if (!empty($_SESSION['admin_id'])) {
-        jsonResponse(['authenticated' => true, 'user' => $_SESSION['admin_user']]);
+        jsonResponse(['authenticated' => true, 'user' => $_SESSION['admin_user'], 'csrf_token' => adminCsrfToken()]);
     } else {
         jsonResponse(['authenticated' => false], 401);
     }
 
 } elseif ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    adminRequireCsrf();
+    adminAuditLog('logout', 'admin_session', !empty($_SESSION['admin_id']) ? (int)$_SESSION['admin_id'] : null);
 
     // Destruir sesión completamente y limpiar cookie
     $_SESSION = [];

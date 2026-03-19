@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /api/
+Disallow: /admin/
+Disallow: /logs/
+Disallow: /vendor/
+Disallow: /sql/
+
+Sitemap: https://www.printingbruno.com/sitemap.xml

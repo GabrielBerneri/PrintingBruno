@@ -4,6 +4,19 @@
    ============================================ */
 
 document.addEventListener('DOMContentLoaded', () => {
+  function showToast(message) {
+    document.querySelectorAll('.site-toast').forEach(el => el.remove());
+    const toast = document.createElement('div');
+    toast.className = 'site-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    requestAnimationFrame(() => toast.classList.add('show'));
+    setTimeout(() => {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 250);
+    }, 2800);
+  }
+
   // ===== Mobile Menu Toggle =====
   const menuToggle = document.getElementById('menuToggle');
   const nav = document.getElementById('nav');
@@ -117,6 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSearch = '';
 
   if (catalogSidebar && catalogGrid) {
+    let emptyState = null;
+
     function applyFilterAndSearch() {
       const cards = catalogGrid.querySelectorAll('.product-card');
       let visibleCount = 0;
@@ -140,6 +155,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (productCount) {
         productCount.textContent = `Mostrando ${visibleCount} producto${visibleCount !== 1 ? 's' : ''}`;
+      }
+
+      if (visibleCount === 0) {
+        if (!emptyState) {
+          emptyState = document.createElement('div');
+          emptyState.className = 'catalog-empty-state';
+          emptyState.innerHTML = `
+            <svg width="72" height="72" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <h3>No encontramos coincidencias</h3>
+            <p>Probá con otra búsqueda o cambiá la categoría para ver más productos.</p>
+          `;
+        }
+        if (!catalogGrid.contains(emptyState)) {
+          catalogGrid.appendChild(emptyState);
+        }
+      } else if (emptyState && catalogGrid.contains(emptyState)) {
+        emptyState.remove();
       }
     }
 
@@ -232,40 +267,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       cards.forEach(card => catalogGrid.appendChild(card));
-    });
-  }
-
-  // ===== Contact Form =====
-  const contactForm = document.getElementById('contactForm');
-  if (contactForm) {
-    contactForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-
-      const name = document.getElementById('name').value;
-      const email = document.getElementById('email').value;
-      const phone = document.getElementById('phone').value;
-      const subject = document.getElementById('subject').value;
-      const message = document.getElementById('message').value;
-
-      // Build WhatsApp message
-      let waMessage = `Hola! Soy ${name}.`;
-      if (subject) waMessage += `\nConsulta: ${subject}`;
-      waMessage += `\n\n${message}`;
-      if (email) waMessage += `\n\nEmail: ${email}`;
-      if (phone) waMessage += `\nTel: ${phone}`;
-
-      const waUrl = `https://wa.me/5491125544248?text=${encodeURIComponent(waMessage)}`;
-      window.open(waUrl, '_blank');
-
-      // Show success message
-      const btn = contactForm.querySelector('button[type="submit"]');
-      const originalText = btn.textContent;
-      btn.textContent = '✓ Redirigiendo a WhatsApp...';
-      btn.style.background = '#25D366';
-      setTimeout(() => {
-        btn.textContent = originalText;
-        btn.style.background = '';
-      }, 3000);
     });
   }
 

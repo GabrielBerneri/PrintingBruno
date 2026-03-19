@@ -4,21 +4,31 @@
 
 # Enable rewrite engine
 RewriteEngine On
+DirectoryIndex index.php index.html
+SetEnvIf Host "^(localhost|127\.0\.0\.1)(:\d+)?$" IS_LOCALHOST=1
+
+# Keep public URLs as .html while rendering shared PHP templates underneath.
+RewriteRule ^(index|catalogo|producto|nosotros|contacto|mi-cuenta)\.html$ $1.php [L]
+
+# Block direct access to dotfiles except ACME/PKI well-known paths.
+RewriteRule "(^|/)\.(?!well-known(?:/|$))" - [F,L]
 
 # ===== Protect Sensitive Files & Directories =====
-# Block access to .env, .git, composer files, SQL dumps, logs
-<FilesMatch "^\.env|^\.git|^composer\.(json|lock)$">
+# Block access to config and build artifacts
+<FilesMatch "^(composer\.(json|lock)|package(-lock)?\.json|phpunit\.xml)$">
   Require all denied
 </FilesMatch>
 
-# Block access to vendor/, sql/, logs/ directories
+# Block access to vendor/, sql/, logs/, scripts/ directories
 RewriteRule ^vendor(/|$) - [F,L]
 RewriteRule ^sql(/|$) - [F,L]
 RewriteRule ^logs(/|$) - [F,L]
+RewriteRule ^scripts(/|$) - [F,L]
 
-# Force HTTPS
-RewriteCond %{HTTPS} off
-RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+# Force HTTPS in production
+RewriteCond %{ENV:IS_LOCALHOST} !1
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
 # Remove www (optional - uncomment if needed)
 # RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
@@ -54,10 +64,11 @@ RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
   Header set X-XSS-Protection "1; mode=block"
   Header set Referrer-Policy "strict-origin-when-cross-origin"
   Header set Permissions-Policy "camera=(), microphone=(), geolocation=()"
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
   # Content Security Policy
   # 'unsafe-inline' necesario por scripts/estilos inline actuales
   # frame-src permite el checkout de MercadoPago
-  Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self'; frame-src https://www.mercadopago.com.ar https://mercadopago.com https://mercadopago.com.ar; object-src 'none'; base-uri 'self'; form-action 'self'"
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com; frame-src https://www.mercadopago.com.ar https://mercadopago.com https://mercadopago.com.ar; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
 </IfModule>
 
 # Prevent directory listing
@@ -68,12 +79,13 @@ Options -Indexes
   RewriteRule ^vendor(/|$) - [F,L]
   RewriteRule ^logs(/|$)   - [F,L]
   RewriteRule ^sql(/|$)    - [F,L]
+  RewriteRule ^scripts(/|$) - [F,L]
 </IfModule>
 
 # Bloquear acceso a archivos de configuración y sensibles
-<FilesMatch "\.(json|lock|md|sh|env|log)$">
+<FilesMatch "\.(sql|bak|ini|log|sh|env|dist|md)$">
   Require all denied
 </FilesMatch>
 
-# Custom error pages (optional)
-ErrorDocument 404 /index.html
+# Custom error pages
+ErrorDocument 404 /404.html

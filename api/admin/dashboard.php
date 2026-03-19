@@ -6,22 +6,24 @@
 
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/../db.php';
+require_once __DIR__ . '/../order_utils.php';
 
 if (empty($_SESSION['admin_id'])) {
     jsonResponse(['error' => 'Unauthorized'], 401);
 }
 
 $db = getDB();
+pbExpireReservations($db);
 
 try {
     // Revenue & order counts
     $stmt = $db->query("
         SELECT
             COUNT(*) AS total_orders,
-            COALESCE(SUM(CASE WHEN status = 'approved' THEN total ELSE 0 END), 0) AS total_revenue,
-            COALESCE(SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END), 0) AS approved_orders,
-            COALESCE(SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END), 0) AS pending_orders,
-            COALESCE(SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END), 0) AS rejected_orders
+            COALESCE(SUM(CASE WHEN payment_status = 'approved' THEN total ELSE 0 END), 0) AS total_revenue,
+            COALESCE(SUM(CASE WHEN payment_status = 'approved' THEN 1 ELSE 0 END), 0) AS approved_orders,
+            COALESCE(SUM(CASE WHEN payment_status IN ('pending', 'under_review') THEN 1 ELSE 0 END), 0) AS pending_orders,
+            COALESCE(SUM(CASE WHEN payment_status IN ('rejected', 'cancelled', 'charged_back') THEN 1 ELSE 0 END), 0) AS rejected_orders
         FROM orders
     ");
     $orderStats = $stmt->fetch();
@@ -30,17 +32,29 @@ try {
     $stmt = $db->query("
         SELECT
             COUNT(*) AS total_products,
-            COALESCE(SUM(CASE WHEN active = 1 THEN 1 ELSE 0 END), 0) AS active_products,
-            COALESCE(SUM(CASE WHEN stock < 5 AND active = 1 THEN 1 ELSE 0 END), 0) AS low_stock_count
-        FROM products
+            COALESCE(SUM(CASE WHEN p.active = 1 THEN 1 ELSE 0 END), 0) AS active_products,
+            COALESCE(SUM(CASE WHEN p.active = 1 AND (p.stock - COALESCE(r.active_reserved, 0)) < 5 THEN 1 ELSE 0 END), 0) AS low_stock_count
+        FROM products p
+        LEFT JOIN (
+            SELECT product_id, SUM(quantity) AS active_reserved
+            FROM stock_reservations
+            WHERE status = 'active'
+            GROUP BY product_id
+        ) r ON r.product_id = p.id
     ");
     $productStats = $stmt->fetch();
 
     // Low stock products (active, stock < 5)
     $stmt = $db->query("
-        SELECT id, name, stock, category, image_url
-        FROM products
-        WHERE active = 1 AND stock < 5
+        SELECT p.id, p.name, (p.stock - COALESCE(r.active_reserved, 0)) AS stock, p.category, p.image_url
+        FROM products p
+        LEFT JOIN (
+            SELECT product_id, SUM(quantity) AS active_reserved
+            FROM stock_reservations
+            WHERE status = 'active'
+            GROUP BY product_id
+        ) r ON r.product_id = p.id
+        WHERE p.active = 1 AND (p.stock - COALESCE(r.active_reserved, 0)) < 5
         ORDER BY stock ASC
         LIMIT 10
     ");
@@ -49,10 +63,10 @@ try {
     // Top 5 best-selling products
     $stmt = $db->query("
         SELECT p.id, p.name, p.image_url, p.price, p.stock,
-               COALESCE(SUM(oi.quantity), 0) AS total_sold
+               COALESCE(SUM(CASE WHEN o.payment_status = 'approved' THEN oi.quantity ELSE 0 END), 0) AS total_sold
         FROM products p
         LEFT JOIN order_items oi ON oi.product_id = p.id
-        LEFT JOIN orders o ON o.id = oi.order_id AND o.status = 'approved'
+        LEFT JOIN orders o ON o.id = oi.order_id
         GROUP BY p.id
         ORDER BY total_sold DESC
         LIMIT 5
@@ -65,7 +79,7 @@ try {
 
     // Recent orders (last 5)
     $stmt = $db->query("
-        SELECT id, order_number, customer_name, total, status, created_at
+        SELECT id, order_number, customer_name, total, status, payment_status, fulfillment_status, created_at
         FROM orders
         ORDER BY created_at DESC
         LIMIT 5
@@ -73,6 +87,10 @@ try {
     $recentOrders = $stmt->fetchAll();
     foreach ($recentOrders as &$ro) {
         $ro['total'] = (float)$ro['total'];
+        $lifecycle = pbGetOrderLifecycle($ro);
+        $ro['status'] = $lifecycle['status'];
+        $ro['payment_status'] = $lifecycle['payment_status'];
+        $ro['fulfillment_status'] = $lifecycle['fulfillment_status'];
     }
 
     jsonResponse([
