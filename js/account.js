@@ -11,12 +11,19 @@ const Account = {
     expiresAt: '',
     verifyToken: '',
     resetToken: '',
+    orders: [],
+    orderDetails: {},
+    orderDetailErrors: {},
+    orderDetailLoadingId: '',
+    activeOrderId: '',
+    ordersFilter: 'all',
   },
 
   init() {
     this.cacheElements();
     this.bindAuthTabs();
     this.bindDashboardTabs();
+    this.bindOrderFilters();
     this.bindForms();
     this.bindQueryActions();
     this.showAuthTab('login');
@@ -26,6 +33,7 @@ const Account = {
   },
 
   cacheElements() {
+    this.accountGrid = document.getElementById('accountGrid');
     this.authCard = document.getElementById('authCard');
     this.dashboardCard = document.getElementById('dashboardCard');
     this.customerGreeting = document.getElementById('customerGreeting');
@@ -37,10 +45,15 @@ const Account = {
     this.resetPasswordMessage = document.getElementById('resetPasswordMessage');
     this.profileMessage = document.getElementById('profileMessage');
     this.addressMessage = document.getElementById('addressMessage');
-    this.ordersTable = document.getElementById('ordersTable');
-    this.orderDetailCard = document.getElementById('orderDetailCard');
-    this.orderDetailPlaceholder = document.getElementById('orderDetailPlaceholder');
+    this.ordersList = document.getElementById('ordersList');
+    this.ordersFilterNote = document.getElementById('ordersFilterNote');
     this.addressesList = document.getElementById('addressesList');
+    this.accountVerificationNotice = document.getElementById('accountVerificationNotice');
+    this.resendVerificationBtn = document.getElementById('resendVerificationBtn');
+    this.ordersOverviewTotal = document.getElementById('ordersOverviewTotal');
+    this.ordersOverviewPending = document.getElementById('ordersOverviewPending');
+    this.ordersOverviewProduction = document.getElementById('ordersOverviewProduction');
+    this.ordersOverviewShipped = document.getElementById('ordersOverviewShipped');
   },
 
   escapeHTML(value) {
@@ -144,6 +157,51 @@ const Account = {
     return `<span class="order-badge ${type}-${normalized}">${this.escapeHTML(this.statusLabel(type, normalized))}</span>`;
   },
 
+  paymentMethodLabel(value) {
+    const labels = {
+      mercadopago: 'Mercado Pago',
+      transferencia: 'Transferencia',
+      efectivo: 'Efectivo',
+    };
+    const normalized = String(value || 'mercadopago').trim().toLowerCase();
+    return labels[normalized] || normalized;
+  },
+
+  isOrderPending(order = {}) {
+    return ['pending', 'under_review'].includes(String(order.payment_status || '').trim().toLowerCase());
+  },
+
+  isOrderCancelled(order = {}) {
+    const paymentStatus = String(order.payment_status || '').trim().toLowerCase();
+    const fulfillmentStatus = String(order.fulfillment_status || '').trim().toLowerCase();
+    return ['rejected', 'cancelled', 'refunded', 'charged_back'].includes(paymentStatus) || fulfillmentStatus === 'cancelled';
+  },
+
+  isOrderInProduction(order = {}) {
+    const fulfillmentStatus = String(order.fulfillment_status || '').trim().toLowerCase();
+    return ['queued', 'in_production', 'ready'].includes(fulfillmentStatus) && !this.isOrderCancelled(order);
+  },
+
+  isOrderShipped(order = {}) {
+    const fulfillmentStatus = String(order.fulfillment_status || '').trim().toLowerCase();
+    return ['shipped', 'delivered'].includes(fulfillmentStatus);
+  },
+
+  getOrderInlineHint(order = {}) {
+    const paymentMethod = String(order.payment_method || '').trim().toLowerCase();
+    const paymentStatus = String(order.payment_status || '').trim().toLowerCase();
+
+    if (paymentMethod === 'transferencia' && ['pending', 'under_review'].includes(paymentStatus)) {
+      return 'Tu pedido está reservado. Cuando confirmemos la transferencia, pasa a producción.';
+    }
+
+    if (paymentMethod === 'efectivo' && ['pending', 'under_review'].includes(paymentStatus)) {
+      return 'El pago en efectivo se coordina al retirar o recibir el pedido.';
+    }
+
+    return '';
+  },
+
   showAuthTab(tab) {
     document.querySelectorAll('[data-auth-tab]').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.authTab === tab);
@@ -202,6 +260,23 @@ const Account = {
     });
   },
 
+  bindOrderFilters() {
+    document.querySelectorAll('[data-order-filter]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        this.state.ordersFilter = btn.dataset.orderFilter || 'all';
+        const visibleOrders = this.getFilteredOrders();
+        const activeVisible = visibleOrders.find(order => String(order.id) === String(this.state.activeOrderId || ''));
+        const targetOrder = activeVisible || visibleOrders[0];
+        if (targetOrder) {
+          await this.loadOrderDetail(targetOrder.id);
+        } else {
+          this.state.activeOrderId = '';
+          this.renderOrdersList();
+        }
+      });
+    });
+  },
+
   bindForms() {
     document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
     document.getElementById('registerForm').addEventListener('submit', (e) => this.handleRegister(e));
@@ -211,6 +286,9 @@ const Account = {
     document.getElementById('addressForm').addEventListener('submit', (e) => this.handleAddressSave(e));
     document.getElementById('addressResetBtn').addEventListener('click', () => this.resetAddressForm());
     document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
+    if (this.resendVerificationBtn) {
+      this.resendVerificationBtn.addEventListener('click', () => this.handleResendVerification());
+    }
     ['registerFirstName', 'registerLastName', 'profileFirstName', 'profileLastName'].forEach((id) => {
       const input = document.getElementById(id);
       if (input) {
@@ -254,14 +332,26 @@ const Account = {
     this.state.customer = null;
     this.dashboardCard.hidden = true;
     this.authCard.hidden = false;
+    if (this.accountGrid) {
+      this.accountGrid.classList.remove('account-grid-dashboard');
+    }
+    this.state.orders = [];
+    this.state.orderDetails = {};
+    this.state.orderDetailErrors = {};
+    this.state.orderDetailLoadingId = '';
+    this.state.activeOrderId = '';
     if (this.sessionMeta) {
       this.sessionMeta.hidden = true;
     }
+    this.updateVerificationNotice();
   },
 
   showDashboardView() {
     this.dashboardCard.hidden = false;
     this.authCard.hidden = true;
+    if (this.accountGrid) {
+      this.accountGrid.classList.add('account-grid-dashboard');
+    }
     const customer = this.state.customer || {};
     const name = customer.full_name || [customer.first_name, customer.last_name].filter(Boolean).join(' ').trim() || customer.email || 'cliente';
     this.customerGreeting.textContent = `Hola, ${name}`;
@@ -272,6 +362,14 @@ const Account = {
         ? `Sesión activa hasta ${this.formatDateTime(this.state.expiresAt)}`
         : 'Sesión activa';
     }
+    this.updateVerificationNotice();
+  },
+
+  updateVerificationNotice() {
+    if (!this.accountVerificationNotice) return;
+    const customer = this.state.customer || {};
+    const shouldShow = this.state.authenticated && !customer.is_verified;
+    this.accountVerificationNotice.hidden = !shouldShow;
   },
 
   syncDerivedNameFields() {
@@ -408,6 +506,26 @@ const Account = {
     }
   },
 
+  async handleResendVerification() {
+    if (!this.resendVerificationBtn) return;
+    const originalText = this.resendVerificationBtn.textContent;
+    this.resendVerificationBtn.disabled = true;
+    this.resendVerificationBtn.textContent = 'Enviando...';
+
+    try {
+      const data = await this.request('auth/resend_verification.php', {
+        method: 'POST',
+        body: JSON.stringify({}),
+      });
+      this.showFlowStatus(data.message || 'Te reenviamos el email de verificación.', 'success');
+    } catch (error) {
+      this.showFlowStatus(error.message || 'No se pudo reenviar el email de verificación.', 'error');
+    } finally {
+      this.resendVerificationBtn.disabled = false;
+      this.resendVerificationBtn.textContent = originalText;
+    }
+  },
+
   async verifyEmail(token) {
     if (!token) return;
     this.showFlowStatus('Verificando email...', 'info');
@@ -479,6 +597,7 @@ const Account = {
       document.getElementById('profilePhone').value = source.phone || '';
       this.setMessage(this.profileMessage, 'Datos cargados.');
       this.syncDerivedNameFields();
+      this.showDashboardView();
     } catch (error) {
       this.setMessage(this.profileMessage, error.message || 'No se pudo cargar el perfil', 'error');
     }
@@ -511,86 +630,50 @@ const Account = {
     }
   },
 
-  async loadOrders() {
-    this.ordersTable.innerHTML = '<tr><td class="account-empty">Cargando pedidos...</td></tr>';
-    this.showOrderDetailPlaceholder('Cargando detalle...');
-    try {
-      const data = await this.request('customer/orders.php', { method: 'GET' });
-      const orders = Array.isArray(data.orders) ? data.orders : Array.isArray(data.items) ? data.items : [];
-      this.state.orders = orders;
-      if (orders.length === 0) {
-        this.ordersTable.innerHTML = '<tr><td class="account-empty">No tenés pedidos todavía.</td></tr>';
-        this.showOrderDetailPlaceholder('Todavía no tenés pedidos para ver en detalle.');
-        return;
-      }
-
-      this.ordersTable.innerHTML = `
-        <thead>
-          <tr>
-            <th>Orden</th>
-            <th>Pago</th>
-            <th>Operación</th>
-            <th>Total</th>
-            <th>Fecha</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${orders.map(order => `
-            <tr data-order-row="${this.escapeHTML(order.id)}">
-              <td>
-                <strong>${this.escapeHTML(order.order_number || `#${order.id || ''}`)}</strong>
-                ${order.payment_method ? `<div style="color:var(--text-muted);font-size:0.8rem">${this.escapeHTML(order.payment_method)}</div>` : ''}
-              </td>
-              <td>${this.renderStatusBadge('payment', order.payment_status || 'pending')}</td>
-              <td>${this.renderStatusBadge('fulfillment', order.fulfillment_status || 'queued')}</td>
-              <td style="font-weight:700;color:var(--accent)">$${Number(order.total || 0).toLocaleString('es-AR')}</td>
-              <td style="color:var(--text-secondary)">${this.escapeHTML(this.formatDate(order.created_at || order.date || ''))}</td>
-              <td style="text-align:right">
-                <button type="button" class="btn btn-secondary btn-sm" data-order-detail="${this.escapeHTML(order.id)}">Ver detalle</button>
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      `;
-
-      this.ordersTable.querySelectorAll('[data-order-detail]').forEach((button) => {
-        button.addEventListener('click', () => {
-          this.loadOrderDetail(button.dataset.orderDetail);
-        });
-      });
-
-      const currentOrderId = this.state.activeOrderId || orders[0]?.id;
-      if (currentOrderId) {
-        await this.loadOrderDetail(currentOrderId);
-      } else {
-        this.showOrderDetailPlaceholder('Seleccioná un pedido para ver el detalle.');
-      }
-    } catch (error) {
-      this.ordersTable.innerHTML = `<tr><td class="account-empty">${this.escapeHTML(error.message || 'No se pudieron cargar los pedidos')}</td></tr>`;
-      this.showOrderDetailPlaceholder(error.message || 'No se pudo cargar el detalle de pedidos.');
-    }
+  setOrdersFilterNote(text) {
+    if (!this.ordersFilterNote) return;
+    this.ordersFilterNote.textContent = text || '';
   },
 
-  showOrderDetailPlaceholder(message) {
-    if (this.orderDetailCard) {
-      this.orderDetailCard.hidden = true;
-      this.orderDetailCard.innerHTML = '';
-    }
-    if (this.orderDetailPlaceholder) {
-      this.orderDetailPlaceholder.hidden = false;
-      this.orderDetailPlaceholder.textContent = message;
-    }
+  renderOrdersOverview(orders = []) {
+    const total = orders.length;
+    const pending = orders.filter(order => this.isOrderPending(order)).length;
+    const production = orders.filter(order => this.isOrderInProduction(order)).length;
+    const shipped = orders.filter(order => this.isOrderShipped(order)).length;
+
+    if (this.ordersOverviewTotal) this.ordersOverviewTotal.textContent = total.toLocaleString('es-AR');
+    if (this.ordersOverviewPending) this.ordersOverviewPending.textContent = pending.toLocaleString('es-AR');
+    if (this.ordersOverviewProduction) this.ordersOverviewProduction.textContent = production.toLocaleString('es-AR');
+    if (this.ordersOverviewShipped) this.ordersOverviewShipped.textContent = shipped.toLocaleString('es-AR');
   },
 
-  renderOrderDetail(order) {
-    if (!this.orderDetailCard) return;
+  getFilteredOrders() {
+    const filter = this.state.ordersFilter || 'all';
+    const orders = Array.isArray(this.state.orders) ? this.state.orders : [];
 
+    return orders.filter((order) => {
+      switch (filter) {
+        case 'pending':
+          return this.isOrderPending(order);
+        case 'production':
+          return this.isOrderInProduction(order);
+        case 'shipped':
+          return this.isOrderShipped(order);
+        case 'cancelled':
+          return this.isOrderCancelled(order);
+        default:
+          return true;
+      }
+    });
+  },
+
+  renderOrderDetailContent(order) {
     const items = Array.isArray(order.items) ? order.items : [];
     const notes = String(order.notes || '').trim();
     const paymentReference = String(order.payment_reference || '').trim();
+    const inlineHint = this.getOrderInlineHint(order);
 
-    this.orderDetailCard.innerHTML = `
+    return `
       <div class="order-detail-head">
         <div>
           <h3>${this.escapeHTML(order.order_number || `#${order.id || ''}`)}</h3>
@@ -620,13 +703,14 @@ const Account = {
         </div>
         <div>
           <strong>Método</strong>
-          <span>${this.escapeHTML(order.payment_method || 'mercadopago')}</span>
+          <span>${this.escapeHTML(this.paymentMethodLabel(order.payment_method || 'mercadopago'))}</span>
         </div>
         <div>
           <strong>Referencia</strong>
           <span>${this.escapeHTML(paymentReference || '—')}</span>
         </div>
       </div>
+      ${inlineHint ? `<div class="order-inline-note"><strong>Próximo paso:</strong> ${this.escapeHTML(inlineHint)}</div>` : ''}
       ${notes ? `<div><strong style="display:block;margin-bottom:6px;color:var(--text-muted);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.04em">Notas</strong><p style="margin:0;color:var(--text-secondary)">${this.escapeHTML(notes)}</p></div>` : ''}
       <div>
         <strong style="display:block;margin-bottom:8px;color:var(--text-muted);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.04em">Productos</strong>
@@ -645,34 +729,191 @@ const Account = {
         </div>
       </div>
     `;
+  },
 
-    if (this.orderDetailPlaceholder) {
-      this.orderDetailPlaceholder.hidden = true;
+  renderOrdersList() {
+    const orders = this.getFilteredOrders();
+    document.querySelectorAll('[data-order-filter]').forEach((btn) => {
+      btn.classList.toggle('active', btn.dataset.orderFilter === this.state.ordersFilter);
+    });
+
+    if (!this.ordersList) return;
+
+    if (!orders.length) {
+      this.ordersList.innerHTML = '<div class="account-empty">No hay pedidos en este estado.</div>';
+      this.setOrdersFilterNote(`Mostrando 0 de ${Array.isArray(this.state.orders) ? this.state.orders.length : 0} pedidos`);
+      return;
     }
-    this.orderDetailCard.hidden = false;
+
+    this.setOrdersFilterNote(`Mostrando ${orders.length} de ${Array.isArray(this.state.orders) ? this.state.orders.length : orders.length} pedidos`);
+    this.ordersList.innerHTML = orders.map((order) => {
+      const preview = order.first_item || null;
+      const orderId = String(order.id);
+      const isActive = orderId === String(this.state.activeOrderId || '');
+      const activeClass = isActive ? ' active' : '';
+      const detail = this.state.orderDetails[orderId] || null;
+      const detailError = this.state.orderDetailErrors[orderId] || '';
+      const isLoading = this.state.orderDetailLoadingId === orderId;
+      const itemCount = Number(order.item_count || 0);
+      const unitsCount = Number(order.units_count || 0);
+      const inlineHint = this.getOrderInlineHint(order);
+      let detailMarkup = '';
+
+      if (isActive) {
+        if (isLoading) {
+          detailMarkup = '<div class="order-card-detail"><div class="order-card-detail-state">Cargando detalle del pedido...</div></div>';
+        } else if (detailError) {
+          detailMarkup = `<div class="order-card-detail"><div class="order-card-detail-state">${this.escapeHTML(detailError)}</div></div>`;
+        } else if (detail) {
+          detailMarkup = `<div class="order-card-detail">${this.renderOrderDetailContent(detail)}</div>`;
+        }
+      }
+
+      return `
+        <article class="order-card${activeClass}" data-order-card="${this.escapeHTML(order.id)}" tabindex="0" role="button" aria-expanded="${isActive ? 'true' : 'false'}">
+          <div class="order-card-head">
+            <div class="order-card-order">
+              <strong>${this.escapeHTML(order.order_number || `#${order.id || ''}`)}</strong>
+              <span>${this.escapeHTML(this.formatDate(order.created_at || order.date || ''))}</span>
+            </div>
+            <div class="order-status-stack">
+              ${this.renderStatusBadge('payment', order.payment_status || 'pending')}
+              ${this.renderStatusBadge('fulfillment', order.fulfillment_status || 'queued')}
+            </div>
+          </div>
+
+          <div class="order-card-preview">
+            <img src="${this.escapeHTML(preview?.image_url || 'assets/logo/logo.png')}" alt="${this.escapeHTML(preview?.product_name || 'Pedido')}" loading="lazy">
+            <div>
+              <strong>${this.escapeHTML(preview?.product_name || 'Pedido sin vista previa')}</strong>
+              <p>${this.escapeHTML(preview?.variant_label || (itemCount > 0 ? 'Variante base' : 'Sin items visibles'))}</p>
+              <p>${itemCount > 1 ? `${itemCount} productos en el pedido` : itemCount === 1 ? '1 producto en el pedido' : 'Sin items en el resumen'}${unitsCount > 0 ? ` · ${unitsCount} unidad${unitsCount === 1 ? '' : 'es'}` : ''}</p>
+            </div>
+          </div>
+
+          <div class="order-card-meta">
+            <span class="meta-chip">${this.escapeHTML(this.paymentMethodLabel(order.payment_method || 'mercadopago'))}</span>
+            <span class="meta-chip">${this.escapeHTML(this.statusLabel('payment', order.payment_status || 'pending'))}</span>
+            <span class="meta-chip">${this.escapeHTML(this.statusLabel('fulfillment', order.fulfillment_status || 'queued'))}</span>
+          </div>
+
+          ${inlineHint ? `<div class="order-inline-note"><strong>Próximo paso:</strong> ${this.escapeHTML(inlineHint)}</div>` : ''}
+
+          <div class="order-card-footer">
+            <div class="order-card-total">
+              <strong>Total</strong>
+              <span>$${Number(order.total || 0).toLocaleString('es-AR')}</span>
+            </div>
+            <div class="order-card-expand-hint">
+              <strong>${isActive ? 'Detalle desplegado' : 'Tocá para ver el detalle'}</strong>
+            </div>
+          </div>
+
+          ${detailMarkup}
+        </article>
+      `;
+    }).join('');
+
+    this.ordersList.querySelectorAll('[data-order-card]').forEach((card) => {
+      const open = () => this.toggleOrderDetail(card.dataset.orderCard);
+      card.addEventListener('click', open);
+      card.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          open();
+        }
+      });
+    });
+  },
+
+  async loadOrders() {
+    this.state.orderDetails = {};
+    this.state.orderDetailErrors = {};
+    this.state.orderDetailLoadingId = '';
+    this.state.activeOrderId = this.state.activeOrderId || '';
+    if (this.ordersList) {
+      this.ordersList.innerHTML = '<div class="account-empty">Cargando pedidos...</div>';
+    }
+    this.renderOrdersOverview([]);
+    this.setOrdersFilterNote('Cargando pedidos...');
+    try {
+      const data = await this.request('customer/orders.php', { method: 'GET' });
+      const orders = Array.isArray(data.orders) ? data.orders : Array.isArray(data.items) ? data.items : [];
+      this.state.orders = orders;
+      this.renderOrdersOverview(orders);
+
+      if (orders.length === 0) {
+        if (this.ordersList) {
+          this.ordersList.innerHTML = '<div class="account-empty">No tenés pedidos todavía.</div>';
+        }
+        this.setOrdersFilterNote('Todavía no registrás compras.');
+        return;
+      }
+
+      const availableIds = new Set(orders.map(order => String(order.id)));
+      if (!availableIds.has(String(this.state.activeOrderId || ''))) {
+        this.state.activeOrderId = String(orders[0].id);
+      }
+
+      this.renderOrdersList();
+      const visibleOrders = this.getFilteredOrders();
+      const currentOrderId = visibleOrders.find(order => String(order.id) === String(this.state.activeOrderId || ''))?.id
+        || visibleOrders[0]?.id
+        || orders[0]?.id;
+
+      if (currentOrderId) {
+        await this.loadOrderDetail(currentOrderId);
+      }
+    } catch (error) {
+      if (this.ordersList) {
+        this.ordersList.innerHTML = `<div class="account-empty">${this.escapeHTML(error.message || 'No se pudieron cargar los pedidos')}</div>`;
+      }
+      this.setOrdersFilterNote('No se pudo cargar el historial.');
+    }
+  },
+
+  async toggleOrderDetail(orderId) {
+    const normalizedId = String(orderId || '');
+    if (!normalizedId) return;
+
+    if (String(this.state.activeOrderId || '') === normalizedId) {
+      this.state.activeOrderId = '';
+      this.renderOrdersList();
+      return;
+    }
+
+    await this.loadOrderDetail(normalizedId);
   },
 
   async loadOrderDetail(orderId) {
     if (!orderId) {
-      this.showOrderDetailPlaceholder('Seleccioná un pedido para ver el detalle.');
+      this.state.activeOrderId = '';
+      this.renderOrdersList();
       return;
     }
 
     const normalizedId = String(orderId);
     this.state.activeOrderId = normalizedId;
-    this.ordersTable.querySelectorAll('[data-order-row]').forEach((row) => {
-      row.style.background = row.dataset.orderRow === normalizedId ? 'rgba(255, 107, 43, 0.06)' : '';
-    });
-
-    this.showOrderDetailPlaceholder('Cargando detalle del pedido...');
+    if (this.state.orderDetails[normalizedId]) {
+      this.renderOrdersList();
+      return;
+    }
+    this.state.orderDetailErrors[normalizedId] = '';
+    this.state.orderDetailLoadingId = normalizedId;
+    this.renderOrdersList();
     try {
       const data = await this.request(`customer/orders.php?id=${encodeURIComponent(normalizedId)}`, { method: 'GET' });
       if (!data.order) {
         throw new Error('No se encontró el detalle del pedido.');
       }
-      this.renderOrderDetail(data.order);
+      this.state.orderDetails[normalizedId] = data.order;
+      this.state.orderDetailLoadingId = '';
+      this.state.orderDetailErrors[normalizedId] = '';
+      this.renderOrdersList();
     } catch (error) {
-      this.showOrderDetailPlaceholder(error.message || 'No se pudo cargar el detalle del pedido.');
+      this.state.orderDetailLoadingId = '';
+      this.state.orderDetailErrors[normalizedId] = error.message || 'No se pudo cargar el detalle del pedido.';
+      this.renderOrdersList();
     }
   },
 

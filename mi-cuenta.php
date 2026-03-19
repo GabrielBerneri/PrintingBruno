@@ -59,6 +59,10 @@
             gap: var(--space-xl);
         }
 
+        .account-grid.account-grid-dashboard {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
         .account-card {
             background: var(--bg-card);
             border: 1px solid var(--border-subtle);
@@ -195,17 +199,105 @@
             padding: var(--space-xl);
         }
 
-        .account-table {
-            width: 100%;
-            border-collapse: collapse;
+        .account-verification-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            padding: var(--space-lg);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid rgba(255, 107, 43, 0.18);
+            background: linear-gradient(135deg, rgba(255, 107, 43, 0.12), rgba(255, 255, 255, 0.03));
         }
 
-        .account-table th,
-        .account-table td {
-            padding: var(--space-sm) 0;
-            border-bottom: 1px solid var(--border-subtle);
-            vertical-align: top;
-            text-align: left;
+        .account-verification-banner strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.95rem;
+        }
+
+        .account-verification-banner p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            max-width: 680px;
+        }
+
+        .orders-overview {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: var(--space-md);
+            margin-bottom: var(--space-lg);
+        }
+
+        .orders-overview-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-md);
+            padding: var(--space-md);
+        }
+
+        .orders-overview-card strong {
+            display: block;
+            color: var(--text-muted);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .orders-overview-card span {
+            display: block;
+            margin-top: 8px;
+            font-family: var(--font-heading);
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .orders-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            margin-bottom: var(--space-lg);
+        }
+
+        .orders-filters {
+            display: inline-flex;
+            gap: 0.35rem;
+            padding: 0.25rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--border-radius-full);
+            flex-wrap: wrap;
+        }
+
+        .orders-filters button {
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            padding: 0.55rem 0.9rem;
+            border-radius: var(--border-radius-full);
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .orders-filters button.active {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .orders-filter-note {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .orders-list {
+            display: grid;
+            gap: var(--space-md);
         }
 
         .account-empty {
@@ -214,14 +306,166 @@
             padding: var(--space-lg) 0;
         }
 
-        .order-detail-card {
-            margin-top: var(--space-lg);
+        .order-card {
+            display: grid;
+            gap: var(--space-md);
+            padding: var(--space-lg);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-subtle);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+            transition: border-color var(--transition-fast), transform var(--transition-fast), background var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .order-card.active {
+            border-color: rgba(255, 107, 43, 0.26);
+            background: rgba(255, 107, 43, 0.06);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+        }
+
+        .order-card:focus-visible {
+            outline: 2px solid rgba(255, 107, 43, 0.4);
+            outline-offset: 2px;
+        }
+
+        .order-card-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .order-card-order {
+            display: grid;
+            gap: 4px;
+        }
+
+        .order-card-order strong {
+            font-family: var(--font-heading);
+            font-size: 1.05rem;
+            line-height: 1.1;
+        }
+
+        .order-card-order span {
+            color: var(--text-muted);
+            font-size: 0.84rem;
+        }
+
+        .order-card-preview {
+            display: grid;
+            grid-template-columns: 64px 1fr;
+            gap: var(--space-md);
+            align-items: center;
+        }
+
+        .order-card-preview img {
+            width: 64px;
+            height: 64px;
+            object-fit: cover;
+            border-radius: var(--border-radius-md);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .order-card-preview strong {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 0.96rem;
+        }
+
+        .order-card-preview p {
+            margin: 0;
+            color: var(--text-secondary);
+            font-size: 0.84rem;
+            line-height: 1.45;
+        }
+
+        .order-card-meta {
+            display: flex;
+            gap: var(--space-sm);
+            flex-wrap: wrap;
+        }
+
+        .order-card-meta .meta-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.38rem 0.7rem;
+            border-radius: 999px;
+            border: 1px solid var(--border-subtle);
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-secondary);
+            font-size: 0.82rem;
+        }
+
+        .order-card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+        }
+
+        .order-card-total {
+            display: grid;
+            gap: 4px;
+        }
+
+        .order-card-total strong {
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .order-card-total span {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            line-height: 1;
+            color: var(--accent);
+        }
+
+        .order-card-expand-hint {
+            color: var(--text-muted);
+            font-size: 0.84rem;
+            font-weight: 600;
+            letter-spacing: 0.01em;
+        }
+
+        .order-card-expand-hint strong {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .order-inline-note {
+            padding: 0.85rem 1rem;
+            border-radius: var(--border-radius-md);
+            border: 1px solid rgba(255, 107, 43, 0.14);
+            background: rgba(255, 107, 43, 0.08);
+            color: var(--text-secondary);
+            font-size: 0.86rem;
+            line-height: 1.5;
+        }
+
+        .order-inline-note strong {
+            color: var(--accent-light);
+        }
+
+        .order-card-detail {
+            margin-top: var(--space-sm);
             border: 1px solid var(--border-subtle);
             border-radius: var(--border-radius-md);
             background: var(--bg-secondary);
             padding: var(--space-lg);
             display: grid;
             gap: var(--space-md);
+        }
+
+        .order-card-detail-state {
+            padding: var(--space-sm) 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
         }
 
         .order-detail-head {
@@ -343,15 +587,6 @@
             font-size: 0.83rem;
         }
 
-        .order-detail-placeholder {
-            margin-top: var(--space-lg);
-            padding: var(--space-lg);
-            border: 1px dashed var(--border-subtle);
-            border-radius: var(--border-radius-md);
-            color: var(--text-muted);
-            text-align: center;
-        }
-
         .address-list {
             display: grid;
             gap: var(--space-md);
@@ -387,6 +622,10 @@
             .account-grid {
                 grid-template-columns: 1fr;
             }
+
+            .orders-overview {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
         }
 
         @media (max-width: 640px) {
@@ -400,6 +639,28 @@
 
             .dashboard-head {
                 align-items: flex-start;
+            }
+
+            .orders-overview {
+                grid-template-columns: 1fr;
+            }
+
+            .order-card-preview {
+                grid-template-columns: 1fr;
+            }
+
+            .order-card-preview img {
+                width: 100%;
+                height: 180px;
+            }
+
+            .order-card-footer {
+                align-items: stretch;
+            }
+
+            .order-card-expand-hint {
+                width: 100%;
+                text-align: left;
             }
         }
     </style>
@@ -416,7 +677,7 @@
                 <p>Iniciá sesión para ver tus pedidos, actualizar tus datos, administrar direcciones y volver a comprar sin repetir información.</p>
             </div>
 
-            <div class="account-grid">
+            <div class="account-grid" id="accountGrid">
                 <section class="account-card" id="authCard">
                     <div class="account-flow-status" id="accountFlowStatus" hidden></div>
                     <div class="account-tabs" id="authTabs">
@@ -516,6 +777,14 @@
                             <button class="btn btn-secondary btn-sm" id="logoutBtn" type="button">Cerrar sesión</button>
                         </div>
 
+                        <div class="account-verification-banner" id="accountVerificationNotice" hidden>
+                            <div>
+                                <strong>Verificá tu email para terminar de activar la cuenta</strong>
+                                <p>Mientras tanto podés navegar y ver tu cuenta, pero la verificación te permite recuperar acceso y vincular pedidos hechos como invitado con más seguridad.</p>
+                            </div>
+                            <button class="btn btn-primary btn-sm" id="resendVerificationBtn" type="button">Reenviar email</button>
+                        </div>
+
                         <div class="dashboard-tabs" id="dashboardTabs">
                             <button type="button" class="active" data-dashboard-tab="orders">Mis pedidos</button>
                             <button type="button" data-dashboard-tab="profile">Mis datos</button>
@@ -523,11 +792,25 @@
                         </div>
 
                         <div class="dashboard-panel" data-dashboard-panel="orders">
-                            <table class="account-table" id="ordersTable">
-                                <tr><td class="account-empty">Cargando pedidos...</td></tr>
-                            </table>
-                            <div class="order-detail-placeholder" id="orderDetailPlaceholder">Seleccioná un pedido para ver el detalle.</div>
-                            <div class="order-detail-card" id="orderDetailCard" hidden></div>
+                            <div class="orders-overview" id="ordersOverview">
+                                <div class="orders-overview-card"><strong>Total pedidos</strong><span id="ordersOverviewTotal">—</span></div>
+                                <div class="orders-overview-card"><strong>Pendientes de pago</strong><span id="ordersOverviewPending">—</span></div>
+                                <div class="orders-overview-card"><strong>En producción</strong><span id="ordersOverviewProduction">—</span></div>
+                                <div class="orders-overview-card"><strong>Enviados</strong><span id="ordersOverviewShipped">—</span></div>
+                            </div>
+                            <div class="orders-toolbar">
+                                <div class="orders-filters" id="ordersFilters">
+                                    <button type="button" class="active" data-order-filter="all">Todos</button>
+                                    <button type="button" data-order-filter="pending">Pendientes</button>
+                                    <button type="button" data-order-filter="production">En producción</button>
+                                    <button type="button" data-order-filter="shipped">Enviados</button>
+                                    <button type="button" data-order-filter="cancelled">Cancelados</button>
+                                </div>
+                                <div class="orders-filter-note" id="ordersFilterNote">Cargando pedidos...</div>
+                            </div>
+                            <div class="orders-list" id="ordersList">
+                                <div class="account-empty">Cargando pedidos...</div>
+                            </div>
                         </div>
 
                         <div class="dashboard-panel" data-dashboard-panel="profile" hidden>
@@ -632,7 +915,7 @@
 
     <script src="js/cart.js?v=20260316-2"></script>
     <script src="js/main.js?v=20260315-4"></script>
-    <script src="js/account.js?v=20260319-2"></script>
+    <script src="js/account.js?v=20260319-3"></script>
 </body>
 
 </html>
