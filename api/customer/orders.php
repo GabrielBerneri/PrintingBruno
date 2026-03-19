@@ -8,6 +8,7 @@
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../customer_auth.php';
 require_once __DIR__ . '/../order_utils.php';
+require_once __DIR__ . '/../order_shipping.php';
 
 $db = getDB();
 $session = pbCustomerRequireAuth($db, false);
@@ -56,6 +57,7 @@ function pbCustomerHydrateOrderDetail(PDO $db, array $order): array {
     $detail = pbCustomerHydrateOrderSummary($order);
     $detail['notes'] = $order['notes'] ?? null;
     $detail['payment_reference'] = $order['payment_reference'] ?? null;
+    $detail['shipping_address'] = pbGetOrderShippingAddress($db, (int)$order['id']);
 
     $stmt = $db->prepare("
         SELECT oi.*, p.name AS product_name, p.image_url

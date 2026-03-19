@@ -183,6 +183,30 @@ CREATE TABLE IF NOT EXISTS customer_addresses (
   CONSTRAINT fk_customer_addresses_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS order_shipping_addresses (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  order_id INT NOT NULL,
+  customer_id INT DEFAULT NULL,
+  customer_address_id INT DEFAULT NULL,
+  label VARCHAR(120) DEFAULT NULL,
+  recipient_name VARCHAR(180) DEFAULT NULL,
+  phone VARCHAR(50) DEFAULT NULL,
+  street VARCHAR(255) NOT NULL,
+  city VARCHAR(120) NOT NULL,
+  province VARCHAR(120) NOT NULL,
+  postal_code VARCHAR(20) NOT NULL,
+  notes TEXT DEFAULT NULL,
+  source ENUM('checkout_form', 'customer_address') NOT NULL DEFAULT 'checkout_form',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uniq_order_shipping_order (order_id),
+  INDEX idx_order_shipping_customer (customer_id),
+  INDEX idx_order_shipping_customer_address (customer_address_id),
+  CONSTRAINT fk_order_shipping_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+  CONSTRAINT fk_order_shipping_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
+  CONSTRAINT fk_order_shipping_customer_address FOREIGN KEY (customer_address_id) REFERENCES customer_addresses(id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS customer_sessions (
   id INT AUTO_INCREMENT PRIMARY KEY,
   customer_id INT NOT NULL,

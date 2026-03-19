@@ -24,21 +24,31 @@ checkAndIncrementRateLimit(
 $payload = getJsonBody();
 [$firstName, $lastName] = pbCustomerNormalizeNameParts($payload);
 $email = trim((string)($payload['email'] ?? ''));
+$emailConfirm = trim((string)($payload['email_confirm'] ?? ''));
 $emailNormalized = pbCustomerNormalizeEmail($email);
+$emailConfirmNormalized = pbCustomerNormalizeEmail($emailConfirm);
 $password = (string)($payload['password'] ?? '');
 $passwordConfirm = (string)($payload['password_confirm'] ?? '');
 $phone = trim((string)($payload['phone'] ?? ''));
 $dni = trim((string)($payload['dni'] ?? ''));
 
-if ($firstName === '' || $emailNormalized === '' || $password === '') {
-    jsonResponse(['error' => 'Nombre, email y contraseña son obligatorios.'], 400);
+if ($firstName === '' || $emailNormalized === '' || $emailConfirmNormalized === '' || $password === '' || $passwordConfirm === '') {
+    jsonResponse(['error' => 'Nombre, email, repetir email, contraseña y repetir contraseña son obligatorios.'], 400);
 }
 
 if (!filter_var($emailNormalized, FILTER_VALIDATE_EMAIL)) {
     jsonResponse(['error' => 'Email inválido.'], 400);
 }
 
-if ($passwordConfirm !== '' && $password !== $passwordConfirm) {
+if (!filter_var($emailConfirmNormalized, FILTER_VALIDATE_EMAIL)) {
+    jsonResponse(['error' => 'El email de confirmación es inválido.'], 400);
+}
+
+if ($emailNormalized !== $emailConfirmNormalized) {
+    jsonResponse(['error' => 'Los emails no coinciden.'], 400);
+}
+
+if ($password !== $passwordConfirm) {
     jsonResponse(['error' => 'Las contraseñas no coinciden.'], 400);
 }
 

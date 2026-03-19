@@ -2740,6 +2740,28 @@
                 const paymentVerifiedInfo = o.payment_verified_by_username && o.payment_verified_at
                     ? `Verificado por ${o.payment_verified_by_username} el ${formatDateTime(o.payment_verified_at, true)}`
                     : 'Todavía no hay verificación registrada.';
+                const shipping = o.shipping_address || null;
+                const shippingLines = shipping ? [
+                    shipping.label ? `<div style="font-weight:700">${esc(shipping.label)}</div>` : '',
+                    shipping.recipient_name ? `<div>${esc(shipping.recipient_name)}</div>` : '',
+                    shipping.street ? `<div>${esc(shipping.street)}</div>` : '',
+                    [shipping.city, shipping.province].filter(Boolean).length > 0
+                        ? `<div>${esc([shipping.city, shipping.province].filter(Boolean).join(', '))}${shipping.postal_code ? ` (${esc(shipping.postal_code)})` : ''}</div>`
+                        : (shipping.postal_code ? `<div>${esc(shipping.postal_code)}</div>` : ''),
+                    shipping.phone ? `<div>Tel: ${esc(shipping.phone)}</div>` : '',
+                    shipping.notes ? `<div style="color:var(--text-muted)">${esc(shipping.notes)}</div>` : '',
+                ].filter(Boolean).join('') : '';
+                const shippingCard = shipping ? `
+                    <div class="manual-payment-card" style="margin:0 0 var(--space-md)">
+                        <span class="admin-help-kicker">Dirección de entrega</span>
+                        ${shippingLines}
+                    </div>
+                ` : `
+                    <div class="manual-payment-card" style="margin:0 0 var(--space-md)">
+                        <span class="admin-help-kicker">Dirección de entrega</span>
+                        <p>Este pedido no tiene una dirección de envío asociada.</p>
+                    </div>
+                `;
 
                 let itemsHtml = '';
                 if (o.items && o.items.length > 0) {
@@ -2792,6 +2814,7 @@
                     <div class="order-detail-row"><span class="label">Medio de P.</span><span style="font-weight:600">${esc(paymentMethodLabel(o.payment_method))}</span></div>
                     <div class="order-detail-row"><span class="label">Fecha</span><span>${formatDateTime(o.created_at, true)}</span></div>
                     <div class="order-detail-row"><span class="label">MercadoPago ID</span><span style="font-family:monospace;font-size:0.85rem">${esc(o.mp_payment_id) || '—'}</span></div>
+                    ${shippingCard}
 
                     <div class="order-form-stack">
                         <div class="order-detail-row" style="align-items:center">

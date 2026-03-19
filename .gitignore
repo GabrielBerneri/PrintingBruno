@@ -1,28 +1,23 @@
-# Entorno sensible
+# === Entorno ===
 .env
-.env.*
+.env.local
+.env.production
 
-# Dependencias instaladas localmente
+# === Dependencias ===
 /vendor/
 
-# Logs y archivos temporales
-/logs/
-*.log
-admin_cookies.txt
+# === Base de datos ===
+/sql/*.sql
 
-# Herramientas y documentación interna
-/.claude/
-*.md
+# === Logs ===
+/logs/*.json
+/logs/*.log
 
-# IDE / OS
+# === Subidas / assets locales ===
+/assets/productos/
+
+# === IDE / OS ===
 .vscode/
 .idea/
 *.DS_Store
 Thumbs.db
-
-# Backups y artefactos viejos
-/otras versines/
-*.zip
-admin-login.json
-mp-test-body.json
-test_api.php

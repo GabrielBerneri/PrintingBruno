@@ -11,6 +11,7 @@ const Account = {
     expiresAt: '',
     verifyToken: '',
     resetToken: '',
+    addresses: [],
     orders: [],
     orderDetails: {},
     orderDetailErrors: {},
@@ -50,6 +51,7 @@ const Account = {
     this.addressesList = document.getElementById('addressesList');
     this.accountVerificationNotice = document.getElementById('accountVerificationNotice');
     this.resendVerificationBtn = document.getElementById('resendVerificationBtn');
+    this.verificationMessage = document.getElementById('verificationMessage');
     this.ordersOverviewTotal = document.getElementById('ordersOverviewTotal');
     this.ordersOverviewPending = document.getElementById('ordersOverviewPending');
     this.ordersOverviewProduction = document.getElementById('ordersOverviewProduction');
@@ -289,12 +291,6 @@ const Account = {
     if (this.resendVerificationBtn) {
       this.resendVerificationBtn.addEventListener('click', () => this.handleResendVerification());
     }
-    ['registerFirstName', 'registerLastName', 'profileFirstName', 'profileLastName'].forEach((id) => {
-      const input = document.getElementById(id);
-      if (input) {
-        input.addEventListener('input', () => this.syncDerivedNameFields());
-      }
-    });
   },
 
   bindQueryActions() {
@@ -330,6 +326,7 @@ const Account = {
   showGuestView() {
     this.state.authenticated = false;
     this.state.customer = null;
+    this.state.addresses = [];
     this.dashboardCard.hidden = true;
     this.authCard.hidden = false;
     if (this.accountGrid) {
@@ -370,22 +367,23 @@ const Account = {
     const customer = this.state.customer || {};
     const shouldShow = this.state.authenticated && !customer.is_verified;
     this.accountVerificationNotice.hidden = !shouldShow;
+    if (!shouldShow) {
+      this.showVerificationMessage('');
+    }
   },
 
-  syncDerivedNameFields() {
-    const registerFirst = document.getElementById('registerFirstName');
-    const registerLast = document.getElementById('registerLastName');
-    const registerFull = document.getElementById('registerFullName');
-    if (registerFirst && registerLast && registerFull) {
-      registerFull.value = [registerFirst.value.trim(), registerLast.value.trim()].filter(Boolean).join(' ');
+  showVerificationMessage(message, type = 'info') {
+    if (!this.verificationMessage) return;
+    if (!message) {
+      this.verificationMessage.hidden = true;
+      this.verificationMessage.textContent = '';
+      delete this.verificationMessage.dataset.type;
+      return;
     }
 
-    const profileFirst = document.getElementById('profileFirstName');
-    const profileLast = document.getElementById('profileLastName');
-    const profileFull = document.getElementById('profileFullName');
-    if (profileFirst && profileLast && profileFull) {
-      profileFull.value = [profileFirst.value.trim(), profileLast.value.trim()].filter(Boolean).join(' ');
-    }
+    this.verificationMessage.hidden = false;
+    this.verificationMessage.textContent = message;
+    this.verificationMessage.dataset.type = type;
   },
 
   async loadCustomerData() {
@@ -426,6 +424,31 @@ const Account = {
 
   async handleRegister(event) {
     event.preventDefault();
+    const email = document.getElementById('registerEmail').value.trim();
+    const emailConfirm = document.getElementById('registerEmailConfirm').value.trim();
+    const password = document.getElementById('registerPassword').value;
+    const passwordConfirm = document.getElementById('registerPasswordConfirm').value;
+
+    if (!email || !emailConfirm) {
+      this.setMessage(this.registerMessage, 'El email y su confirmación son obligatorios.', 'error');
+      return;
+    }
+
+    if (email.toLowerCase() !== emailConfirm.toLowerCase()) {
+      this.setMessage(this.registerMessage, 'Los emails no coinciden.', 'error');
+      return;
+    }
+
+    if (!password || !passwordConfirm) {
+      this.setMessage(this.registerMessage, 'La contraseña y su confirmación son obligatorias.', 'error');
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      this.setMessage(this.registerMessage, 'Las contraseñas no coinciden.', 'error');
+      return;
+    }
+
     this.setMessage(this.registerMessage, 'Creando cuenta...');
     try {
       const data = await this.request('auth/register.php', {
@@ -434,11 +457,12 @@ const Account = {
         body: JSON.stringify({
           first_name: document.getElementById('registerFirstName').value.trim(),
           last_name: document.getElementById('registerLastName').value.trim(),
-          full_name: document.getElementById('registerFullName').value.trim(),
           dni: document.getElementById('registerDni').value.trim(),
           phone: document.getElementById('registerPhone').value.trim(),
-          email: document.getElementById('registerEmail').value.trim(),
-          password: document.getElementById('registerPassword').value,
+          email,
+          email_confirm: emailConfirm,
+          password,
+          password_confirm: passwordConfirm,
         }),
       });
 
@@ -446,13 +470,28 @@ const Account = {
         this.state.customer = data.customer;
       }
       this.updateCsrfToken(data.csrf_token);
-      this.setMessage(
-        this.registerMessage,
-        data.verification_required ? 'Cuenta creada. Revisá tu email para verificarla.' : 'Cuenta creada. Ahora podés ingresar.',
-        'success'
-      );
-      this.showAuthTab('login');
       document.getElementById('registerForm').reset();
+      await this.loadSession();
+
+      if (this.state.authenticated) {
+        if (Array.isArray(this.state.addresses) && this.state.addresses.length === 0) {
+          this.showDashboardTab('addresses');
+          this.setMessage(this.addressMessage, 'Cuenta creada. Antes de comprar, cargá una dirección de entrega.', 'info');
+        } else {
+          this.showDashboardTab('orders');
+          this.setOrdersFilterNote('Cuenta creada. Ya podés revisar tus pedidos o comprar con tus datos precargados.');
+        }
+        if (data.verification_required) {
+          this.showVerificationMessage('Cuenta creada. Revisá tu email para verificarla.', 'success');
+        }
+      } else {
+        this.setMessage(
+          this.registerMessage,
+          data.verification_required ? 'Cuenta creada. Revisá tu email para verificarla.' : 'Cuenta creada. Ahora podés ingresar.',
+          'success'
+        );
+        this.showAuthTab('login');
+      }
     } catch (error) {
       this.setMessage(this.registerMessage, error.message || 'No se pudo registrar la cuenta', 'error');
     }
@@ -511,15 +550,16 @@ const Account = {
     const originalText = this.resendVerificationBtn.textContent;
     this.resendVerificationBtn.disabled = true;
     this.resendVerificationBtn.textContent = 'Enviando...';
+    this.showVerificationMessage('Enviando email de verificación...', 'info');
 
     try {
       const data = await this.request('auth/resend_verification.php', {
         method: 'POST',
         body: JSON.stringify({}),
       });
-      this.showFlowStatus(data.message || 'Te reenviamos el email de verificación.', 'success');
+      this.showVerificationMessage(data.message || 'Te reenviamos el email de verificación.', 'success');
     } catch (error) {
-      this.showFlowStatus(error.message || 'No se pudo reenviar el email de verificación.', 'error');
+      this.showVerificationMessage(error.message || 'No se pudo reenviar el email de verificación.', 'error');
     } finally {
       this.resendVerificationBtn.disabled = false;
       this.resendVerificationBtn.textContent = originalText;
@@ -575,8 +615,7 @@ const Account = {
   buildFullName() {
     const first = document.getElementById('profileFirstName').value.trim();
     const last = document.getElementById('profileLastName').value.trim();
-    const full = [first, last].filter(Boolean).join(' ').trim();
-    return full || document.getElementById('profileFullName').value.trim();
+    return [first, last].filter(Boolean).join(' ').trim();
   },
 
   async loadProfile() {
@@ -591,12 +630,10 @@ const Account = {
       const names = this.splitNameParts(source);
       document.getElementById('profileFirstName').value = source.first_name || names.first_name || '';
       document.getElementById('profileLastName').value = source.last_name || names.last_name || '';
-      document.getElementById('profileFullName').value = source.full_name || [source.first_name, source.last_name].filter(Boolean).join(' ').trim() || '';
       document.getElementById('profileDni').value = source.dni || '';
       document.getElementById('profileEmail').value = source.email || '';
       document.getElementById('profilePhone').value = source.phone || '';
       this.setMessage(this.profileMessage, 'Datos cargados.');
-      this.syncDerivedNameFields();
       this.showDashboardView();
     } catch (error) {
       this.setMessage(this.profileMessage, error.message || 'No se pudo cargar el perfil', 'error');
@@ -672,6 +709,20 @@ const Account = {
     const notes = String(order.notes || '').trim();
     const paymentReference = String(order.payment_reference || '').trim();
     const inlineHint = this.getOrderInlineHint(order);
+    const shipping = order.shipping_address || null;
+    const shippingHtml = shipping ? `
+      <div>
+        <strong style="display:block;margin-bottom:8px;color:var(--text-muted);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.04em">Dirección de entrega</strong>
+        <div class="order-inline-note" style="background:rgba(255,255,255,0.03);border-color:var(--border-subtle)">
+          ${shipping.label ? `<div style="font-weight:700;color:var(--text-primary);margin-bottom:4px">${this.escapeHTML(shipping.label)}</div>` : ''}
+          ${shipping.recipient_name ? `<div>${this.escapeHTML(shipping.recipient_name)}</div>` : ''}
+          ${shipping.street ? `<div>${this.escapeHTML(shipping.street)}</div>` : ''}
+          ${(shipping.city || shipping.province || shipping.postal_code) ? `<div>${this.escapeHTML([shipping.city, shipping.province].filter(Boolean).join(', '))}${shipping.postal_code ? ` (${this.escapeHTML(shipping.postal_code)})` : ''}</div>` : ''}
+          ${shipping.phone ? `<div>Tel: ${this.escapeHTML(shipping.phone)}</div>` : ''}
+          ${shipping.notes ? `<div style="margin-top:4px;color:var(--text-muted)">${this.escapeHTML(shipping.notes)}</div>` : ''}
+        </div>
+      </div>
+    ` : '';
 
     return `
       <div class="order-detail-head">
@@ -711,6 +762,7 @@ const Account = {
         </div>
       </div>
       ${inlineHint ? `<div class="order-inline-note"><strong>Próximo paso:</strong> ${this.escapeHTML(inlineHint)}</div>` : ''}
+      ${shippingHtml}
       ${notes ? `<div><strong style="display:block;margin-bottom:6px;color:var(--text-muted);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.04em">Notas</strong><p style="margin:0;color:var(--text-secondary)">${this.escapeHTML(notes)}</p></div>` : ''}
       <div>
         <strong style="display:block;margin-bottom:8px;color:var(--text-muted);font-size:0.82rem;text-transform:uppercase;letter-spacing:0.04em">Productos</strong>

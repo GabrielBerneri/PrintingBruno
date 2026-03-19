@@ -116,6 +116,170 @@ const Cart = {
         return this.getItems().reduce((sum, item) => sum + item.quantity, 0);
     },
 
+    normalizeCustomerAddress(address = {}) {
+        return {
+            id: Number(address.id || 0) || null,
+            label: String(address.label || address.nickname || 'Dirección').trim(),
+            recipient_name: String(address.recipient_name || address.recipient || '').trim(),
+            street: String(address.street || address.line1 || '').trim(),
+            city: String(address.city || '').trim(),
+            province: String(address.province || address.state || '').trim(),
+            postal_code: String(address.postal_code || address.zip || '').trim(),
+            phone: String(address.phone || '').trim(),
+            notes: String(address.notes || '').trim(),
+            is_default: Number(address.is_default || 0) === 1,
+        };
+    },
+
+    async fetchCheckoutCustomerContext() {
+        const context = {
+            authenticated: false,
+            customer: null,
+            addresses: [],
+        };
+
+        try {
+            const sessionRes = await fetch(`${this.getApiBase()}/auth/session.php`, {
+                method: 'GET',
+                credentials: 'same-origin',
+            });
+            const sessionData = await sessionRes.json();
+            if (!sessionRes.ok || !sessionData.authenticated) {
+                return context;
+            }
+
+            context.authenticated = true;
+            context.customer = sessionData.customer || null;
+
+            try {
+                const addressRes = await fetch(`${this.getApiBase()}/customer/addresses.php`, {
+                    method: 'GET',
+                    credentials: 'same-origin',
+                });
+                const addressData = await addressRes.json();
+                if (addressRes.ok) {
+                    context.addresses = (Array.isArray(addressData.addresses) ? addressData.addresses : [])
+                        .map(address => this.normalizeCustomerAddress(address));
+                }
+            } catch (_) {
+                context.addresses = [];
+            }
+        } catch (_) {
+            return context;
+        }
+
+        return context;
+    },
+
+    applyCheckoutAddressToForm(address = {}) {
+        const normalized = this.normalizeCustomerAddress(address);
+        const recipient = document.getElementById('checkoutRecipient');
+        const street = document.getElementById('checkoutStreet');
+        const city = document.getElementById('checkoutCity');
+        const province = document.getElementById('checkoutProvince');
+        const postalCode = document.getElementById('checkoutPostalCode');
+
+        if (recipient) recipient.value = normalized.recipient_name || '';
+        if (street) street.value = normalized.street || '';
+        if (city) city.value = normalized.city || '';
+        if (province) province.value = normalized.province || '';
+        if (postalCode) postalCode.value = normalized.postal_code || '';
+    },
+
+    buildCheckoutShippingPayload() {
+        const savedAddressSelect = document.getElementById('checkoutSavedAddress');
+        const savedAddressGroup = document.getElementById('checkoutSavedAddressGroup');
+        const recipient = document.getElementById('checkoutRecipient');
+        const street = document.getElementById('checkoutStreet');
+        const city = document.getElementById('checkoutCity');
+        const province = document.getElementById('checkoutProvince');
+        const postalCode = document.getElementById('checkoutPostalCode');
+        const phone = document.getElementById('checkoutPhone');
+
+        const savedAddressId = Number(savedAddressSelect?.value || 0) || null;
+        const payload = {
+            customer_address_id: savedAddressId,
+            use_saved_address: savedAddressId ? 1 : 0,
+            recipient_name: recipient?.value?.trim() || '',
+            street: street?.value?.trim() || '',
+            city: city?.value?.trim() || '',
+            province: province?.value?.trim() || '',
+            postal_code: postalCode?.value?.trim() || '',
+            phone: phone?.value?.trim() || '',
+        };
+
+        const hasAnyAddressData = payload.recipient_name !== ''
+            || payload.street !== ''
+            || payload.city !== ''
+            || payload.province !== ''
+            || payload.postal_code !== ''
+            || !!payload.customer_address_id;
+
+        const hasVisibleSavedAddressSelector = !!savedAddressSelect && !!savedAddressGroup && !savedAddressGroup.hidden;
+        return hasAnyAddressData || hasVisibleSavedAddressSelector ? payload : null;
+    },
+
+    async prefillCheckoutCustomerContext(overlay) {
+        const context = await this.fetchCheckoutCustomerContext();
+        const nameInput = document.getElementById('checkoutName');
+        const emailInput = document.getElementById('checkoutEmail');
+        const phoneInput = document.getElementById('checkoutPhone');
+        const helperText = overlay.querySelector('#checkoutAccountHint');
+        const savedAddressGroup = document.getElementById('checkoutSavedAddressGroup');
+        const savedAddressSelect = document.getElementById('checkoutSavedAddress');
+
+        if (context.customer) {
+            const fullName = String(context.customer.full_name || '').trim();
+            if (nameInput && !nameInput.value.trim()) nameInput.value = fullName;
+            if (emailInput && !emailInput.value.trim()) emailInput.value = String(context.customer.email || '').trim();
+            if (phoneInput && !phoneInput.value.trim()) phoneInput.value = String(context.customer.phone || '').trim();
+        }
+
+        if (helperText) {
+            helperText.style.display = 'block';
+            helperText.textContent = context.authenticated
+                ? 'La dirección elegida va a quedar guardada en este pedido para que el admin la vea tal como fue comprada.'
+                : 'Si completás una dirección ahora, también va a quedar asociada al pedido.';
+        }
+
+        if (!savedAddressGroup || !savedAddressSelect) {
+            return;
+        }
+
+        if (!context.addresses.length) {
+            savedAddressGroup.hidden = true;
+            return;
+        }
+
+        savedAddressGroup.hidden = false;
+        savedAddressSelect.innerHTML = `
+            <option value="">Ingresar otra dirección</option>
+            ${context.addresses.map(address => `
+                <option value="${this.escapeAttr(address.id)}">
+                    ${this.escapeHTML(address.label || 'Dirección')} · ${this.escapeHTML(address.street || '')}
+                </option>
+            `).join('')}
+        `;
+
+        const defaultAddress = context.addresses.find(address => address.is_default) || context.addresses[0];
+        if (defaultAddress) {
+            savedAddressSelect.value = String(defaultAddress.id);
+            this.applyCheckoutAddressToForm(defaultAddress);
+        }
+
+        savedAddressSelect.addEventListener('change', () => {
+            const selectedId = Number(savedAddressSelect.value || 0);
+            if (!selectedId) {
+                this.applyCheckoutAddressToForm({});
+                return;
+            }
+            const selected = context.addresses.find(address => Number(address.id) === selectedId);
+            if (selected) {
+                this.applyCheckoutAddressToForm(selected);
+            }
+        });
+    },
+
     // ===== UI: Badge =====
     updateBadge() {
         const badges = document.querySelectorAll('.cart-badge');
@@ -266,10 +430,10 @@ const Cart = {
         }
 
         // Show checkout modal
-        this.showCheckoutModal();
+        await this.showCheckoutModal();
     },
 
-    showCheckoutModal() {
+    async showCheckoutModal() {
         // Remove existing
         document.querySelectorAll('.checkout-modal-overlay').forEach(m => m.remove());
 
@@ -295,6 +459,38 @@ const Cart = {
           <div class="form-floating-group">
             <input type="tel" class="form-input" id="checkoutPhone" required placeholder=" ">
             <label class="form-floating-label" for="checkoutPhone">Teléfono (WhatsApp activo) *</label>
+          </div>
+          <div class="form-group" style="margin-bottom: var(--space-lg);">
+            <label style="display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;font-weight:500;">Dirección de entrega</label>
+            <p id="checkoutAccountHint" style="display:none;margin:0 0 0.75rem;font-size:0.82rem;color:var(--text-muted);line-height:1.5;"></p>
+            <div id="checkoutSavedAddressGroup" hidden style="margin-bottom:0.75rem;">
+              <label for="checkoutSavedAddress" style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.35rem;">Direcciones guardadas</label>
+              <select id="checkoutSavedAddress" class="form-select">
+                <option value="">Ingresar otra dirección</option>
+              </select>
+            </div>
+            <div class="form-floating-group">
+              <input type="text" class="form-input" id="checkoutRecipient" placeholder=" ">
+              <label class="form-floating-label" for="checkoutRecipient">Destinatario</label>
+            </div>
+            <div class="form-floating-group">
+              <input type="text" class="form-input" id="checkoutStreet" placeholder=" ">
+              <label class="form-floating-label" for="checkoutStreet">Calle y altura</label>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-md);">
+              <div class="form-floating-group">
+                <input type="text" class="form-input" id="checkoutCity" placeholder=" ">
+                <label class="form-floating-label" for="checkoutCity">Ciudad</label>
+              </div>
+              <div class="form-floating-group">
+                <input type="text" class="form-input" id="checkoutProvince" placeholder=" ">
+                <label class="form-floating-label" for="checkoutProvince">Provincia</label>
+              </div>
+            </div>
+            <div class="form-floating-group" style="margin-bottom:0;">
+              <input type="text" class="form-input" id="checkoutPostalCode" placeholder=" ">
+              <label class="form-floating-label" for="checkoutPostalCode">Código postal</label>
+            </div>
           </div>
           <div class="form-floating-group" style="margin-bottom: var(--space-xl);">
             <textarea class="form-input" id="checkoutNotes" placeholder=" " rows="2" style="resize: vertical; min-height: 50px;"></textarea>
@@ -341,6 +537,7 @@ const Cart = {
 
         document.body.appendChild(overlay);
         requestAnimationFrame(() => overlay.classList.add('active'));
+        await this.prefillCheckoutCustomerContext(overlay);
 
         // Handle payment method change
         const paymentRadios = document.querySelectorAll('input[name="checkoutPayment"]');
@@ -419,6 +616,7 @@ const Cart = {
                             email: document.getElementById('checkoutEmail').value,
                             phone: document.getElementById('checkoutPhone').value,
                         },
+                        shipping_address: this.buildCheckoutShippingPayload(),
                         notes: document.getElementById('checkoutNotes')?.value || '',
                         payment_method: paymentMethod,
                         idempotency_key: this.getCheckoutToken()

@@ -224,6 +224,20 @@
             max-width: 680px;
         }
 
+        .account-verification-message {
+            margin-top: var(--space-sm);
+            font-size: 0.86rem;
+            color: var(--text-muted);
+        }
+
+        .account-verification-message[data-type="success"] {
+            color: #25D366;
+        }
+
+        .account-verification-message[data-type="error"] {
+            color: #e74c3c;
+        }
+
         .orders-overview {
             display: grid;
             grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -718,10 +732,6 @@
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="form-label" for="registerFullName">Nombre completo</label>
-                                <input class="form-input" id="registerFullName" type="text" autocomplete="name" placeholder="Se puede completar solo" readonly>
-                            </div>
-                            <div class="form-group">
                                 <label class="form-label" for="registerPhone">Teléfono</label>
                                 <input class="form-input" id="registerPhone" type="tel" autocomplete="tel">
                             </div>
@@ -730,9 +740,18 @@
                                 <input class="form-input" id="registerEmail" type="email" autocomplete="email" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label" for="registerPassword">Contraseña</label>
-                                <input class="form-input" id="registerPassword" type="password" autocomplete="new-password" required>
+                                <label class="form-label" for="registerEmailConfirm">Repetir email</label>
+                                <input class="form-input" id="registerEmailConfirm" type="email" autocomplete="email" required>
                             </div>
+                            <div class="form-group">
+                                <label class="form-label" for="registerPassword">Contraseña</label>
+                                <input class="form-input" id="registerPassword" type="password" autocomplete="new-password" minlength="12" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="registerPasswordConfirm">Repetir contraseña</label>
+                                <input class="form-input" id="registerPasswordConfirm" type="password" autocomplete="new-password" minlength="12" required>
+                            </div>
+                            <p class="account-note">El email se usa para validar tu cuenta. La contraseña debe tener al menos 12 caracteres, con letras y números.</p>
                             <button class="btn btn-primary" type="submit">Crear cuenta</button>
                             <div class="account-message" id="registerMessage"></div>
                         </form>
@@ -781,6 +800,7 @@
                             <div>
                                 <strong>Verificá tu email para terminar de activar la cuenta</strong>
                                 <p>Mientras tanto podés navegar y ver tu cuenta, pero la verificación te permite recuperar acceso y vincular pedidos hechos como invitado con más seguridad.</p>
+                                <div class="account-verification-message" id="verificationMessage" hidden></div>
                             </div>
                             <button class="btn btn-primary btn-sm" id="resendVerificationBtn" type="button">Reenviar email</button>
                         </div>
@@ -828,10 +848,6 @@
                                         <label class="form-label" for="profileDni">DNI</label>
                                         <input class="form-input" id="profileDni" type="text" autocomplete="off">
                                     </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" for="profileFullName">Nombre completo</label>
-                                    <input class="form-input" id="profileFullName" type="text" readonly>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label" for="profileEmail">Email</label>
@@ -912,10 +928,11 @@
     </main>
 
     <?php pb_render_footer(); ?>
+    <?php pb_render_cart_drawer(); ?>
 
     <script src="js/cart.js?v=20260316-2"></script>
     <script src="js/main.js?v=20260315-4"></script>
-    <script src="js/account.js?v=20260319-3"></script>
+    <script src="js/account.js?v=20260319-5"></script>
 </body>
 
 </html>

@@ -112,6 +112,10 @@ define('APP_ENV', pbEnv('APP_ENV', 'production'));
 define('VERSION_TOKEN', pbEnv('VERSION_TOKEN', ''));
 define('ORDER_ACCESS_SECRET', pbEnv('ORDER_ACCESS_SECRET', VERSION_TOKEN));
 define('GA4_MEASUREMENT_ID', trim((string)pbEnv('GA4_MEASUREMENT_ID', '')));
+define('GA4_PROPERTY_ID', trim((string)pbEnv('GA4_PROPERTY_ID', '')));
+define('GA4_SERVICE_ACCOUNT_JSON', trim((string)pbEnv('GA4_SERVICE_ACCOUNT_JSON', '')));
+define('GA4_SERVICE_ACCOUNT_JSON_PATH', trim((string)pbEnv('GA4_SERVICE_ACCOUNT_JSON_PATH', '')));
+define('GA4_CACHE_TTL_SECONDS', max(60, (int)pbEnv('GA4_CACHE_TTL_SECONDS', '900')));
 
 // ===== MercadoPago Redirect URLs =====
 define('MP_SUCCESS_URL', SITE_URL . '/checkout-success.html');

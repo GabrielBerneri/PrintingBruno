@@ -5,7 +5,8 @@
  * 
  * Body: {
  *   "items": [{ "id": 1, "variant_id": 10, "quantity": 2 }, ...],
- *   "customer": { "name": "...", "email": "...", "phone": "..." }
+ *   "customer": { "name": "...", "email": "...", "phone": "..." },
+ *   "shipping_address": { "customer_address_id": 1, "recipient_name": "...", "street": "...", "city": "...", "province": "...", "postal_code": "..." }
  * }
  * 
  * Returns: { "init_point": "https://...", "preference_id": "...", "order_id": ... }
@@ -29,6 +30,7 @@ set_error_handler(function ($severity, $message, $file, $line) {
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/security/rate_limit.php';
 require_once __DIR__ . '/order_utils.php';
+require_once __DIR__ . '/order_shipping.php';
 require_once __DIR__ . '/customer_auth.php';
 require_once __DIR__ . '/../vendor/autoload.php';
 
@@ -240,6 +242,15 @@ try {
         $linkedCustomerId = (int)$customerSession['customer_id'];
     }
     $hasOrderCustomerIdColumn = pbHasColumn($db, 'orders', 'customer_id');
+    $shippingSnapshot = pbResolveOrderShippingSnapshot(
+        $db,
+        $linkedCustomerId,
+        $customerSession['customer'] ?? [
+            'full_name' => $body['customer']['name'] ?? '',
+            'phone' => $body['customer']['phone'] ?? '',
+        ],
+        isset($body['shipping_address']) && is_array($body['shipping_address']) ? $body['shipping_address'] : null
+    );
 
     if ($reuseExistingOrder) {
         $orderId = (int)$reuseExistingOrder['id'];
@@ -247,6 +258,9 @@ try {
         $total = (float)$reuseExistingOrder['total'];
         if ($linkedCustomerId && $hasOrderCustomerIdColumn && empty($reuseExistingOrder['customer_id'])) {
             $db->prepare('UPDATE orders SET customer_id = ? WHERE id = ? AND customer_id IS NULL')->execute([$linkedCustomerId, $orderId]);
+        }
+        if ($shippingSnapshot) {
+            pbSaveOrderShippingAddress($db, $orderId, $shippingSnapshot);
         }
     } else {
         $db->beginTransaction();
@@ -317,6 +331,9 @@ try {
         }
 
         pbCreateReservations($db, $orderId, $orderItems);
+        if ($shippingSnapshot) {
+            pbSaveOrderShippingAddress($db, $orderId, $shippingSnapshot);
+        }
 
         $db->commit();
 
@@ -390,6 +407,9 @@ try {
         'error' => 'Error al procesar el pago. Por favor intente nuevamente.',
         'order_id' => $orderId ?? null,
     ], 500);
+} catch (InvalidArgumentException $e) {
+    if (isset($db) && $db->inTransaction()) $db->rollBack();
+    jsonResponse(['error' => $e->getMessage()], 400);
 } catch (Exception $e) {
     if (isset($db) && $db->inTransaction()) $db->rollBack();
     error_log('create_preference error: ' . $e->getMessage());

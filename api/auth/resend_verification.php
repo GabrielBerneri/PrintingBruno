@@ -6,6 +6,7 @@
 
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../customer_auth.php';
+require_once __DIR__ . '/../security/rate_limit.php';
 require_once __DIR__ . '/../email/customer_verification.php';
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
@@ -29,6 +30,14 @@ if (!empty($customer['is_verified'])) {
         'customer' => $customer,
     ]);
 }
+
+checkAndIncrementRateLimit(
+    getRateLimitKey('customer_resend_verification_' . $customerId),
+    3,
+    3600,
+    3600,
+    'Demasiadas solicitudes de verificación. Intentá nuevamente en una hora.'
+);
 
 try {
     $token = pbCustomerCreateEmailVerification($db, $customerId);

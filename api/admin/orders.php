@@ -9,6 +9,7 @@
 require_once __DIR__ . '/session.php';
 require_once __DIR__ . '/../db.php';
 require_once __DIR__ . '/../order_utils.php';
+require_once __DIR__ . '/../order_shipping.php';
 require_once __DIR__ . '/audit.php';
 
 if (empty($_SESSION['admin_id'])) {
@@ -200,6 +201,7 @@ function getAdminOrderDetail(PDO $db, int $orderId): array {
     }
 
     $order['items'] = $items;
+    $order['shipping_address'] = pbGetOrderShippingAddress($db, $orderId);
     return $order;
 }
 
