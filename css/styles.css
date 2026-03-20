@@ -844,14 +844,11 @@ select {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   transition: transform var(--transition-slow);
-  padding: 1rem;
+  padding: 0;
 }
 
-.product-card:hover .product-image img {
-  transform: scale(1.08);
-}
 
 .product-image-nav {
   position: absolute;
@@ -3593,11 +3590,14 @@ select {
 
 .product-card-main-image {
   transition: opacity var(--transition-base), transform var(--transition-base);
+  object-fit: contain;
+  object-position: center;
+  padding: clamp(12px, 1.6vw, 18px);
+  box-sizing: border-box;
 }
 
 .product-card-gallery-image {
-  object-fit: cover;
-  padding: 0;
+  object-fit: contain;
 }
 
 .product-card-secondary-image {
@@ -3605,10 +3605,13 @@ select {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
   opacity: 0;
   transition: opacity var(--transition-base), transform var(--transition-base);
   pointer-events: none;
+  padding: clamp(12px, 1.6vw, 18px);
+  box-sizing: border-box;
 }
 
 .product-card.has-secondary-image:hover .product-card-secondary-image {
@@ -3663,25 +3666,6 @@ select {
 .product-detail-image-wrap {
   --zoom-x: 50%;
   --zoom-y: 50%;
-}
-
-.product-detail-image-wrap.zoom-active .product-detail-image {
-  transform: scale(1.8);
-  transform-origin: var(--zoom-x) var(--zoom-y);
-  cursor: zoom-in;
-}
-
-.product-detail-zoom-lens {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle at var(--zoom-x) var(--zoom-y), rgba(255, 255, 255, 0.16), transparent 22%);
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-}
-
-.product-detail-image-wrap.zoom-active .product-detail-zoom-lens {
-  opacity: 1;
 }
 
 .product-mobile-bar {

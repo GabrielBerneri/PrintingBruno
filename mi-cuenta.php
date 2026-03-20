@@ -1,3 +1,72 @@
+<?php
+$accountPageStatus = null;
+
+if (!empty($_GET['verify'])) {
+    require_once __DIR__ . '/api/db.php';
+    require_once __DIR__ . '/api/customer_auth.php';
+
+    $redirectParams = $_GET;
+    unset($redirectParams['verify']);
+
+    $token = trim((string)$_GET['verify']);
+    $db = getDB();
+    $verification = pbCustomerFindVerificationToken($db, $token);
+
+    if (!$verification) {
+        $redirectParams['verified'] = 'invalid';
+    } else {
+        $db->beginTransaction();
+        try {
+            $db->prepare('UPDATE customers SET verified_at = NOW() WHERE id = ?')->execute([(int)$verification['customer_id']]);
+            $db->prepare('UPDATE customer_email_verifications SET verified_at = NOW() WHERE id = ?')->execute([(int)$verification['verification_id']]);
+            $claimedOrders = pbCustomerClaimGuestOrders($db, (int)$verification['customer_id'], (string)$verification['email']);
+            $db->commit();
+
+            $redirectParams['verified'] = 'success';
+            if ($claimedOrders > 0) {
+                $redirectParams['claimed'] = (string)$claimedOrders;
+            } else {
+                unset($redirectParams['claimed']);
+            }
+        } catch (Throwable $e) {
+            if ($db->inTransaction()) {
+                $db->rollBack();
+            }
+            error_log('mi-cuenta verify redirect error: ' . $e->getMessage());
+            $redirectParams['verified'] = 'error';
+        }
+    }
+
+    $redirectUrl = 'mi-cuenta.php';
+    if (!empty($redirectParams)) {
+        $redirectUrl .= '?' . http_build_query($redirectParams);
+    }
+
+    header('Location: ' . $redirectUrl, true, 302);
+    exit;
+}
+
+$verifiedState = trim((string)($_GET['verified'] ?? ''));
+$claimedOrders = max(0, (int)($_GET['claimed'] ?? 0));
+if ($verifiedState === 'success') {
+    $accountPageStatus = [
+        'type' => 'success',
+        'message' => $claimedOrders > 0
+            ? "Tu cuenta ya quedó verificada. Además vinculamos {$claimedOrders} pedido(s) hecho(s) como invitado."
+            : 'Tu cuenta ya quedó verificada.',
+    ];
+} elseif ($verifiedState === 'invalid') {
+    $accountPageStatus = [
+        'type' => 'error',
+        'message' => 'El enlace de verificación es inválido o ya venció.',
+    ];
+} elseif ($verifiedState === 'error') {
+    $accountPageStatus = [
+        'type' => 'error',
+        'message' => 'No se pudo verificar la cuenta. Intentá nuevamente.',
+    ];
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 
@@ -6,7 +75,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Mi cuenta | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260319-1">
+    <link rel="stylesheet" href="css/styles.css?v=20260319-4">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';
@@ -35,6 +104,26 @@
             max-width: 760px;
             color: var(--text-secondary);
             margin: 0;
+        }
+
+        .account-page-status {
+            margin-bottom: var(--space-xl);
+            padding: var(--space-md) var(--space-lg);
+            border-radius: var(--border-radius-lg);
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .account-page-status[data-type="success"] {
+            border-color: rgba(37, 211, 102, 0.25);
+            color: #25D366;
+        }
+
+        .account-page-status[data-type="error"] {
+            border-color: rgba(231, 76, 60, 0.25);
+            color: #e74c3c;
         }
 
         .account-banner {
@@ -152,6 +241,24 @@
             margin-top: var(--space-md);
             font-size: 0.85rem;
             color: var(--text-muted);
+        }
+
+        .account-subpanel {
+            margin-top: var(--space-xl);
+            padding-top: var(--space-xl);
+            border-top: 1px solid var(--border-subtle);
+        }
+
+        .account-subpanel h3 {
+            margin: 0 0 var(--space-xs);
+            font-size: 1.05rem;
+        }
+
+        .account-subpanel p {
+            margin: 0 0 var(--space-md);
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.6;
         }
 
         .dashboard-shell {
@@ -690,6 +797,11 @@
                 <h1>Tu cuenta, pedidos y datos en un solo lugar.</h1>
                 <p>Iniciá sesión para ver tus pedidos, actualizar tus datos, administrar direcciones y volver a comprar sin repetir información.</p>
             </div>
+            <?php if ($accountPageStatus): ?>
+                <div class="account-page-status" data-type="<?php echo htmlspecialchars($accountPageStatus['type'], ENT_QUOTES, 'UTF-8'); ?>">
+                    <?php echo htmlspecialchars($accountPageStatus['message'], ENT_QUOTES, 'UTF-8'); ?>
+                </div>
+            <?php endif; ?>
 
             <div class="account-grid" id="accountGrid">
                 <section class="account-card" id="authCard">
@@ -771,6 +883,7 @@
                     <div class="account-panel" data-auth-panel="reset-password">
                         <form class="account-form" id="resetPasswordForm">
                             <input type="hidden" id="resetPasswordToken">
+                            <input type="email" id="resetPasswordUsername" autocomplete="username" hidden>
                             <div class="form-group">
                                 <label class="form-label" for="resetNewPassword">Nueva contraseña</label>
                                 <input class="form-input" id="resetNewPassword" type="password" autocomplete="new-password" required>
@@ -860,6 +973,30 @@
                                 <button class="btn btn-primary" type="submit">Guardar cambios</button>
                                 <div class="account-message" id="profileMessage"></div>
                             </form>
+                            <div class="account-subpanel">
+                                <h3>Cambiar contraseña</h3>
+                                <p>Usá tu contraseña actual para definir una nueva clave de acceso para tu cuenta.</p>
+                                <form class="account-form" id="passwordForm">
+                                    <input type="email" id="passwordUsername" autocomplete="username" hidden>
+                                    <div class="form-group">
+                                        <label class="form-label" for="currentPassword">Contraseña actual</label>
+                                        <input class="form-input" id="currentPassword" type="password" autocomplete="current-password" required>
+                                    </div>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label class="form-label" for="newPassword">Nueva contraseña</label>
+                                            <input class="form-input" id="newPassword" type="password" autocomplete="new-password" minlength="12" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="form-label" for="newPasswordConfirm">Repetir nueva contraseña</label>
+                                            <input class="form-input" id="newPasswordConfirm" type="password" autocomplete="new-password" minlength="12" required>
+                                        </div>
+                                    </div>
+                                    <p class="account-note">La nueva contraseña debe tener al menos 12 caracteres, con letras y números.</p>
+                                    <button class="btn btn-primary" type="submit">Actualizar contraseña</button>
+                                    <div class="account-message" id="passwordMessage"></div>
+                                </form>
+                            </div>
                         </div>
 
                         <div class="dashboard-panel" data-dashboard-panel="addresses" hidden>
@@ -932,7 +1069,7 @@
 
     <script src="js/cart.js?v=20260316-2"></script>
     <script src="js/main.js?v=20260315-4"></script>
-    <script src="js/account.js?v=20260319-5"></script>
+    <script src="js/account.js?v=20260319-8"></script>
 </body>
 
 </html>

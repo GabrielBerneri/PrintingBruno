@@ -45,6 +45,7 @@ const Account = {
     this.resetMessage = document.getElementById('resetMessage');
     this.resetPasswordMessage = document.getElementById('resetPasswordMessage');
     this.profileMessage = document.getElementById('profileMessage');
+    this.passwordMessage = document.getElementById('passwordMessage');
     this.addressMessage = document.getElementById('addressMessage');
     this.ordersList = document.getElementById('ordersList');
     this.ordersFilterNote = document.getElementById('ordersFilterNote');
@@ -250,6 +251,18 @@ const Account = {
     }
   },
 
+  removeQueryParam(paramName) {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has(paramName)) {
+      return;
+    }
+
+    url.searchParams.delete(paramName);
+    const nextSearch = url.searchParams.toString();
+    const nextUrl = `${url.pathname}${nextSearch ? `?${nextSearch}` : ''}${url.hash || ''}`;
+    window.history.replaceState({}, document.title, nextUrl);
+  },
+
   bindAuthTabs() {
     document.querySelectorAll('[data-auth-tab]').forEach(btn => {
       btn.addEventListener('click', () => this.showAuthTab(btn.dataset.authTab));
@@ -285,6 +298,7 @@ const Account = {
     document.getElementById('resetForm').addEventListener('submit', (e) => this.handleResetRequest(e));
     document.getElementById('resetPasswordForm').addEventListener('submit', (e) => this.handleResetPassword(e));
     document.getElementById('profileForm').addEventListener('submit', (e) => this.handleProfileSave(e));
+    document.getElementById('passwordForm').addEventListener('submit', (e) => this.handlePasswordSave(e));
     document.getElementById('addressForm').addEventListener('submit', (e) => this.handleAddressSave(e));
     document.getElementById('addressResetBtn').addEventListener('click', () => this.resetAddressForm());
     document.getElementById('logoutBtn').addEventListener('click', () => this.handleLogout());
@@ -294,10 +308,7 @@ const Account = {
   },
 
   bindQueryActions() {
-    const verifyToken = this.state.verifyToken;
-    if (verifyToken) {
-      this.verifyEmail(verifyToken);
-    }
+    return;
   },
 
   async loadSession() {
@@ -575,6 +586,9 @@ const Account = {
         csrf: false,
       });
       const message = data.message || 'Email verificado correctamente.';
+      this.state.verifyToken = '';
+      this.removeQueryParam('verify');
+      await this.loadSession();
       this.showFlowStatus(message, 'success');
     } catch (error) {
       this.showFlowStatus(error.message || 'No se pudo verificar el email.', 'error');
@@ -633,6 +647,14 @@ const Account = {
       document.getElementById('profileDni').value = source.dni || '';
       document.getElementById('profileEmail').value = source.email || '';
       document.getElementById('profilePhone').value = source.phone || '';
+      const passwordUsername = document.getElementById('passwordUsername');
+      if (passwordUsername) {
+        passwordUsername.value = source.email || '';
+      }
+      const resetPasswordUsername = document.getElementById('resetPasswordUsername');
+      if (resetPasswordUsername) {
+        resetPasswordUsername.value = source.email || '';
+      }
       this.setMessage(this.profileMessage, 'Datos cargados.');
       this.showDashboardView();
     } catch (error) {
@@ -664,6 +686,45 @@ const Account = {
       await this.loadSession();
     } catch (error) {
       this.setMessage(this.profileMessage, error.message || 'No se pudieron guardar los datos', 'error');
+    }
+  },
+
+  async handlePasswordSave(event) {
+    event.preventDefault();
+
+    const currentPassword = document.getElementById('currentPassword').value;
+    const password = document.getElementById('newPassword').value;
+    const passwordConfirm = document.getElementById('newPasswordConfirm').value;
+
+    if (!currentPassword || !password || !passwordConfirm) {
+      this.setMessage(this.passwordMessage, 'Completá la contraseña actual, la nueva y su confirmación.', 'error');
+      return;
+    }
+
+    if (password !== passwordConfirm) {
+      this.setMessage(this.passwordMessage, 'Las nuevas contraseñas no coinciden.', 'error');
+      return;
+    }
+
+    this.setMessage(this.passwordMessage, 'Actualizando contraseña...');
+    try {
+      const data = await this.request('customer/password.php', {
+        method: 'POST',
+        body: JSON.stringify({
+          current_password: currentPassword,
+          password,
+          password_confirm: passwordConfirm,
+        }),
+      });
+
+      document.getElementById('passwordForm').reset();
+      const passwordUsername = document.getElementById('passwordUsername');
+      if (passwordUsername && this.state.customer?.email) {
+        passwordUsername.value = this.state.customer.email;
+      }
+      this.setMessage(this.passwordMessage, data.message || 'Contraseña actualizada.', 'success');
+    } catch (error) {
+      this.setMessage(this.passwordMessage, error.message || 'No se pudo actualizar la contraseña.', 'error');
     }
   },
 

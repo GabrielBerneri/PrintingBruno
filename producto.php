@@ -6,12 +6,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Detalle de producto de PrintingBruno.">
     <title>Producto | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260319-1">
+    <link rel="stylesheet" href="css/styles.css?v=20260319-4">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';
     pb_render_analytics_head();
     ?>
+    <style>
+        .product-detail-image-wrap {
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(16px, 2vw, 24px);
+        }
+
+        .product-detail-image {
+            display: block;
+            object-position: center;
+            background: #ffffff;
+        }
+
+        .product-detail-thumb {
+            background: #ffffff;
+        }
+    </style>
 </head>
 
 <body>

@@ -7,7 +7,7 @@
     <meta name="description"
         content="Catálogo de productos de impresión 3D de PrintingBruno. Figuras, decoración, piezas funcionales y más.">
     <title>Catálogo | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260319-1">
+    <link rel="stylesheet" href="css/styles.css?v=20260319-4">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';
