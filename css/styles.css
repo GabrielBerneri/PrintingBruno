@@ -2807,8 +2807,14 @@ select {
     --header-height: 70px;
   }
 
+  .header {
+    z-index: 1300;
+  }
+
   .menu-toggle {
     display: flex;
+    position: relative;
+    z-index: 1311;
   }
 
   .nav {
@@ -2824,7 +2830,7 @@ select {
     gap: var(--space-xl);
     transition: right var(--transition-base);
     border-left: 1px solid var(--border-subtle);
-    z-index: 1000;
+    z-index: 1310;
   }
 
   .nav.open {
@@ -2857,7 +2863,7 @@ select {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.6);
-    z-index: 999;
+    z-index: 1305;
   }
 
   .nav-overlay.active {

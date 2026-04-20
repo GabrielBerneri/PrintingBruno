@@ -1,2 +1,0 @@
-ALTER TABLE orders
-  ADD COLUMN IF NOT EXISTS payment_reference VARCHAR(120) DEFAULT NULL AFTER payment_notes;

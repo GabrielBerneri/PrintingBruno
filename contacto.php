@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Contactá a PrintingBruno para consultas sobre impresión 3D.">
     <title>Contacto | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260319-4">
+    <link rel="stylesheet" href="css/styles.css?v=20260331-1">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';
@@ -215,8 +215,8 @@
     </section>
     <?php pb_render_footer(); ?>
 
-    <script src="js/main.js?v=20260315-4"></script>
-    <script src="js/contact.js?v=20260315-4"></script>
+    <script src="js/main.js?v=20260331-1"></script>
+    <script src="js/contact.js?v=20260331-1"></script>
 </body>
 
 </html>

@@ -410,15 +410,32 @@ const Cart = {
         });
     },
 
-    toggleDrawer() {
+    closeMobileMenu() {
+        const menuToggle = document.getElementById('menuToggle');
+        const nav = document.getElementById('nav');
+        const navOverlay = document.getElementById('navOverlay');
+
+        if (menuToggle) menuToggle.classList.remove('active');
+        if (nav) nav.classList.remove('open');
+        if (navOverlay) navOverlay.classList.remove('active');
+        document.body.style.overflow = '';
+    },
+
+    toggleDrawer(forceOpen = null) {
         const drawer = document.getElementById('cartDrawer');
         const overlay = document.getElementById('cartOverlay');
         if (!drawer) return;
 
         const isOpen = drawer.classList.contains('open');
-        drawer.classList.toggle('open');
-        if (overlay) overlay.classList.toggle('active');
-        document.body.style.overflow = isOpen ? '' : 'hidden';
+        const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : !isOpen;
+
+        if (shouldOpen) {
+            this.closeMobileMenu();
+        }
+
+        drawer.classList.toggle('open', shouldOpen);
+        if (overlay) overlay.classList.toggle('active', shouldOpen);
+        document.body.style.overflow = shouldOpen ? 'hidden' : '';
     },
 
     // ===== Checkout =====
@@ -561,7 +578,7 @@ const Cart = {
                 } else {
                     submitBtn.textContent = 'Confirmar Pedido';
                     secureText.textContent = e.target.value === 'transferencia' 
-                        ? 'Te enviaremos los datos bancarios para transferir.' 
+                        ? 'Al confirmar el pedido vas a ver los datos bancarios para transferir.' 
                         : 'Abonás en efectivo al retirar o recibir el pedido.';
                 }
             });

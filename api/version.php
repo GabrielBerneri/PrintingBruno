@@ -10,6 +10,7 @@
  */
 
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/version_helpers.php';
 
 // Determinar si el acceso está autorizado para ver detalles
 $providedToken   = $_SERVER['HTTP_X_VERSION_TOKEN'] ?? '';
@@ -18,25 +19,22 @@ $isTokenValid    = VERSION_TOKEN !== '' && hash_equals(VERSION_TOKEN, $providedT
 $isAuthorized    = $isLocalRequest || $isTokenValid;
 
 // Respuesta pública mínima (sin información sensible)
+$versionInfo = pbGetVersionInfo();
 $response = [
-    'app'    => 'printingbruno',
+    'app'    => $versionInfo['app'],
     'status' => 'ok',
 ];
 
 // Detalle extendido solo para accesos autorizados
 if ($isAuthorized) {
-    $versionFile = __DIR__ . '/../version.json';
-    $fromFile = [];
-    if (is_file($versionFile) && is_readable($versionFile)) {
-        $json = json_decode((string)file_get_contents($versionFile), true);
-        if (is_array($json)) $fromFile = $json;
-    }
-
-    $response['environment']  = APP_ENV;
-    $response['version']      = pbEnv('APP_VERSION', $fromFile['version'] ?? 'unknown');
-    $response['commit']       = pbEnv('GIT_COMMIT',  $fromFile['commit']  ?? 'unknown');
-    $response['branch']       = pbEnv('GIT_BRANCH',  $fromFile['branch']  ?? 'unknown');
-    $response['deployed_at']  = pbEnv('DEPLOYED_AT', $fromFile['deployed_at'] ?? null);
+    $response['environment'] = APP_ENV;
+    $response['version'] = $versionInfo['version'];
+    $response['asset_version'] = $versionInfo['asset_version'];
+    $response['fingerprint'] = $versionInfo['fingerprint'];
+    $response['commit'] = $versionInfo['commit'];
+    $response['branch'] = $versionInfo['branch'];
+    $response['built_at'] = $versionInfo['built_at'];
+    $response['deployed_at'] = $versionInfo['deployed_at'];
 }
 
 http_response_code(200);

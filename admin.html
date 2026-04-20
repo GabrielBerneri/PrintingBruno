@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Admin | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260319-4">
+    <link rel="stylesheet" href="css/styles.css?v=20260331-1">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <style>
         /* ===== Admin Dashboard Styles ===== */
@@ -131,6 +131,31 @@
         .mini-badge.ok {
             background: rgba(37, 211, 102, 0.15);
             color: #25D366;
+        }
+
+        .admin-header-user {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 0.2rem;
+        }
+
+        .admin-version-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 255, 255, 0.09);
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-muted);
+            font-size: 0.72rem;
+            letter-spacing: 0.02em;
+        }
+
+        .admin-version-chip strong {
+            color: var(--text-primary);
+            font-weight: 700;
         }
 
         .admin-subsection {
@@ -745,7 +770,10 @@
                     <img class="logo-icon" src="assets/logo/logo.png" alt="PrintingBruno">Printing<span>Bruno</span>
                 </a>
                 <div style="display:flex;align-items:center;gap:var(--space-md)">
-                    <span style="color:var(--text-secondary);font-size:0.9rem" id="adminUsername"></span>
+                    <div class="admin-header-user">
+                        <span style="color:var(--text-secondary);font-size:0.9rem" id="adminUsername"></span>
+                        <span class="admin-version-chip" id="adminVersion" style="display:none"></span>
+                    </div>
                     <button class="btn btn-secondary btn-sm" id="logoutBtn">Cerrar Sesión</button>
                 </div>
             </div>
@@ -1361,10 +1389,38 @@
             return false;
         }
 
+        async function loadVersionInfo() {
+            const chip = document.getElementById('adminVersion');
+            if (!chip) return;
+
+            try {
+                const res = await fetch(`${API}/version.php`, { credentials: 'same-origin' });
+                if (!res.ok) return;
+
+                const data = await res.json();
+                const version = data.version || 'unknown';
+                const assetVersion = data.asset_version || 'unknown';
+                const fingerprint = data.fingerprint && data.fingerprint !== 'unknown'
+                    ? data.fingerprint
+                    : '';
+
+                chip.innerHTML = `<strong>v${esc(version)}</strong><span>${esc(assetVersion)}</span>${fingerprint ? `<span>${esc(fingerprint)}</span>` : ''}`;
+                chip.title = [
+                    data.environment ? `Entorno: ${data.environment}` : '',
+                    data.built_at ? `Build: ${data.built_at}` : '',
+                    data.deployed_at ? `Deploy: ${data.deployed_at}` : ''
+                ].filter(Boolean).join(' | ');
+                chip.style.display = 'inline-flex';
+            } catch (e) {
+                chip.style.display = 'none';
+            }
+        }
+
         function showAdmin(username) {
             document.getElementById('loginView').style.display = 'none';
             document.getElementById('adminView').style.display = 'block';
             document.getElementById('adminUsername').textContent = username;
+            loadVersionInfo();
             loadColors();
             loadDashboard();
             loadProducts();

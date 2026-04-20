@@ -17,7 +17,7 @@
   <meta property="og:image" content="https://www.printingbruno.com/assets/logo/logo.png">
   <title>PrintingBruno | Impresión 3D a Medida</title>
   <link rel="canonical" href="https://www.printingbruno.com/">
-  <link rel="stylesheet" href="css/styles.css?v=20260319-4">
+  <link rel="stylesheet" href="css/styles.css?v=20260331-1">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo/logo.png">
   <link rel="apple-touch-icon" href="https://www.printingbruno.com/assets/logo/logo.png">
   <?php
@@ -295,9 +295,9 @@
   <?php pb_render_footer(); ?>
   <?php pb_render_cart_drawer(); ?>
 
-  <script src="js/cart.js?v=20260316-2"></script>
-  <script src="js/products.js?v=20260319-1"></script>
-  <script src="js/main.js?v=20260315-4"></script>
+  <script src="js/cart.js?v=20260331-1"></script>
+  <script src="js/products.js?v=20260331-1"></script>
+  <script src="js/main.js?v=20260331-1"></script>
   <script>Products.loadFeatured('featuredGrid');</script>
 </body>
 

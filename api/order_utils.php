@@ -515,7 +515,6 @@ function pbVerifyOrderAccessToken(int $orderId, string $orderNumber, string $pro
 function pbBuildOrderReturnQuery(int $orderId, string $orderNumber): string {
     $params = [
         'order' => $orderId,
-        'on' => $orderNumber,
     ];
 
     $token = pbBuildOrderAccessToken($orderId, $orderNumber);

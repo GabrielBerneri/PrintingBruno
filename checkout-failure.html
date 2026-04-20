@@ -32,11 +32,6 @@
             <h1
                 style="font-family:var(--font-heading);font-size:2rem;font-weight:800;margin-bottom:var(--space-md);color:#e74c3c">
                 Pago No Completado</h1>
-            
-            <div id="orderNumberContainer" style="display:none; margin: 0 0 var(--space-xl)">
-                <div style="font-size:0.9rem;color:var(--text-muted);margin-bottom:4px">Tu N° de Orden</div>
-                <div id="orderNumberDisplay" style="font-family:monospace;font-size:1.5rem;font-weight:800;color:var(--accent);background:rgba(255,107,43,0.1);padding:8px 20px;border-radius:8px;display:inline-block"></div>
-            </div>
 
             <p style="color:var(--text-secondary);font-size:1.05rem;line-height:1.7;margin-bottom:var(--space-2xl)">El
                 pago no pudo ser procesado. Tus productos siguen en el carrito, podés intentar nuevamente o contactarnos
@@ -53,13 +48,6 @@
         (async function syncPaymentReturn() {
             const params = new URLSearchParams(window.location.search);
             const order = params.get('order');
-            const on = params.get('on');
-            
-            if (on) {
-                document.getElementById('orderNumberContainer').style.display = 'block';
-                document.getElementById('orderNumberDisplay').textContent = on;
-                document.getElementById('waContactBtn').href = `https://wa.me/5491137022937?text=Hola!%20Tuve%20un%20problema%20con%20el%20pago%20de%20mi%20pedido%20${on}`;
-            }
 
             if (!order) return;
 
@@ -70,12 +58,15 @@
                 const response = await fetch(`api/sync_payment.php?${params.toString()}`);
                 const data = await response.json();
                 if (data.success) {
-                    statusEl.textContent = `Pedido #${data.order_id} actualizado como: ${data.status}.`;
+                    if (data.order_number) {
+                        document.getElementById('waContactBtn').href = `https://wa.me/5491137022937?text=Hola!%20Tuve%20un%20problema%20con%20el%20pago%20de%20la%20compra%20${encodeURIComponent(data.order_number)}`;
+                    }
+                    statusEl.textContent = 'Registramos el intento de pago. Si necesitás ayuda, escribinos.';
                 } else {
-                    statusEl.textContent = `Pedido #${order}. No se pudo registrar automáticamente.`;
+                    statusEl.textContent = `No se pudo registrar automaticamente el intento de pago.`;
                 }
             } catch (error) {
-                statusEl.textContent = `Pedido #${order}. Error registrando el resultado en local.`;
+                statusEl.textContent = `Error registrando el resultado del pago.`;
             }
         })();
     </script>

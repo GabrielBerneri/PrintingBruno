@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Conocé a PrintingBruno - Impresión 3D de alta calidad.">
     <title>Nosotros | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260319-4">
+    <link rel="stylesheet" href="css/styles.css?v=20260331-1">
     <link rel="icon" type="image/jpeg" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';
@@ -45,7 +45,7 @@
                 </div>
                 <div class="reveal"
                     style="border-radius: var(--border-radius-lg); overflow: hidden; border: 1px solid var(--border-subtle); background: var(--bg-card);">
-                    <img src="assets/logo/about.png" alt="Nosotros PrintingBruno"
+                    <img src="esteesbruno.jpeg" alt="Bruno de PrintingBruno"
                         style="width:100%;height:100%;object-fit:cover;display:block;">
                 </div>
             </div>
@@ -150,7 +150,7 @@
     <?php pb_render_footer(); ?>
 
 
-    <script src="js/main.js?v=20260315-4"></script>
+    <script src="js/main.js?v=20260331-1"></script>
 </body>
 
 </html>

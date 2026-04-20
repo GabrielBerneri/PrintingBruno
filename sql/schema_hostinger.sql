@@ -30,25 +30,11 @@ CREATE TABLE IF NOT EXISTS products (
   INDEX idx_featured (featured)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS product_colors (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  name VARCHAR(100) NOT NULL,
-  slug VARCHAR(120) NOT NULL UNIQUE,
-  hex_primary CHAR(7) NOT NULL,
-  hex_secondary CHAR(7) DEFAULT NULL,
-  active TINYINT(1) NOT NULL DEFAULT 1,
-  sort_order INT NOT NULL DEFAULT 0,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_product_colors_active_sort (active, sort_order)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Orders table
 CREATE TABLE IF NOT EXISTS orders (
   id INT AUTO_INCREMENT PRIMARY KEY,
   order_number VARCHAR(30) DEFAULT NULL,
   idempotency_key VARCHAR(100) DEFAULT NULL,
-  customer_id INT DEFAULT NULL,
   customer_name VARCHAR(255) NOT NULL,
   customer_email VARCHAR(255) NOT NULL,
   customer_phone VARCHAR(50) DEFAULT NULL,
@@ -76,7 +62,6 @@ CREATE TABLE IF NOT EXISTS orders (
   INDEX idx_status (status),
   INDEX idx_payment_status (payment_status),
   INDEX idx_fulfillment_status (fulfillment_status),
-  INDEX idx_customer_id (customer_id),
   INDEX idx_mp_payment (mp_payment_id),
   INDEX idx_mp_preference (mp_preference_id),
   INDEX idx_payment_verified_by (payment_verified_by)
@@ -86,8 +71,6 @@ CREATE TABLE IF NOT EXISTS product_variants (
   id INT AUTO_INCREMENT PRIMARY KEY,
   product_id INT NOT NULL,
   label VARCHAR(120) NOT NULL DEFAULT 'Base',
-  primary_color_id INT DEFAULT NULL,
-  secondary_color_id INT DEFAULT NULL,
   primary_color VARCHAR(50) DEFAULT NULL,
   secondary_color VARCHAR(50) DEFAULT NULL,
   sku VARCHAR(100) DEFAULT NULL,
@@ -102,10 +85,6 @@ CREATE TABLE IF NOT EXISTS product_variants (
   INDEX idx_variant_product (product_id),
   INDEX idx_variant_active (active),
   INDEX idx_variant_sort (product_id, sort_order),
-  INDEX idx_variant_primary_color (primary_color_id),
-  INDEX idx_variant_secondary_color (secondary_color_id),
-  CONSTRAINT fk_product_variant_primary_color FOREIGN KEY (primary_color_id) REFERENCES product_colors(id) ON DELETE SET NULL,
-  CONSTRAINT fk_product_variant_secondary_color FOREIGN KEY (secondary_color_id) REFERENCES product_colors(id) ON DELETE SET NULL,
   CONSTRAINT fk_product_variant_product FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -146,111 +125,6 @@ CREATE TABLE IF NOT EXISTS stock_reservations (
   CONSTRAINT fk_stock_reservation_variant FOREIGN KEY (variant_id) REFERENCES product_variants(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE IF NOT EXISTS customers (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  email VARCHAR(255) NOT NULL,
-  email_normalized VARCHAR(255) NOT NULL,
-  first_name VARCHAR(120) NOT NULL,
-  last_name VARCHAR(120) DEFAULT NULL,
-  phone VARCHAR(50) DEFAULT NULL,
-  dni VARCHAR(30) DEFAULT NULL,
-  password_hash VARCHAR(255) NOT NULL,
-  verified_at DATETIME DEFAULT NULL,
-  last_login_at DATETIME DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY uniq_customers_email_normalized (email_normalized),
-  INDEX idx_customers_verified (verified_at)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS customer_addresses (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  customer_id INT NOT NULL,
-  label VARCHAR(80) DEFAULT NULL,
-  recipient_name VARCHAR(180) DEFAULT NULL,
-  phone VARCHAR(50) DEFAULT NULL,
-  street VARCHAR(180) NOT NULL,
-  city VARCHAR(120) NOT NULL,
-  province VARCHAR(120) NOT NULL,
-  postal_code VARCHAR(20) NOT NULL,
-  notes VARCHAR(255) DEFAULT NULL,
-  is_default TINYINT(1) NOT NULL DEFAULT 0,
-  active TINYINT(1) NOT NULL DEFAULT 1,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  INDEX idx_customer_addresses_customer (customer_id),
-  INDEX idx_customer_addresses_default (customer_id, is_default),
-  CONSTRAINT fk_customer_addresses_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS order_shipping_addresses (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  order_id INT NOT NULL,
-  customer_id INT DEFAULT NULL,
-  customer_address_id INT DEFAULT NULL,
-  label VARCHAR(120) DEFAULT NULL,
-  recipient_name VARCHAR(180) DEFAULT NULL,
-  phone VARCHAR(50) DEFAULT NULL,
-  street VARCHAR(255) NOT NULL,
-  city VARCHAR(120) NOT NULL,
-  province VARCHAR(120) NOT NULL,
-  postal_code VARCHAR(20) NOT NULL,
-  notes TEXT DEFAULT NULL,
-  source ENUM('checkout_form', 'customer_address') NOT NULL DEFAULT 'checkout_form',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY uniq_order_shipping_order (order_id),
-  INDEX idx_order_shipping_customer (customer_id),
-  INDEX idx_order_shipping_customer_address (customer_address_id),
-  CONSTRAINT fk_order_shipping_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
-  CONSTRAINT fk_order_shipping_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE SET NULL,
-  CONSTRAINT fk_order_shipping_customer_address FOREIGN KEY (customer_address_id) REFERENCES customer_addresses(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS customer_sessions (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  customer_id INT NOT NULL,
-  token_hash CHAR(64) NOT NULL,
-  csrf_token CHAR(64) NOT NULL,
-  expires_at DATETIME NOT NULL,
-  last_seen_at DATETIME DEFAULT NULL,
-  ip_address VARCHAR(64) DEFAULT NULL,
-  user_agent VARCHAR(255) DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  UNIQUE KEY uniq_customer_sessions_token (token_hash),
-  INDEX idx_customer_sessions_customer (customer_id),
-  INDEX idx_customer_sessions_expiry (expires_at),
-  CONSTRAINT fk_customer_sessions_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS customer_password_resets (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  customer_id INT NOT NULL,
-  token_hash CHAR(64) NOT NULL,
-  expires_at DATETIME NOT NULL,
-  requested_at DATETIME NOT NULL,
-  used_at DATETIME DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY uniq_customer_password_reset_token (token_hash),
-  INDEX idx_customer_password_resets_customer (customer_id),
-  INDEX idx_customer_password_resets_expiry (expires_at),
-  CONSTRAINT fk_customer_password_resets_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
-CREATE TABLE IF NOT EXISTS customer_email_verifications (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  customer_id INT NOT NULL,
-  token_hash CHAR(64) NOT NULL,
-  expires_at DATETIME NOT NULL,
-  verified_at DATETIME DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY uniq_customer_email_verification_token (token_hash),
-  INDEX idx_customer_email_verifications_customer (customer_id),
-  INDEX idx_customer_email_verifications_expiry (expires_at),
-  CONSTRAINT fk_customer_email_verifications_customer FOREIGN KEY (customer_id) REFERENCES customers(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
 -- Email logs table for auditing sent emails
 CREATE TABLE IF NOT EXISTS email_logs (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -282,13 +156,8 @@ CREATE TABLE IF NOT EXISTS admin_audit_log (
 CREATE TABLE IF NOT EXISTS admin_users (
   id INT AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(100) NOT NULL UNIQUE,
-  email VARCHAR(255) DEFAULT NULL,
   password_hash VARCHAR(255) NOT NULL,
-  password_reset_token_hash CHAR(64) DEFAULT NULL,
-  password_reset_expires_at DATETIME DEFAULT NULL,
-  password_reset_requested_at DATETIME DEFAULT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  UNIQUE KEY uniq_admin_email (email)
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- No se crea admin por defecto.
@@ -296,22 +165,6 @@ CREATE TABLE IF NOT EXISTS admin_users (
 --   php scripts/create_admin_user.php <usuario>
 
 -- Catálogo de productos reales
-INSERT INTO product_colors (name, slug, hex_primary, hex_secondary, active, sort_order) VALUES
-  ('Rojo', 'rojo', '#d83b3b', NULL, 1, 10),
-  ('Blanco', 'blanco', '#f4f4f1', NULL, 1, 20),
-  ('Negro', 'negro', '#1a1a1a', NULL, 1, 30),
-  ('Gris', 'gris', '#8c8f96', NULL, 1, 40),
-  ('Azul', 'azul', '#2f63d8', NULL, 1, 50),
-  ('Verde', 'verde', '#2f9d63', NULL, 1, 60),
-  ('Dorado', 'dorado', '#c9a227', NULL, 1, 70),
-  ('Celeste', 'celeste', '#6bbef0', NULL, 1, 80),
-  ('Rosa', 'rosa', '#ef7ca8', NULL, 1, 90)
-ON DUPLICATE KEY UPDATE
-  hex_primary = VALUES(hex_primary),
-  hex_secondary = VALUES(hex_secondary),
-  active = VALUES(active),
-  sort_order = VALUES(sort_order);
-
 INSERT INTO products (name, slug, description, price, category, image_url, badge, material, stock, active, featured) VALUES
   ('Mate River Plate', 'mate-river-plate', 'Mate con escudo de River Plate impreso en 3D. Incluye virola de aluminio. Ideal para el hincha millonario.', 8500.00, 'mates', 'assets/productos/mate-river-plate.jpeg', 'Popular', 'PLA', 10, 1, 1),
   ('Mate Boca Juniors', 'mate-boca-juniors', 'Mate con escudo de Boca Juniors impreso en 3D. Incluye virola de aluminio. Para el hincha xeneize.', 8500.00, 'mates', 'assets/productos/mate-boca-juniors.jpeg', 'Popular', 'PLA', 10, 1, 1),

@@ -263,6 +263,21 @@
       });
     }
 
+    if (imageWrap && mainImg && zoomLens && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      const moveZoom = (e) => {
+        const rect = imageWrap.getBoundingClientRect();
+        const x = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+        const y = Math.min(Math.max(e.clientY - rect.top, 0), rect.height);
+        const xPercent = rect.width ? (x / rect.width) * 100 : 50;
+        const yPercent = rect.height ? (y / rect.height) * 100 : 50;
+        imageWrap.style.setProperty('--zoom-x', `${xPercent}%`);
+        imageWrap.style.setProperty('--zoom-y', `${yPercent}%`);
+      };
+
+      imageWrap.addEventListener('mouseenter', () => imageWrap.classList.add('zoom-active'));
+      imageWrap.addEventListener('mouseleave', () => imageWrap.classList.remove('zoom-active'));
+      imageWrap.addEventListener('mousemove', moveZoom);
+    }
   }
 
   function renderProduct(product, selectedVariantId = null) {

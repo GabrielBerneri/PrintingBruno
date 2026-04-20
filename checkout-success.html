@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>¡Compra Exitosa! | PrintingBruno</title>
+    <title>Estado de compra | PrintingBruno</title>
     <link rel="stylesheet" href="css/styles.css">
     <link rel="icon" type="image/jpeg" href="assets/logo/logo.png">
 </head>
@@ -27,58 +27,245 @@
     </header>
 
     <section class="admin-login">
-        <div class="admin-login-card" style="max-width:500px;text-align:center">
-            <div style="font-size:4rem;margin-bottom:var(--space-xl)">✅</div>
-            <h1
+        <div class="admin-login-card" style="max-width:560px;text-align:center">
+            <div id="statusIcon" style="font-size:4rem;margin-bottom:var(--space-xl)">✅</div>
+            <h1 id="statusTitle"
                 style="font-family:var(--font-heading);font-size:2rem;font-weight:800;margin-bottom:var(--space-md);color:#25D366">
                 ¡Compra Exitosa!</h1>
-            
-            <div id="orderNumberContainer" style="display:none; margin: 0 0 var(--space-xl)">
-                <div style="font-size:0.9rem;color:var(--text-muted);margin-bottom:4px">Tu N° de Orden</div>
-                <div id="orderNumberDisplay" style="font-family:monospace;font-size:1.5rem;font-weight:800;color:var(--accent);background:rgba(255,107,43,0.1);padding:8px 20px;border-radius:8px;display:inline-block"></div>
+
+            <p id="statusMessage" style="color:var(--text-secondary);font-size:1.05rem;line-height:1.7;margin-bottom:var(--space-xl)">
+                Estamos confirmando el estado de tu compra.
+            </p>
+
+            <div id="transferDetails" style="display:none;text-align:left;background:rgba(255,255,255,0.03);border:1px solid var(--border-subtle);border-radius:16px;padding:20px;margin:0 0 var(--space-xl)">
+                <div style="font-size:0.8rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent-light);margin-bottom:0.75rem;font-weight:700">
+                    Datos para transferir
+                </div>
+                <div id="transferDetailsBody" style="display:grid;gap:0.85rem"></div>
+                <p style="margin:1rem 0 0;color:var(--text-muted);font-size:0.86rem;line-height:1.6">
+                    Cuando hagas la transferencia, mandanos el comprobante por WhatsApp para acelerar la validacion.
+                </p>
             </div>
 
-            <p style="color:var(--text-secondary);font-size:1.05rem;line-height:1.7;margin-bottom:var(--space-2xl)">Tu
-                pago fue procesado correctamente. Pronto recibirás un email con los detalles de tu pedido y nos
-                pondremos en contacto para coordinar el envío.</p>
             <p id="paymentSyncStatus" style="color:var(--text-muted);font-size:0.95rem;margin:-0.5rem 0 var(--space-xl)"></p>
+
             <div style="display:flex;gap:var(--space-md);justify-content:center;flex-wrap:wrap">
                 <a href="catalogo.html" class="btn btn-primary btn-lg">Seguir Comprando</a>
-                <a id="waContactBtn" href="https://wa.me/5491137022937?text=Hola!%20Acabo%20de%20realizar%20una%20compra" target="_blank"
+                <a id="waContactBtn" href="https://wa.me/5491137022937?text=Hola!%20Necesito%20ayuda%20con%20una%20compra" target="_blank"
                     class="btn btn-whatsapp btn-lg">Contactarnos</a>
             </div>
         </div>
     </section>
 
-    <script src="js/cart.js?v=20260316-2"></script>
+    <script src="js/cart.js?v=20260331-1"></script>
     <script>Cart.clear();</script>
     <script>
-        (async function syncPaymentReturn() {
-            const params = new URLSearchParams(window.location.search);
-            const order = params.get('order');
-            const on = params.get('on');
-            
-            if (on) {
-                document.getElementById('orderNumberContainer').style.display = 'block';
-                document.getElementById('orderNumberDisplay').textContent = on;
-                document.getElementById('waContactBtn').href = `https://wa.me/5491137022937?text=Hola!%20Mi%20pedido%20es%20${on}`;
+        function escapeHtml(value) {
+            const div = document.createElement('div');
+            div.textContent = value || '';
+            return div.innerHTML;
+        }
+
+        function buildWhatsAppUrl(message) {
+            return `https://wa.me/5491137022937?text=${encodeURIComponent(message)}`;
+        }
+
+        function setWhatsAppButton(message, label) {
+            const btn = document.getElementById('waContactBtn');
+            btn.href = buildWhatsAppUrl(message);
+            btn.textContent = label;
+        }
+
+        function renderTransferDetails(details) {
+            const body = document.getElementById('transferDetailsBody');
+            const container = document.getElementById('transferDetails');
+            const rows = [];
+
+            if (details.bank_name) {
+                rows.push(`
+                    <div>
+                        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px">Banco</div>
+                        <div style="font-weight:700;color:var(--text-primary)">${escapeHtml(details.bank_name)}</div>
+                    </div>
+                `);
             }
 
-            if (!order || !/^\d+$/.test(order)) return;
+            if (details.account_label) {
+                rows.push(`
+                    <div>
+                        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px">Cuenta</div>
+                        <div style="font-weight:700;color:var(--text-primary)">${escapeHtml(details.account_label)}</div>
+                    </div>
+                `);
+            }
 
-            const statusEl = document.getElementById('paymentSyncStatus');
-            statusEl.textContent = `Validando estado del pago en servidor...`;
+            if (details.alias) {
+                rows.push(`
+                    <div>
+                        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px">Alias</div>
+                        <div style="font-family:monospace;font-size:1rem;font-weight:800;color:var(--accent);background:rgba(255,107,43,0.1);padding:10px 12px;border-radius:10px;word-break:break-word">${escapeHtml(details.alias)}</div>
+                    </div>
+                `);
+            }
+
+            if (details.cbu) {
+                rows.push(`
+                    <div>
+                        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px">CBU</div>
+                        <div style="font-family:monospace;font-size:1rem;font-weight:800;color:var(--text-primary);background:rgba(255,255,255,0.04);padding:10px 12px;border-radius:10px;word-break:break-all">${escapeHtml(details.cbu)}</div>
+                    </div>
+                `);
+            }
+
+            if (details.account_holder) {
+                rows.push(`
+                    <div>
+                        <div style="font-size:0.78rem;color:var(--text-muted);margin-bottom:4px">Titular</div>
+                        <div style="font-weight:700;color:var(--text-primary)">${escapeHtml(details.account_holder)}</div>
+                    </div>
+                `);
+            }
+
+            if (rows.length === 0) {
+                body.innerHTML = `
+                    <p style="margin:0;color:var(--text-secondary);line-height:1.6">
+                        No pudimos cargar los datos de la cuenta en este momento. Escribinos por WhatsApp y te los pasamos.
+                    </p>
+                `;
+            } else {
+                body.innerHTML = rows.join('');
+            }
+
+            container.style.display = 'block';
+        }
+
+        function applyMercadoPagoState(paymentStatus, orderNumber) {
+            const iconEl = document.getElementById('statusIcon');
+            const titleEl = document.getElementById('statusTitle');
+            const messageEl = document.getElementById('statusMessage');
+            const syncStatusEl = document.getElementById('paymentSyncStatus');
+
+            if (paymentStatus === 'approved') {
+                iconEl.textContent = '✅';
+                titleEl.textContent = '¡Compra Exitosa!';
+                titleEl.style.color = '#25D366';
+                messageEl.textContent = 'Tu pago fue procesado correctamente. Pronto recibirás un email con los detalles de tu pedido y nos pondremos en contacto para coordinar el envio.';
+                syncStatusEl.textContent = '';
+            } else if (paymentStatus === 'under_review' || paymentStatus === 'pending') {
+                iconEl.textContent = '⏳';
+                titleEl.textContent = 'Compra recibida';
+                titleEl.style.color = '#fbbf24';
+                messageEl.textContent = 'Tu compra fue registrada correctamente y el pago quedo en validacion. Te avisaremos apenas tengamos confirmacion.';
+                syncStatusEl.textContent = 'Estamos esperando la confirmacion final del pago.';
+            } else {
+                iconEl.textContent = '🧾';
+                titleEl.textContent = 'Compra registrada';
+                titleEl.style.color = 'var(--accent)';
+                messageEl.textContent = 'Tu compra fue registrada correctamente. Si necesitás ayuda con el pago, escribinos y lo revisamos.';
+                syncStatusEl.textContent = '';
+            }
+
+            setWhatsAppButton(
+                orderNumber
+                    ? `Hola! Necesito ayuda con mi compra ${orderNumber}.`
+                    : 'Hola! Necesito ayuda con una compra reciente.',
+                'Contactarnos'
+            );
+        }
+
+        function applyTransferState(orderNumber, paymentStatus, transferDetails) {
+            const iconEl = document.getElementById('statusIcon');
+            const titleEl = document.getElementById('statusTitle');
+            const messageEl = document.getElementById('statusMessage');
+            const syncStatusEl = document.getElementById('paymentSyncStatus');
+
+            iconEl.textContent = '🏦';
+            titleEl.textContent = '¡Compra recibida!';
+            titleEl.style.color = 'var(--accent)';
+            messageEl.textContent = 'Tu compra fue registrada correctamente. Para confirmar el pedido, realizá la transferencia a la cuenta indicada abajo. Cuando veamos la acreditacion, te avisamos por email o WhatsApp.';
+            renderTransferDetails(transferDetails || {});
+            syncStatusEl.textContent = paymentStatus === 'approved'
+                ? 'La transferencia ya figura como acreditada.'
+                : 'El pedido quedo registrado con pago pendiente hasta recibir la transferencia.';
+
+            setWhatsAppButton(
+                orderNumber
+                    ? `Hola! Quiero enviar el comprobante de la compra ${orderNumber}.`
+                    : 'Hola! Quiero enviar el comprobante de mi compra.',
+                'Enviar comprobante'
+            );
+        }
+
+        function applyCashState(orderNumber) {
+            const iconEl = document.getElementById('statusIcon');
+            const titleEl = document.getElementById('statusTitle');
+            const messageEl = document.getElementById('statusMessage');
+            const syncStatusEl = document.getElementById('paymentSyncStatus');
+
+            iconEl.textContent = '💵';
+            titleEl.textContent = '¡Compra recibida!';
+            titleEl.style.color = 'var(--accent)';
+            messageEl.textContent = 'Tu compra fue registrada correctamente. El pago quedo pendiente para abonar en efectivo al retirar o recibir el pedido. Te vamos a contactar para coordinar.';
+            syncStatusEl.textContent = 'El pedido quedo pendiente de cobro hasta la entrega o el retiro.';
+
+            setWhatsAppButton(
+                orderNumber
+                    ? `Hola! Quiero coordinar el pago en efectivo de la compra ${orderNumber}.`
+                    : 'Hola! Quiero coordinar el pago en efectivo de mi compra.',
+                'Coordinar pago'
+            );
+        }
+
+        (async function loadReturnState() {
+            const params = new URLSearchParams(window.location.search);
+            const order = params.get('order');
+            const token = params.get('ot');
+            let syncedPaymentStatus = '';
+
+            if (order) {
+                try {
+                    const syncResponse = await fetch(`api/sync_payment.php?${params.toString()}`);
+                    const syncData = await syncResponse.json();
+                    if (syncResponse.ok && syncData.success) {
+                        syncedPaymentStatus = String(syncData.payment_status || '').trim();
+                    }
+                } catch (error) {
+                    console.error('sync_payment error', error);
+                }
+            }
+
+            if (!order || !token) {
+                document.getElementById('paymentSyncStatus').textContent = '';
+                return;
+            }
 
             try {
-                const response = await fetch(`api/sync_payment.php?${params.toString()}`);
+                const response = await fetch(`api/order_return.php?order=${encodeURIComponent(order)}&ot=${encodeURIComponent(token)}`);
                 const data = await response.json();
-                if (data.success) {
-                    statusEl.textContent = `Pedido #${data.order_id} actualizado como: ${data.status}.`;
-                } else {
-                    statusEl.textContent = `Pedido #${order}. No se pudo validar automáticamente.`;
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'No se pudo cargar el contexto de la compra.');
                 }
+
+                const paymentMethod = String(data.payment_method || 'mercadopago').trim();
+                const paymentStatus = syncedPaymentStatus || String(data.payment_status || '').trim();
+                const orderNumber = String(data.order_number || '').trim();
+
+                if (paymentMethod === 'transferencia') {
+                    applyTransferState(orderNumber, paymentStatus, data.transfer_details || {});
+                    return;
+                }
+
+                if (paymentMethod === 'efectivo') {
+                    applyCashState(orderNumber);
+                    return;
+                }
+
+                applyMercadoPagoState(paymentStatus, orderNumber);
             } catch (error) {
-                statusEl.textContent = `Pedido #${order}. Error validando el pago en local.`;
+                document.getElementById('paymentSyncStatus').textContent = '';
+                setWhatsAppButton('Hola! Necesito ayuda con una compra reciente.', 'Contactarnos');
+                console.error('order_return error', error);
             }
         })();
     </script>
