@@ -9,13 +9,14 @@
   <meta name="keywords"
     content="impresión 3D, printing bruno, figuras 3D, impresión personalizada, 3D printing Argentina">
   <meta name="author" content="PrintingBruno">
-  <meta property="og:title" content="PrintingBruno - Impresión 3D a Medida">
+  <meta property="og:title" content="Impresión 3D a Medida | PrintingBruno">
   <meta property="og:description"
     content="Transformamos tus ideas en objetos reales. Impresión 3D de alta calidad con atención personalizada.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://www.printingbruno.com/">
   <meta property="og:image" content="https://www.printingbruno.com/assets/logo/logo.png">
-  <title>PrintingBruno | Impresión 3D a Medida</title>
+  <meta property="og:site_name" content="PrintingBruno">
+  <title>Impresión 3D a Medida | PrintingBruno</title>
   <link rel="canonical" href="https://www.printingbruno.com/">
   <link rel="stylesheet" href="css/styles.css?v=20260331-1">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo/logo.png">
