@@ -1063,7 +1063,7 @@ select {
 }
 
 .product-stock-status {
-  margin-top: calc(var(--space-sm) * -0.5);
+  margin-top: var(--space-sm);
   margin-bottom: var(--space-md);
   font-size: 0.78rem;
   font-weight: 600;
