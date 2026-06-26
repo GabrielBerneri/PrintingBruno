@@ -267,8 +267,8 @@ function pb_render_footer(): void
                         <p class="footer-payments-title">Medios de pago</p>
                         <div class="footer-payments-icons">
                             <div class="payment-icon">Mercado Pago</div>
-                            <div class="payment-icon">Transferencia</div>
-                            <div class="payment-icon">Efectivo</div>
+                            <div class="payment-icon">Transferencia <span style="background:#22c55e;color:#fff;font-size:0.65rem;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:3px;">10% OFF</span></div>
+                            <div class="payment-icon">Efectivo <span style="background:#22c55e;color:#fff;font-size:0.65rem;padding:1px 5px;border-radius:4px;font-weight:700;margin-left:3px;">10% OFF</span></div>
                         </div>
                     </div>
                 </div>
