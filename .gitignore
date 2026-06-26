@@ -14,8 +14,6 @@
 /logs/*.json
 /logs/*.log
 
-# === Subidas / assets locales ===
-/assets/productos/
 
 
 # === IDE / OS ===
