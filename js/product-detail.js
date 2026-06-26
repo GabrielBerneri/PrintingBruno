@@ -83,9 +83,9 @@
   }
 
   function variantChipBackground(variant) {
-    const primary = colorHex(variant?.primary_color || variant?.label);
+    const primary = variant?.primary_color_hex || colorHex(variant?.primary_color || variant?.label);
     if (variant?.secondary_color) {
-      const secondary = colorHex(variant.secondary_color);
+      const secondary = variant?.secondary_color_hex || colorHex(variant.secondary_color);
       return `linear-gradient(135deg, ${primary} 0%, ${primary} 52%, ${secondary} 52%, ${secondary} 100%)`;
     }
     return primary;
