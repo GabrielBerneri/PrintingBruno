@@ -320,9 +320,9 @@ function pbNormalizeVariantsInput($value, array $productFallback = []): array {
                     'Variante ' . ($index + 1)
                 ),
                 'primary_color'      => trim((string)($rawVariant['primary_color'] ?? '')),
-                'secondary_color'    => trim((string)($rawVariant['secondary_color'] ?? '')),
+                'secondary_color'    => strtolower(trim((string)($rawVariant['secondary_color'] ?? ''))) === 'sin definir' ? '' : trim((string)($rawVariant['secondary_color'] ?? '')),
                 'primary_color_name' => trim((string)($rawVariant['primary_color_name'] ?? ($rawVariant['primary_color'] ?? ''))),
-                'secondary_color_name' => trim((string)($rawVariant['secondary_color_name'] ?? ($rawVariant['secondary_color'] ?? ''))),
+                'secondary_color_name' => strtolower(trim((string)($rawVariant['secondary_color_name'] ?? ($rawVariant['secondary_color'] ?? '')))) === 'sin definir' ? '' : trim((string)($rawVariant['secondary_color_name'] ?? ($rawVariant['secondary_color'] ?? ''))),
                 'primary_color_id'   => $primaryColorId,
                 'secondary_color_id' => $secondaryColorId,
                 'primary_color_hex'  => pbNormalizeColorHex($rawVariant['primary_color_hex'] ?? null) ?? pbLegacyColorHex($rawVariant['primary_color'] ?? null),
@@ -450,6 +450,8 @@ function pbFetchProductVariantsByProductIds(PDO $db, array $productIds, bool $in
             : ($colorMapByName[strtolower(trim((string)($variant['secondary_color'] ?? '')))] ?? null);
         $primaryColorName = trim((string)($primaryRecord['name'] ?? ($variant['primary_color'] ?? '')));
         $secondaryColorName = trim((string)($secondaryRecord['name'] ?? ($variant['secondary_color'] ?? '')));
+        if (strtolower($secondaryColorName) === 'sin definir') $secondaryColorName = '';
+        if (strtolower($primaryColorName) === 'sin definir') $primaryColorName = '';
 
         $normalized = [
             'id'                   => $variantId,
