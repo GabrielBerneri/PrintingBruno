@@ -414,6 +414,14 @@ function pbFetchProductVariantsByProductIds(PDO $db, array $productIds, bool $in
         }
     }
     $colorMap = pbProductColorMapByIds($db, $colorIds);
+
+    $colorMapByName = [];
+    if (pbHasProductColorsTable($db)) {
+        foreach (pbListProductColors($db) as $c) {
+            $colorMapByName[strtolower(trim((string)($c['name'] ?? '')))] = $c;
+        }
+    }
+
     $mapped = [];
 
     foreach ($variants as $variant) {
@@ -425,8 +433,12 @@ function pbFetchProductVariantsByProductIds(PDO $db, array $productIds, bool $in
 
         $primaryColorId = isset($variant['primary_color_id']) && $variant['primary_color_id'] !== null ? (int)$variant['primary_color_id'] : null;
         $secondaryColorId = isset($variant['secondary_color_id']) && $variant['secondary_color_id'] !== null ? (int)$variant['secondary_color_id'] : null;
-        $primaryRecord = $primaryColorId !== null && isset($colorMap[$primaryColorId]) ? $colorMap[$primaryColorId] : null;
-        $secondaryRecord = $secondaryColorId !== null && isset($colorMap[$secondaryColorId]) ? $colorMap[$secondaryColorId] : null;
+        $primaryRecord = ($primaryColorId !== null && isset($colorMap[$primaryColorId]))
+            ? $colorMap[$primaryColorId]
+            : ($colorMapByName[strtolower(trim((string)($variant['primary_color'] ?? '')))] ?? null);
+        $secondaryRecord = ($secondaryColorId !== null && isset($colorMap[$secondaryColorId]))
+            ? $colorMap[$secondaryColorId]
+            : ($colorMapByName[strtolower(trim((string)($variant['secondary_color'] ?? '')))] ?? null);
         $primaryColorName = trim((string)($primaryRecord['name'] ?? ($variant['primary_color'] ?? '')));
         $secondaryColorName = trim((string)($secondaryRecord['name'] ?? ($variant['secondary_color'] ?? '')));
 
