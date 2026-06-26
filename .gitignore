@@ -4,7 +4,8 @@
 .env.production
 
 # === Dependencias ===
-/vendor/
+# vendor/ se versiona a proposito: el deploy Git de hPanel no corre composer install
+# /vendor/
 
 # === Base de datos ===
 /sql/*.sql
