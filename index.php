@@ -60,8 +60,7 @@
           Tienda de impresión <span class="hero-3d">3D</span>
         </h1>
         <p class="hero-description">
-          Si tenés un STL, una referencia o sólo una idea, te respondemos con una propuesta concreta y la llevamos a
-          producción sin vueltas.
+          Venimos con las mejores ofertas del mercado y la confianza que tu proyecto necesita.
         </p>
         <div class="hero-buttons">
           <a href="contacto.html" class="btn btn-primary btn-lg">

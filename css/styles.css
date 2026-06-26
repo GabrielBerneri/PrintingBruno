@@ -549,6 +549,7 @@ select {
   font-weight: 900;
   line-height: 1.1;
   margin-bottom: var(--space-lg);
+  text-align: center;
   animation: fadeInUp 0.6s ease-out 0.1s both;
 }
 
