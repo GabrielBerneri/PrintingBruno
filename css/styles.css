@@ -552,6 +552,43 @@ select {
   animation: fadeInUp 0.6s ease-out 0.1s both;
 }
 
+/* Efecto especial para el "3D" del titulo del hero */
+.hero-3d {
+  display: inline-block;
+  font-weight: 900;
+  background: linear-gradient(120deg, var(--accent-light), #ffd27a, var(--accent));
+  background-size: 250% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transform-origin: center;
+  will-change: transform, filter;
+  animation: hero3dShimmer 3s linear infinite, hero3dPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes hero3dShimmer {
+  to { background-position: 250% center; }
+}
+
+@keyframes hero3dPulse {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+    filter: drop-shadow(0 0 6px var(--accent-glow));
+  }
+  50% {
+    transform: translateY(-3px) scale(1.08);
+    filter: drop-shadow(0 0 16px var(--accent-glow-strong));
+  }
+}
+
+/* Respetar usuarios que prefieren menos movimiento */
+@media (prefers-reduced-motion: reduce) {
+  .hero-3d {
+    animation: none;
+    filter: drop-shadow(0 0 8px var(--accent-glow));
+  }
+}
+
 .hero-description {
   font-size: 1.08rem;
   color: var(--text-secondary);

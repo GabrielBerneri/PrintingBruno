@@ -57,7 +57,7 @@
     <div class="container">
       <div class="hero-content">
         <h1 class="hero-title">
-          Tienda de impresión 3D
+          Tienda de impresión <span class="hero-3d">3D</span>
         </h1>
         <p class="hero-description">
           Si tenés un STL, una referencia o sólo una idea, te respondemos con una propuesta concreta y la llevamos a
