@@ -520,10 +520,10 @@ const Cart = {
                 <input type="radio" name="checkoutPayment" value="mercadopago" checked> MercadoPago
               </label>
               <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem;">
-                <input type="radio" name="checkoutPayment" value="transferencia"> Transferencia
+                <input type="radio" name="checkoutPayment" value="transferencia"> Transferencia <span style="background:#22c55e;color:#fff;font-size:0.68rem;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:2px;">10% OFF</span>
               </label>
               <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem;">
-                <input type="radio" name="checkoutPayment" value="efectivo"> Efectivo
+                <input type="radio" name="checkoutPayment" value="efectivo"> Efectivo <span style="background:#22c55e;color:#fff;font-size:0.68rem;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:2px;">10% OFF</span>
               </label>
             </div>
           </div>
@@ -532,9 +532,17 @@ const Cart = {
               <span>Subtotal (${this.getCount()} items)</span>
               <strong>$${this.getTotal().toLocaleString('es-AR')}</strong>
             </div>
+            <div class="checkout-summary-row" id="checkoutDiscountRow" style="margin-top: 0.5rem; display: none; color: #22c55e; font-weight: 600;">
+              <span>Descuento 10%</span>
+              <span id="checkoutDiscountAmount"></span>
+            </div>
             <div class="checkout-summary-row" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
               <span>Envío</span>
               <span>A coordinar</span>
+            </div>
+            <div class="checkout-summary-row" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
+              <span><strong>Total</strong></span>
+              <strong id="checkoutTotal">$${this.getTotal().toLocaleString('es-AR')}</strong>
             </div>
           </div>
           <button type="submit" class="btn btn-primary btn-lg" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;" id="checkoutSubmitBtn">
@@ -560,9 +568,26 @@ const Cart = {
         const paymentRadios = document.querySelectorAll('input[name="checkoutPayment"]');
         const submitBtn = document.getElementById('checkoutSubmitBtn');
         const secureText = overlay.querySelector('p:last-of-type');
-        
+        const subtotal = this.getTotal();
+
         paymentRadios.forEach(radio => {
             radio.addEventListener('change', (e) => {
+                const isDescuento = ['transferencia', 'efectivo'].includes(e.target.value);
+                const discountRow = document.getElementById('checkoutDiscountRow');
+                const discountAmountEl = document.getElementById('checkoutDiscountAmount');
+                const totalEl = document.getElementById('checkoutTotal');
+
+                if (isDescuento) {
+                    const descuento = Math.round(subtotal * 0.10 * 100) / 100;
+                    const totalFinal = Math.round((subtotal - descuento) * 100) / 100;
+                    discountRow.style.display = '';
+                    discountAmountEl.textContent = `-$${descuento.toLocaleString('es-AR')}`;
+                    totalEl.textContent = `$${totalFinal.toLocaleString('es-AR')}`;
+                } else {
+                    discountRow.style.display = 'none';
+                    totalEl.textContent = `$${subtotal.toLocaleString('es-AR')}`;
+                }
+
                 if (e.target.value === 'mercadopago') {
                     submitBtn.innerHTML = `
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -577,8 +602,8 @@ const Cart = {
                     `;
                 } else {
                     submitBtn.textContent = 'Confirmar Pedido';
-                    secureText.textContent = e.target.value === 'transferencia' 
-                        ? 'Al confirmar el pedido vas a ver los datos bancarios para transferir.' 
+                    secureText.textContent = e.target.value === 'transferencia'
+                        ? 'Al confirmar el pedido vas a ver los datos bancarios para transferir.'
                         : 'Abonás en efectivo al retirar o recibir el pedido.';
                 }
             });

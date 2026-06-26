@@ -237,6 +237,10 @@ try {
     if (!in_array($paymentMethod, ['mercadopago', 'transferencia', 'efectivo'])) {
         $paymentMethod = 'mercadopago';
     }
+    // Descuento del 10% para transferencia o efectivo
+    if (in_array($paymentMethod, ['transferencia', 'efectivo'])) {
+        $total = round($total * 0.90, 2);
+    }
     $linkedCustomerId = null;
     if ($customerSession && pbCustomerNormalizeEmail($body['customer']['email'] ?? '') === pbCustomerNormalizeEmail($customerSession['customer']['email'] ?? '')) {
         $linkedCustomerId = (int)$customerSession['customer_id'];
