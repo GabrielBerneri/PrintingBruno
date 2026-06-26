@@ -226,11 +226,20 @@ function pbDecodeImageUrls(?string $imageUrl, $imageUrlsColumn): array {
 function pbBuildVariantLabel(?string $primaryColor, ?string $secondaryColor, ?string $explicitLabel = null, ?string $fallback = null): string {
     $explicitLabel = trim((string)$explicitLabel);
     if ($explicitLabel !== '') {
-        return $explicitLabel;
+        // Limpiar "Sin definir" de labels guardados con datos anteriores al fix
+        $cleaned = preg_replace('/\s*\+\s*sin\s+definir\s*$/i', '', $explicitLabel);
+        $cleaned = preg_replace('/^\s*sin\s+definir\s*\+\s*/i', '', $cleaned);
+        $cleaned = trim($cleaned);
+        if ($cleaned !== '' && strtolower($cleaned) !== 'sin definir') {
+            return $cleaned;
+        }
+        // Si solo quedó "Sin definir", re-derivar de los colores
     }
 
     $primaryColor = trim((string)$primaryColor);
     $secondaryColor = trim((string)$secondaryColor);
+    if (strtolower($secondaryColor) === 'sin definir') $secondaryColor = '';
+    if (strtolower($primaryColor) === 'sin definir') $primaryColor = '';
 
     if ($primaryColor !== '' && $secondaryColor !== '') {
         return $primaryColor . ' + ' . $secondaryColor;

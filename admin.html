@@ -1979,7 +1979,7 @@
         }
 
         function resolveColorSelection(selectEl) {
-            if (!selectEl) {
+            if (!selectEl || !selectEl.value) {
                 return {
                     id: null,
                     name: '',
