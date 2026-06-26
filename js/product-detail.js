@@ -354,10 +354,6 @@
             <span class="product-detail-meta-label">Disponibilidad</span>
             <span class="product-detail-meta-value">${esc(statusTextForStock(stock, isPublishedProduct(product)))}</span>
           </div>
-          <div class="product-detail-meta-item">
-            <span class="product-detail-meta-label">Código</span>
-            <span class="product-detail-meta-value">${esc(selectedVariant?.sku || `#${product.id}${selectedVariant ? `-${selectedVariant.id}` : ''}`)}</span>
-          </div>
         </div>
         <div class="product-detail-actions">
           <button class="btn btn-primary btn-lg" id="detailAddToCart">${isAvailable ? 'Agregar al carrito' : 'Sin stock'}</button>
