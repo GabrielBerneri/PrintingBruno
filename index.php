@@ -57,7 +57,7 @@
     <div class="container">
       <div class="hero-content">
         <h1 class="hero-title">
-          Impresión 3D a pedido, con criterio y terminación cuidada
+          Tienda de impresión 3D
         </h1>
         <p class="hero-description">
           Si tenés un STL, una referencia o sólo una idea, te respondemos con una propuesta concreta y la llevamos a
