@@ -1197,30 +1197,6 @@ select {
   pointer-events: none;
 }
 
-.product-footer.product-footer-variant {
-  display: grid;
-  grid-template-columns: 1fr;
-  align-items: stretch;
-}
-
-.product-footer.product-footer-variant .product-price {
-  line-height: 1.1;
-}
-
-.product-footer.product-footer-variant .product-action {
-  width: 100%;
-  margin-left: 0;
-}
-
-.product-footer.product-footer-variant .product-action .btn {
-  flex: 1 1 0;
-  justify-content: center;
-}
-
-.product-footer.product-footer-variant .product-action .btn-detail {
-  min-width: 0;
-}
-
 /* ---------- Product Detail ---------- */
 .product-detail-layout {
   display: grid;
