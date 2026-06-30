@@ -988,6 +988,7 @@ select {
   letter-spacing: 0.01em;
   font-size: 0.7rem;
   padding: 0.25rem 0.6rem;
+  text-align: center;
 }
 
 /* Skeleton Loading CSS */
