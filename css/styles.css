@@ -1387,6 +1387,15 @@ select {
   font-size: 0.82rem;
 }
 
+.product-detail-price-discounted {
+  margin-top: calc(var(--space-lg) * -0.7);
+  margin-bottom: var(--space-sm);
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #22c55e;
+}
+
 .product-variant-picker {
   display: grid;
   gap: var(--space-md);

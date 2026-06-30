@@ -332,7 +332,10 @@
         <span class="product-detail-category">${esc(Products.categoryLabel(product.category))}</span>
         <h1 class="product-detail-title">${esc(product.name)}</h1>
         <div class="product-detail-price">${Products.formatPrice(price)}</div>
-        ${Number(product.transfer_discount || 0) > 0 ? `<span class="product-badge transfer-discount" style="position:static;display:inline-block;margin-top:0;margin-bottom:var(--space-md);">${Number(product.transfer_discount)}% OFF transferencia/efectivo</span>` : ''}
+        ${Number(product.transfer_discount || 0) > 0 ? `
+          <div class="product-detail-price-discounted">${Products.formatPrice(price * (1 - Number(product.transfer_discount) / 100))} <span style="font-weight:400;font-size:0.85em;">con transferencia/efectivo</span></div>
+          <span class="product-badge transfer-discount" style="position:static;display:inline-block;margin-top:0;margin-bottom:var(--space-md);">${Number(product.transfer_discount)}% OFF transferencia/efectivo</span>
+        ` : ''}
         ${priceNote}
         <div class="product-detail-description">${esc(product.description || 'Sin descripción por el momento.')}</div>
         ${renderVariantSelector(product, selectedVariant)}
