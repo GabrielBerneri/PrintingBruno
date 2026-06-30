@@ -129,8 +129,9 @@ const Products = {
     const customBadge = product.badge
       ? `<span class="product-badge ${this.badgeClass(product.badge)}">${this.escapeHTML(product.badgeLabel || product.badge)}</span>`
       : '';
-    const transferDiscountBadge = product.transfer_discount == 1
-      ? `<span class="product-badge transfer-discount">10% OFF transferencia/efectivo</span>`
+    const transferDiscountPct = Number(product.transfer_discount || 0);
+    const transferDiscountBadge = transferDiscountPct > 0
+      ? `<span class="product-badge transfer-discount">${transferDiscountPct}% OFF transferencia/efectivo</span>`
       : '';
 
     const div = document.createElement('div');
@@ -190,7 +191,7 @@ const Products = {
         name: product.name,
         price: this.resolveDisplayPrice(product, chosenVariant),
         image_url: chosenImageUrls[0] || product.image_url,
-        transfer_discount: product.transfer_discount == 1 ? 1 : 0
+        transfer_discount: Number(product.transfer_discount || 0)
       });
 
       // Feedback visual del botón

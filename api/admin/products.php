@@ -94,7 +94,7 @@ try {
             }
             if ($hasTransferDiscountColumn) {
                 $columns .= ', transfer_discount';
-                $params[] = (int)($body['transfer_discount'] ?? 0);
+                $params[] = max(0, min(100, (int)($body['transfer_discount'] ?? 0)));
             }
             $placeholders = implode(', ', array_fill(0, count($params), '?'));
             $stmt = $db->prepare("INSERT INTO products ($columns) VALUES ($placeholders)");
@@ -137,7 +137,9 @@ try {
             foreach ($fields as $field) {
                 if (isset($body[$field])) {
                     $updates[] = "$field = ?";
-                    $params[] = $body[$field];
+                    $params[] = $field === 'transfer_discount'
+                        ? max(0, min(100, (int)$body[$field]))
+                        : $body[$field];
                 }
             }
 

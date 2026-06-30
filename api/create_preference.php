@@ -195,8 +195,9 @@ try {
         $price = $variant && $variant['price'] !== null
             ? (float)$variant['price']
             : (float)$product['price'];
-        if ($applyTransferDiscount && !empty($product['transfer_discount'])) {
-            $price = round($price * 0.90, 2);
+        $discountPercent = max(0, min(100, (int)($product['transfer_discount'] ?? 0)));
+        if ($applyTransferDiscount && $discountPercent > 0) {
+            $price = round($price * (1 - $discountPercent / 100), 2);
         }
         $total += $price * $qty;
         $variantLabel = $variant ? pbBuildVariantLabel(
