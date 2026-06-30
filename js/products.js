@@ -161,7 +161,7 @@ const Products = {
           <span class="product-price">${priceText}</span>
           <div class="product-action">
             <a class="btn btn-secondary btn-sm btn-detail" href="${this.escapeAttr(this.productUrl(product))}">Ver detalle</a>
-            <button class="btn btn-primary btn-sm btn-add-cart${hasMultipleVariants ? ' has-label' : ''}" type="button" aria-label="${this.escapeAttr(hasMultipleVariants ? `Elegir variante de ${product.name}` : `Agregar ${product.name} al carrito`)}" title="${this.escapeAttr(hasMultipleVariants ? 'Elegir variante' : 'Agregar al carrito')}" ${isAvailable ? '' : 'disabled'}>${isAvailable ? (hasMultipleVariants ? 'Elegir' : '+') : '—'}</button>
+            <button class="btn btn-primary btn-sm btn-add-cart" type="button" aria-label="${this.escapeAttr(hasMultipleVariants ? `Elegir variante de ${product.name}` : `Agregar ${product.name} al carrito`)}" title="${this.escapeAttr(hasMultipleVariants ? 'Elegir variante' : 'Agregar al carrito')}" ${isAvailable ? '' : 'disabled'}>${isAvailable ? '+' : '—'}</button>
           </div>
         </div>
       </div>
