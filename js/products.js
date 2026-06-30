@@ -155,7 +155,6 @@ const Products = {
         </h3>
         <p class="product-description">${this.escapeHTML(product.description)}</p>
         <div class="product-card-extra">
-          ${hasMultipleVariants ? this.renderVariantSwatches(variants) : ''}
           ${!isAvailable ? '<div class="product-stock-status out-of-stock">Sin stock disponible</div>' : ''}
           ${transferDiscountBadge}
         </div>
