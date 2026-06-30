@@ -887,7 +887,11 @@
                                         <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pFeatured"> Destacado ⭐</label>
                                         <div>
                                             <label class="form-label" style="margin-bottom:0.25rem" for="pTransferDiscount">% OFF transferencia/efectivo</label>
-                                            <input type="number" class="form-input" id="pTransferDiscount" min="0" max="100" step="1" value="0" style="max-width:120px">
+                                            <div style="display:flex;align-items:center;gap:var(--space-sm)">
+                                                <input type="number" class="form-input" id="pTransferDiscount" min="0" max="100" step="1" value="0" style="max-width:90px;text-align:center">
+                                                <span style="color:var(--text-muted)">→</span>
+                                                <span id="pTransferDiscountPreview" style="font-weight:600;color:var(--accent)">Sin descuento</span>
+                                            </div>
                                             <div class="field-help">0 = sin descuento para este producto.</div>
                                         </div>
                                     </div>
@@ -1711,6 +1715,20 @@
             if (e.target === e.currentTarget) closeProductModal();
         });
 
+        function updateTransferDiscountPreview() {
+            const previewEl = document.getElementById('pTransferDiscountPreview');
+            const price = parseFloat(document.getElementById('pPrice').value) || 0;
+            const pct = Math.max(0, Math.min(100, parseInt(document.getElementById('pTransferDiscount').value, 10) || 0));
+            if (pct <= 0 || price <= 0) {
+                previewEl.textContent = 'Sin descuento';
+                return;
+            }
+            const finalPrice = price * (1 - pct / 100);
+            previewEl.textContent = `$${finalPrice.toLocaleString('es-AR', { maximumFractionDigits: 0 })}`;
+        }
+        document.getElementById('pTransferDiscount').addEventListener('input', updateTransferDiscountPreview);
+        document.getElementById('pPrice').addEventListener('input', updateTransferDiscountPreview);
+
         document.getElementById('addProductBtn').addEventListener('click', () => {
             document.getElementById('productId').value = '';
             document.getElementById('productForm').reset();
@@ -1719,6 +1737,7 @@
             document.getElementById('productFormTitle').textContent = 'Nuevo Producto';
             resetImageUploader();
             resetVariantBlocks();
+            updateTransferDiscountPreview();
             formOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         });
@@ -1746,6 +1765,7 @@
             document.getElementById('pActive').checked = p.active == 1;
             document.getElementById('pFeatured').checked = p.featured == 1;
             document.getElementById('pTransferDiscount').value = parseInt(p.transfer_discount || 0, 10);
+            updateTransferDiscountPreview();
             document.getElementById('productFormTitle').textContent = 'Editar Producto';
             formOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
