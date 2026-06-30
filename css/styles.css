@@ -852,6 +852,8 @@ select {
   transition: all var(--transition-base);
   display: flex;
   flex-direction: column;
+  height: 100%;
+  align-self: stretch;
 }
 
 .product-card:hover {
