@@ -40,6 +40,7 @@ const Cart = {
             price: Number(item?.price || 0),
             image_url: String(item?.image_url || ''),
             quantity: Math.max(1, Number(item?.quantity || 1) || 1),
+            transfer_discount: Number(item?.transfer_discount || 0) === 1 ? 1 : 0,
         };
     },
 
@@ -110,6 +111,15 @@ const Cart = {
 
     getTotal() {
         return this.getItems().reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    },
+
+    // Suma de subtotales de items que tienen habilitado el descuento por transferencia/efectivo
+    getTransferDiscountEligibleSubtotal() {
+        return this.getItems().reduce((sum, item) => sum + (item.transfer_discount === 1 ? item.price * item.quantity : 0), 0);
+    },
+
+    getTransferDiscountAmount() {
+        return Math.round(this.getTransferDiscountEligibleSubtotal() * 0.10 * 100) / 100;
     },
 
     getCount() {
@@ -520,10 +530,10 @@ const Cart = {
                 <input type="radio" name="checkoutPayment" value="mercadopago" checked> MercadoPago
               </label>
               <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem;">
-                <input type="radio" name="checkoutPayment" value="transferencia"> Transferencia <span style="background:#22c55e;color:#fff;font-size:0.68rem;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:2px;">10% OFF</span>
+                <input type="radio" name="checkoutPayment" value="transferencia"> Transferencia ${this.getTransferDiscountEligibleSubtotal() > 0 ? '<span style="background:#22c55e;color:#fff;font-size:0.68rem;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:2px;">10% OFF en productos seleccionados</span>' : ''}
               </label>
               <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem;">
-                <input type="radio" name="checkoutPayment" value="efectivo"> Efectivo <span style="background:#22c55e;color:#fff;font-size:0.68rem;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:2px;">10% OFF</span>
+                <input type="radio" name="checkoutPayment" value="efectivo"> Efectivo ${this.getTransferDiscountEligibleSubtotal() > 0 ? '<span style="background:#22c55e;color:#fff;font-size:0.68rem;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:2px;">10% OFF en productos seleccionados</span>' : ''}
               </label>
             </div>
           </div>
@@ -533,7 +543,7 @@ const Cart = {
               <strong>$${this.getTotal().toLocaleString('es-AR')}</strong>
             </div>
             <div class="checkout-summary-row" id="checkoutDiscountRow" style="margin-top: 0.5rem; display: none; color: #22c55e; font-weight: 600;">
-              <span>Descuento 10%</span>
+              <span>Descuento 10% (productos seleccionados)</span>
               <span id="checkoutDiscountAmount"></span>
             </div>
             <div class="checkout-summary-row" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
@@ -577,8 +587,8 @@ const Cart = {
                 const discountAmountEl = document.getElementById('checkoutDiscountAmount');
                 const totalEl = document.getElementById('checkoutTotal');
 
-                if (isDescuento) {
-                    const descuento = Math.round(subtotal * 0.10 * 100) / 100;
+                const descuento = this.getTransferDiscountAmount();
+                if (isDescuento && descuento > 0) {
                     const totalFinal = Math.round((subtotal - descuento) * 100) / 100;
                     discountRow.style.display = '';
                     discountAmountEl.textContent = `-$${descuento.toLocaleString('es-AR')}`;

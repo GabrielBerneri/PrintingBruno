@@ -129,6 +129,9 @@ const Products = {
     const customBadge = product.badge
       ? `<span class="product-badge ${this.badgeClass(product.badge)}">${this.escapeHTML(product.badgeLabel || product.badge)}</span>`
       : '';
+    const transferDiscountBadge = product.transfer_discount == 1
+      ? `<span class="product-badge transfer-discount">10% OFF transferencia/efectivo</span>`
+      : '';
 
     const div = document.createElement('div');
     div.className = `product-card reveal${secondaryImage ? ' has-secondary-image' : ''}${enableGallery ? ' has-gallery' : ''}${delay ? ' ' + delay : ''}`;
@@ -152,6 +155,7 @@ const Products = {
         <p class="product-description">${this.escapeHTML(product.description)}</p>
         ${hasMultipleVariants ? this.renderVariantSwatches(variants) : ''}
         ${!isAvailable ? '<div class="product-stock-status out-of-stock">Sin stock disponible</div>' : ''}
+        ${transferDiscountBadge}
         <div class="product-footer${hasMultipleVariants ? ' product-footer-variant' : ''}">
           <span class="product-price">${priceText}</span>
           <div class="product-action">
@@ -185,7 +189,8 @@ const Products = {
         cart_key: chosenVariant?.id ? `v:${chosenVariant.id}` : `p:${product.id}`,
         name: product.name,
         price: this.resolveDisplayPrice(product, chosenVariant),
-        image_url: chosenImageUrls[0] || product.image_url
+        image_url: chosenImageUrls[0] || product.image_url,
+        transfer_discount: product.transfer_discount == 1 ? 1 : 0
       });
 
       // Feedback visual del botón

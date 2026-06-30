@@ -144,6 +144,12 @@ try {
     $orderItems = [];
     $hasVariantColumns = pbHasColumn($db, 'order_items', 'variant_id');
 
+    $paymentMethod = $body['payment_method'] ?? 'mercadopago';
+    if (!in_array($paymentMethod, ['mercadopago', 'transferencia', 'efectivo'])) {
+        $paymentMethod = 'mercadopago';
+    }
+    $applyTransferDiscount = in_array($paymentMethod, ['transferencia', 'efectivo']);
+
     foreach ($body['items'] as $item) {
         $pid = (int)($item['product_id'] ?? $item['id'] ?? 0);
         $requestedVariantId = (int)($item['variant_id'] ?? 0);
@@ -189,6 +195,9 @@ try {
         $price = $variant && $variant['price'] !== null
             ? (float)$variant['price']
             : (float)$product['price'];
+        if ($applyTransferDiscount && !empty($product['transfer_discount'])) {
+            $price = round($price * 0.90, 2);
+        }
         $total += $price * $qty;
         $variantLabel = $variant ? pbBuildVariantLabel(
             $variant['primary_color'] ?? null,
@@ -233,14 +242,6 @@ try {
     }
     
     // Create order in DB
-    $paymentMethod = $body['payment_method'] ?? 'mercadopago';
-    if (!in_array($paymentMethod, ['mercadopago', 'transferencia', 'efectivo'])) {
-        $paymentMethod = 'mercadopago';
-    }
-    // Descuento del 10% para transferencia o efectivo
-    if (in_array($paymentMethod, ['transferencia', 'efectivo'])) {
-        $total = round($total * 0.90, 2);
-    }
     $linkedCustomerId = null;
     if ($customerSession && pbCustomerNormalizeEmail($body['customer']['email'] ?? '') === pbCustomerNormalizeEmail($customerSession['customer']['email'] ?? '')) {
         $linkedCustomerId = (int)$customerSession['customer_id'];

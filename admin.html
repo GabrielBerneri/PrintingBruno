@@ -885,9 +885,10 @@
                                     <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--border-radius);padding:var(--space-md);display:flex;flex-direction:column;gap:var(--space-md)">
                                         <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pActive" checked> Activo</label>
                                         <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pFeatured"> Destacado ⭐</label>
+                                        <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pTransferDiscount"> 10% OFF transferencia/efectivo</label>
                                     </div>
                                 </div>
-                                
+
                                 <!-- Right Column: Data -->
                                 <div style="flex:1;min-width:300px;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
                                     <div class="form-group" style="grid-column:1/-1"><label class="form-label">Nombre *</label><input type="text" class="form-input" id="pName" required></div>
@@ -1621,7 +1622,7 @@
                     <tr>
                         <td><img src="${esc(p.image_url)}" alt="${esc(p.name)}" onerror="this.style.display='none'"></td>
                         <td>
-                            <strong>${esc(p.name)}</strong>${p.featured == 1 ? ' ⭐' : ''}
+                            <strong>${esc(p.name)}</strong>${p.featured == 1 ? ' ⭐' : ''}${p.transfer_discount == 1 ? ' <span style="background:#22c55e;color:#fff;font-size:0.65rem;padding:1px 5px;border-radius:4px;font-weight:700;">10% OFF</span>' : ''}
                             <div style="font-size:0.72rem;color:var(--text-muted)">${parseInt(p.variant_count || 0)} variante${parseInt(p.variant_count || 0) === 1 ? '' : 's'}</div>
                         </td>
                         <td>${esc(p.category)}</td>
@@ -1740,6 +1741,7 @@
             }]);
             document.getElementById('pActive').checked = p.active == 1;
             document.getElementById('pFeatured').checked = p.featured == 1;
+            document.getElementById('pTransferDiscount').checked = p.transfer_discount == 1;
             document.getElementById('productFormTitle').textContent = 'Editar Producto';
             formOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -1762,6 +1764,7 @@
                 description: document.getElementById('pDescription').value,
                 active: document.getElementById('pActive').checked ? 1 : 0,
                 featured: document.getElementById('pFeatured').checked ? 1 : 0,
+                transfer_discount: document.getElementById('pTransferDiscount').checked ? 1 : 0,
                 variants,
             };
             const url = id ? `${API}/products.php?id=${id}` : `${API}/products.php`;

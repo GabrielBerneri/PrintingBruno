@@ -22,6 +22,7 @@ adminRequireCsrf();
 
 $db = getDB();
 $hasImageUrlsColumn = hasImageUrlsColumn($db);
+$hasTransferDiscountColumn = pbHasColumn($db, 'products', 'transfer_discount');
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
@@ -34,6 +35,7 @@ try {
                 $p['price'] = (float)$p['price'];
                 $p['reserved_stock'] = (int)($reservedByProduct[(int)$p['id']] ?? 0);
                 $p['available_stock'] = max(0, (int)$p['stock'] - $p['reserved_stock']);
+                $p['transfer_discount'] = $hasTransferDiscountColumn ? (int)($p['transfer_discount'] ?? 0) : 0;
                 enrichProductImages($p, $hasImageUrlsColumn);
             }
             unset($p);
@@ -59,8 +61,8 @@ try {
             $db->beginTransaction();
 
             if ($hasImageUrlsColumn) {
-                $stmt = $db->prepare("INSERT INTO products (name, slug, description, price, category, image_url, image_urls, badge, material, stock, active, featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([
+                $columns = 'name, slug, description, price, category, image_url, image_urls, badge, material, stock, active, featured';
+                $params = [
                     $body['name'],
                     $slug,
                     $body['description'] ?? '',
@@ -73,10 +75,10 @@ try {
                     (int)($body['stock'] ?? 0),
                     (int)($body['active'] ?? 1),
                     (int)($body['featured'] ?? 0),
-                ]);
+                ];
             } else {
-                $stmt = $db->prepare("INSERT INTO products (name, slug, description, price, category, image_url, badge, material, stock, active, featured) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-                $stmt->execute([
+                $columns = 'name, slug, description, price, category, image_url, badge, material, stock, active, featured';
+                $params = [
                     $body['name'],
                     $slug,
                     $body['description'] ?? '',
@@ -88,8 +90,15 @@ try {
                     (int)($body['stock'] ?? 0),
                     (int)($body['active'] ?? 1),
                     (int)($body['featured'] ?? 0),
-                ]);
+                ];
             }
+            if ($hasTransferDiscountColumn) {
+                $columns .= ', transfer_discount';
+                $params[] = (int)($body['transfer_discount'] ?? 0);
+            }
+            $placeholders = implode(', ', array_fill(0, count($params), '?'));
+            $stmt = $db->prepare("INSERT INTO products ($columns) VALUES ($placeholders)");
+            $stmt->execute($params);
 
             $newId = (int)$db->lastInsertId();
             pbSaveProductVariants($db, $newId, $body['variants'] ?? [], [
@@ -119,6 +128,9 @@ try {
             
             // Build dynamic update
             $fields = ['name', 'description', 'price', 'category', 'badge', 'material', 'stock', 'active', 'featured'];
+            if ($hasTransferDiscountColumn) {
+                $fields[] = 'transfer_discount';
+            }
             $updates = [];
             $params = [];
             

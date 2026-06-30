@@ -977,6 +977,19 @@ select {
   color: #fff;
 }
 
+.product-badge.transfer-discount {
+  position: static;
+  display: inline-block;
+  background: #22c55e;
+  color: #fff;
+  margin-top: var(--space-sm);
+  margin-bottom: calc(var(--space-sm) * -0.5);
+  text-transform: none;
+  letter-spacing: 0.01em;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+}
+
 /* Skeleton Loading CSS */
 .skeleton {
   background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-card) 50%, var(--bg-elevated) 75%);
