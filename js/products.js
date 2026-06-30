@@ -154,9 +154,11 @@ const Products = {
           <a class="product-link" href="${this.escapeAttr(this.productUrl(product))}">${this.escapeHTML(product.name)}</a>
         </h3>
         <p class="product-description">${this.escapeHTML(product.description)}</p>
-        ${hasMultipleVariants ? this.renderVariantSwatches(variants) : ''}
-        ${!isAvailable ? '<div class="product-stock-status out-of-stock">Sin stock disponible</div>' : ''}
-        ${transferDiscountBadge}
+        <div class="product-card-extra">
+          ${hasMultipleVariants ? this.renderVariantSwatches(variants) : ''}
+          ${!isAvailable ? '<div class="product-stock-status out-of-stock">Sin stock disponible</div>' : ''}
+          ${transferDiscountBadge}
+        </div>
         <div class="product-footer${hasMultipleVariants ? ' product-footer-variant' : ''}">
           <span class="product-price">${priceText}</span>
           <div class="product-action">
