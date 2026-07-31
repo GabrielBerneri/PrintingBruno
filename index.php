@@ -75,11 +75,8 @@
 
       <div class="hero-visual">
         <div class="hero-image-glow"></div>
-        <div class="hero-collage" id="heroCollage">
-          <div class="hero-collage-item"><div class="hero-collage-placeholder"></div></div>
-          <div class="hero-collage-item"><div class="hero-collage-placeholder"></div></div>
-          <div class="hero-collage-item"><div class="hero-collage-placeholder"></div></div>
-          <div class="hero-collage-item"><div class="hero-collage-placeholder"></div></div>
+        <div class="hero-3d-scene">
+          <canvas id="heroCanvas"></canvas>
         </div>
       </div>
     </div>
@@ -302,6 +299,176 @@
   <script src="js/products.js?v=20260331-1"></script>
   <script src="js/main.js?v=20260331-1"></script>
   <script>Products.loadFeatured('featuredGrid');</script>
+
+  <script>
+  function initHero3D() {
+    var THREE = window.THREE;
+    if (!THREE) return;
+    var canvas = document.getElementById('heroCanvas');
+    if (!canvas) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    var container = canvas.parentElement;
+    var isMobile = window.innerWidth < 768;
+
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+    camera.position.z = 5.5;
+
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !isMobile, alpha: true, powerPreference: 'high-performance' });
+    renderer.setClearColor(0x000000, 0);
+    renderer.localClippingEnabled = true;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 1.5));
+
+    function setSize() {
+      var w = container.offsetWidth;
+      var h = container.offsetHeight;
+      if (!w || !h) return;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+    }
+    setSize();
+    window.addEventListener('resize', setSize, { passive: true });
+
+    // Clip plane: normal (0,-1,0), clips where y > constant
+    // constant=-2: all clipped (y≥-1.5 > -2); constant=2: nothing clipped (y≤1.5 < 2)
+    // Reveals bottom-to-top as constant rises from -2 to 2
+    var clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), -2);
+
+    var segs  = isMobile ? 80  : 140;
+    var rSegs = isMobile ? 12  : 16;
+    var torusGeo = new THREE.TorusKnotGeometry(1.1, 0.35, segs, rSegs, 2, 3);
+
+    var solidMat = new THREE.MeshPhongMaterial({
+      color: 0x0e0e1a, emissive: 0x120800, specular: 0x222222, shininess: 50,
+      clippingPlanes: [clipPlane],
+    });
+    var solid = new THREE.Mesh(torusGeo, solidMat);
+    scene.add(solid);
+
+    var wireMat = new THREE.LineBasicMaterial({
+      color: 0xff6b2b, transparent: true, opacity: 0.55,
+      clippingPlanes: [clipPlane],
+    });
+    var wire = new THREE.LineSegments(new THREE.WireframeGeometry(torusGeo), wireMat);
+    solid.add(wire);
+
+    var glowGeo = new THREE.TorusKnotGeometry(1.1, 0.39, segs, rSegs, 2, 3);
+    var glowMat = new THREE.MeshBasicMaterial({
+      color: 0xff6b2b, side: THREE.BackSide, transparent: true, opacity: 0.05,
+      depthWrite: false, clippingPlanes: [clipPlane],
+    });
+    var glowMesh = new THREE.Mesh(glowGeo, glowMat);
+    scene.add(glowMesh);
+
+    // Scan line (printer head moving upward during reveal)
+    var scanGeo = new THREE.TorusGeometry(1.9, 0.007, 8, 64);
+    var scanMat = new THREE.MeshBasicMaterial({ color: 0xff6b2b, transparent: true, opacity: 0 });
+    var scanLine = new THREE.Mesh(scanGeo, scanMat);
+    scanLine.rotation.x = Math.PI / 2;
+    scene.add(scanLine);
+
+    // Particles
+    var pCount = isMobile ? 60 : 160;
+    var pPos = new Float32Array(pCount * 3);
+    for (var i = 0; i < pCount; i++) {
+      var r = 2.5 + Math.random() * 2;
+      var theta = Math.random() * Math.PI * 2;
+      var phi = Math.acos(2 * Math.random() - 1);
+      pPos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
+      pPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
+      pPos[i * 3 + 2] = r * Math.cos(phi);
+    }
+    var pGeo = new THREE.BufferGeometry();
+    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
+    var pMat = new THREE.PointsMaterial({ color: 0xff6b2b, size: 0.04, transparent: true, opacity: 0.45 });
+    var particles = new THREE.Points(pGeo, pMat);
+    scene.add(particles);
+
+    // Lights
+    scene.add(new THREE.AmbientLight(0xffffff, 0.15));
+    var orbLight = new THREE.PointLight(0xff6b2b, 4, 14);
+    scene.add(orbLight);
+    var fillLight = new THREE.PointLight(0xff8f5e, 1.5, 10);
+    fillLight.position.set(-3, -1.5, 2);
+    scene.add(fillLight);
+    var rimLight = new THREE.PointLight(0xffffff, 0.5, 8);
+    rimLight.position.set(0, 3, -2);
+    scene.add(rimLight);
+
+    // Mouse parallax
+    var mx = 0, my = 0, txm = 0, tym = 0;
+    window.addEventListener('mousemove', function(e) {
+      txm = (e.clientX / window.innerWidth  - 0.5);
+      tym = (e.clientY / window.innerHeight - 0.5);
+    }, { passive: true });
+
+    var clock = new THREE.Clock();
+    var REVEAL = 2.8;
+    var rafId = null;
+    var running = true;
+
+    function animate() {
+      if (!running) return;
+      rafId = requestAnimationFrame(animate);
+      var t = clock.getElapsedTime();
+
+      // Ease-out cubic reveal
+      var rev  = Math.min(1, t / REVEAL);
+      var ease = 1 - Math.pow(1 - rev, 3);
+
+      // Clip plane rises from -2 to 2 (bottom to top reveal)
+      clipPlane.constant = -2 + ease * 4;
+
+      // Scan line follows clip boundary and fades in/out
+      scanLine.position.y = clipPlane.constant;
+      var scanAlpha = rev < 0.08 ? rev * 12.5 : (rev > 0.85 ? (1 - rev) / 0.15 : 1);
+      scanMat.opacity = 0.85 * Math.max(0, Math.min(1, scanAlpha));
+
+      // Rotation starts mid-reveal
+      var rotFactor = Math.max(0, (rev - 0.3) / 0.7);
+      solid.rotation.x    = t * 0.16 * rotFactor;
+      solid.rotation.y    = t * 0.24 * rotFactor;
+      glowMesh.rotation.copy(solid.rotation);
+
+      // Float
+      var fy = Math.sin(t * 0.65) * 0.12;
+      solid.position.y    = fy;
+      glowMesh.position.y = fy;
+
+      // Mouse parallax (smooth lerp)
+      mx += (txm - mx) * 0.035;
+      my += (tym - my) * 0.035;
+      scene.rotation.y = mx * 0.3;
+      scene.rotation.x = -my * 0.2;
+
+      // Orbiting key light
+      orbLight.position.set(Math.cos(t * 0.4) * 5, 2, Math.sin(t * 0.4) * 5);
+      orbLight.intensity = 3.5 + Math.sin(t * 1.1) * 0.8;
+
+      // Particles drift
+      particles.rotation.y = t * 0.04;
+      particles.rotation.z = t * 0.012;
+
+      renderer.render(scene, camera);
+    }
+
+    animate();
+
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden) {
+        running = false;
+        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      } else {
+        running = true;
+        clock.start();
+        animate();
+      }
+    });
+  }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" onload="initHero3D()" defer></script>
 </body>
 
 </html>
