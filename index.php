@@ -75,8 +75,11 @@
 
       <div class="hero-visual">
         <div class="hero-image-glow"></div>
-        <div class="hero-image-wrapper">
-          <img src="assets/logo/heroimg.jpg" alt="Impresión 3D PrintingBruno" loading="eager">
+        <div class="hero-collage" id="heroCollage">
+          <div class="hero-collage-item"><div class="hero-collage-placeholder"></div></div>
+          <div class="hero-collage-item"><div class="hero-collage-placeholder"></div></div>
+          <div class="hero-collage-item"><div class="hero-collage-placeholder"></div></div>
+          <div class="hero-collage-item"><div class="hero-collage-placeholder"></div></div>
         </div>
       </div>
     </div>
@@ -92,7 +95,7 @@
       </div>
 
       <div class="entry-points-grid">
-        <article class="entry-card reveal reveal-delay-1">
+        <article class="entry-card reveal-left reveal-delay-1">
           <div class="entry-icon">STL</div>
           <h3>Ya tenés archivo</h3>
           <p>Subinos el contexto, material buscado y cantidad. Lo evaluamos y te orientamos rápido.</p>
@@ -104,7 +107,7 @@
           <p>Si tenés una idea, boceto o referencia, te ayudamos a traducirla a una pieza imprimible.</p>
           <a href="contacto.html" class="entry-link">Contar la idea</a>
         </article>
-        <article class="entry-card reveal reveal-delay-3">
+        <article class="entry-card reveal-right reveal-delay-3">
           <div class="entry-icon">B2B</div>
           <h3>Querés una tanda o reposición</h3>
           <p>Ideal para eventos, souvenirs, series cortas o clientes que necesitan repetir producción.</p>
@@ -188,22 +191,22 @@
       </div>
 
       <div class="features-grid">
-        <div class="feature-card reveal reveal-delay-1">
-          <div class="feature-icon">💎</div>
+        <div class="feature-card reveal-scale reveal-delay-1">
+          <div class="feature-icon">⚙️</div>
           <h3 class="feature-title">Criterio técnico</h3>
           <p class="feature-text">Elegimos materiales, orientación y terminación según el uso real de la pieza, no solo por estética.</p>
         </div>
-        <div class="feature-card reveal reveal-delay-2">
+        <div class="feature-card reveal-scale reveal-delay-2">
           <div class="feature-icon">🎨</div>
           <h3 class="feature-title">Personalización real</h3>
           <p class="feature-text">Podemos partir de una idea, una referencia o un archivo y llevarlo a una versión imprimible y prolija.</p>
         </div>
-        <div class="feature-card reveal reveal-delay-3">
-          <div class="feature-icon">🚀</div>
+        <div class="feature-card reveal-scale reveal-delay-3">
+          <div class="feature-icon">⚡</div>
           <h3 class="feature-title">Respuesta sin rodeos</h3>
           <p class="feature-text">Te decimos rápido si conviene hacerlo, cómo encararlo y qué información falta para avanzar.</p>
         </div>
-        <div class="feature-card reveal reveal-delay-4">
+        <div class="feature-card reveal-scale reveal-delay-4">
           <div class="feature-icon">💬</div>
           <h3 class="feature-title">Seguimiento directo</h3>
           <p class="feature-text">Hablás con quien produce y define el pedido. Menos vueltas, mejores decisiones y mejor resultado.</p>

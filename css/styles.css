@@ -4,7 +4,7 @@
    ============================================ */
 
 /* ---------- Google Fonts ---------- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,400&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
 /* ---------- CSS Custom Properties ---------- */
 :root {
@@ -45,7 +45,7 @@
   --shadow-accent-lg: 0 8px 40px rgba(255, 107, 43, 0.3);
 
   /* Typography */
-  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-heading: 'Outfit', 'Inter', sans-serif;
 
   /* Spacing */
@@ -618,23 +618,89 @@ select {
   animation: fadeInUp 0.8s ease-out 0.3s both;
 }
 
-.hero-image-wrapper {
-  position: relative;
+/* Hero product collage */
+.hero-collage {
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.9fr;
+  grid-template-rows: 55% 45%;
+  gap: 10px;
   width: 100%;
-  aspect-ratio: 0.92;
-  border-radius: calc(var(--border-radius-xl) + 8px);
-  overflow: hidden;
-  border: 1px solid var(--border-subtle);
-  box-shadow: var(--shadow-lg);
+  max-width: 520px;
+  height: 430px;
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+  position: relative;
   z-index: 2;
-  background: rgba(255, 255, 255, 0.03);
 }
 
-.hero-image-wrapper img {
+.hero-collage-item {
+  border-radius: var(--border-radius-md);
+  overflow: hidden;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  position: relative;
+  animation: collageFadeIn 0.6s ease-out both;
+}
+
+.hero-collage-item:nth-child(1) {
+  grid-column: 1 / 3;
+  grid-row: 1;
+  animation-delay: 0.1s;
+}
+
+.hero-collage-item:nth-child(2) {
+  grid-column: 3;
+  grid-row: 1 / 3;
+  animation-delay: 0.25s;
+}
+
+.hero-collage-item:nth-child(3) {
+  grid-column: 1;
+  grid-row: 2;
+  animation-delay: 0.35s;
+}
+
+.hero-collage-item:nth-child(4) {
+  grid-column: 2;
+  grid-row: 2;
+  animation-delay: 0.45s;
+}
+
+.hero-collage-item img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: center;
+  transition: transform 0.5s ease;
+}
+
+.hero-collage-item:hover img {
+  transform: scale(1.07);
+}
+
+.hero-collage-item::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 107, 43, 0);
+  transition: background var(--transition-base);
+  pointer-events: none;
+}
+
+.hero-collage-item:hover::after {
+  background: rgba(255, 107, 43, 0.06);
+}
+
+.hero-collage-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, var(--bg-elevated) 25%, rgba(255,255,255,0.04) 50%, var(--bg-elevated) 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes collageFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
 }
 
 .hero-image-glow {
@@ -835,6 +901,20 @@ select {
   font-size: 0.9rem;
   position: relative;
   z-index: 1;
+}
+
+/* Per-category gradient tints */
+.category-card[href*="mates"] {
+  background: linear-gradient(150deg, rgba(160, 90, 40, 0.13) 0%, var(--bg-card) 55%);
+}
+.category-card[href*="personalizado"] {
+  background: linear-gradient(150deg, rgba(130, 70, 210, 0.13) 0%, var(--bg-card) 55%);
+}
+.category-card[href*="filamentos"] {
+  background: linear-gradient(150deg, rgba(40, 110, 220, 0.13) 0%, var(--bg-card) 55%);
+}
+.category-card[href*="funcional"] {
+  background: linear-gradient(150deg, rgba(60, 140, 150, 0.13) 0%, var(--bg-card) 55%);
 }
 
 /* ---------- Products Section ---------- */
@@ -1550,24 +1630,26 @@ select {
 }
 
 .feature-icon {
-  width: 56px;
-  height: 56px;
+  width: 72px;
+  height: 72px;
   margin: 0 auto var(--space-lg);
   display: flex;
   align-items: center;
   justify-content: center;
   background: rgba(255, 107, 43, 0.1);
-  border-radius: var(--border-radius-md);
-  font-size: 1.5rem;
+  border-radius: var(--border-radius-lg);
+  font-size: 2rem;
   transition: all var(--transition-base);
   color: var(--accent-light);
   position: relative;
   z-index: 2;
+  box-shadow: 0 0 0 8px rgba(255, 107, 43, 0.04), 0 4px 16px rgba(255, 107, 43, 0.1);
 }
 
 .feature-card:hover .feature-icon {
-  background: rgba(255, 107, 43, 0.2);
-  transform: scale(1.1) rotate(5deg);
+  background: rgba(255, 107, 43, 0.18);
+  transform: scale(1.12) rotate(4deg);
+  box-shadow: 0 0 0 12px rgba(255, 107, 43, 0.06), 0 8px 24px rgba(255, 107, 43, 0.2);
 }
 
 .feature-title {
@@ -1602,10 +1684,32 @@ select {
   border: 1px solid var(--border-subtle);
   border-radius: var(--border-radius-lg);
   transition: all var(--transition-base);
+  position: relative;
+  overflow: hidden;
+}
+
+.testimonial-card::before {
+  content: '\201C';
+  position: absolute;
+  top: -1rem;
+  right: 1.2rem;
+  font-size: 8rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  color: rgba(255, 107, 43, 0.07);
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  transition: color var(--transition-base);
 }
 
 .testimonial-card:hover {
   border-color: var(--border-accent);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-accent);
+}
+
+.testimonial-card:hover::before {
+  color: rgba(255, 107, 43, 0.11);
 }
 
 .testimonial-stars {
@@ -1947,6 +2051,31 @@ select {
 
 .reveal-delay-4 {
   transition-delay: 0.4s;
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.88);
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-left.visible,
+.reveal-right.visible,
+.reveal-scale.visible {
+  opacity: 1;
+  transform: none;
 }
 
 @keyframes fadeInUp {
@@ -2806,6 +2935,11 @@ select {
     justify-self: center;
   }
 
+  .hero-collage {
+    max-width: 480px;
+    height: 360px;
+  }
+
   .section-head {
     flex-direction: column;
     align-items: flex-start;
@@ -2958,6 +3092,11 @@ select {
 
   .hero-description {
     font-size: 1.02rem;
+  }
+
+  .hero-collage {
+    max-width: 100%;
+    height: 280px;
   }
 
   .footer-grid {
@@ -3679,6 +3818,11 @@ select {
 
 .product-card.has-secondary-image:hover .product-card-main-image {
   opacity: 0;
+}
+
+/* Image zoom on hover for cards without secondary image */
+.product-card:not(.has-secondary-image):hover .product-card-main-image {
+  transform: scale(1.05);
 }
 
 .product-card.has-gallery .product-card-main-image,

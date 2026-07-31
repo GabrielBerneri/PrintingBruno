@@ -3,7 +3,39 @@
    Interactivity, Animations & UI Logic
    ============================================ */
 
+function initHeroCollage() {
+  const collage = document.getElementById('heroCollage');
+  if (!collage) return;
+
+  fetch('api/products.php?limit=12')
+    .then(r => r.json())
+    .then(data => {
+      const products = Array.isArray(data) ? data : (data.data || data.products || []);
+      const withImages = products.filter(p => p.image_url);
+
+      if (withImages.length < 3) {
+        const visual = collage.closest('.hero-visual');
+        if (visual) visual.style.display = 'none';
+        return;
+      }
+
+      const selected = withImages.slice(0, 4);
+      collage.innerHTML = selected.map((p, i) => {
+        const alt = (p.name || 'Producto PrintingBruno').replace(/"/g, '&quot;');
+        return `<div class="hero-collage-item">
+          <img src="${p.image_url}" alt="${alt}" loading="${i === 0 ? 'eager' : 'lazy'}"
+            onerror="this.parentElement.innerHTML='<div class=\\'hero-collage-placeholder\\'></div>'">
+        </div>`;
+      }).join('');
+    })
+    .catch(() => {
+      const visual = collage.closest('.hero-visual');
+      if (visual) visual.style.display = 'none';
+    });
+}
+
 document.addEventListener('DOMContentLoaded', () => {
+  initHeroCollage();
   function showToast(message) {
     document.querySelectorAll('.site-toast').forEach(el => el.remove());
     const toast = document.createElement('div');
@@ -66,7 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ===== Scroll Reveal Animations =====
-  const revealElements = document.querySelectorAll('.reveal');
+  const revealElements = document.querySelectorAll('.reveal, .reveal-left, .reveal-right, .reveal-scale');
   if (revealElements.length > 0) {
     const revealObserver = new IntersectionObserver((entries) => {
       entries.forEach(entry => {
@@ -288,10 +320,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-  // ===== Preload hero image for LCP =====
-  const heroImg = document.querySelector('.hero-image-wrapper img');
-  if (heroImg) {
-    heroImg.loading = 'eager';
-    heroImg.fetchPriority = 'high';
-  }
 });
