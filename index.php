@@ -75,8 +75,19 @@
 
       <div class="hero-visual">
         <div class="hero-image-glow"></div>
-        <div class="hero-3d-scene">
-          <canvas id="heroCanvas"></canvas>
+        <div class="hero-carousel" id="heroCarousel">
+          <div class="carousel-stage" id="carouselStage">
+            <div class="carousel-skeleton"></div>
+          </div>
+          <div class="carousel-nav">
+            <button class="carousel-arrow" id="carouselPrev" aria-label="Producto anterior">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            </button>
+            <div class="carousel-dots" id="carouselDots"></div>
+            <button class="carousel-arrow" id="carouselNext" aria-label="Producto siguiente">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -301,231 +312,140 @@
   <script>Products.loadFeatured('featuredGrid');</script>
 
   <script>
-  function initHero3D() {
-    var THREE = window.THREE;
-    if (!THREE) return;
-    var canvas = document.getElementById('heroCanvas');
-    if (!canvas) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  (function() {
+    var stage      = document.getElementById('carouselStage');
+    var dotsWrap   = document.getElementById('carouselDots');
+    var prevBtn    = document.getElementById('carouselPrev');
+    var nextBtn    = document.getElementById('carouselNext');
+    if (!stage || !dotsWrap || !prevBtn || !nextBtn) return;
 
-    var container = canvas.parentElement;
-    var isMobile = window.innerWidth < 768;
+    var products   = [];
+    var current    = 0;
+    var timer      = null;
+    var DELAY      = 4800;
 
-    // Scene + camera: 3/4 view desde arriba-derecha para ver la cama y el cubo
-    var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-    camera.position.set(2.8, 2.2, 4.8);
-    camera.lookAt(0, -0.3, 0);
-
-    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !isMobile, alpha: true, powerPreference: 'high-performance' });
-    renderer.setClearColor(0x000000, 0);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 1.5));
-
-    function setSize() {
-      var w = container.offsetWidth, h = container.offsetHeight;
-      if (!w || !h) return;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-    }
-    setSize();
-    window.addEventListener('resize', setSize, { passive: true });
-
-    // === PRINT BED ===
-    var grid = new THREE.GridHelper(4.0, 16, 0x2a1208, 0x160a04);
-    grid.position.y = -1.85;
-    scene.add(grid);
-
-    var bedPlane = new THREE.Mesh(
-      new THREE.PlaneGeometry(4.0, 4.0),
-      new THREE.MeshBasicMaterial({ color: 0x0d0600, transparent: true, opacity: 0.6, side: THREE.DoubleSide })
-    );
-    bedPlane.rotation.x = -Math.PI / 2;
-    bedPlane.position.y = -1.85;
-    scene.add(bedPlane);
-
-    // === CUBO DE FILAMENTO: capas de tubos cuadrados ===
-    var SQ    = 1.55;          // lado del cuadrado
-    var h_sq  = SQ / 2;
-    var LAYERS      = isMobile ? 10 : 15;
-    var LAYER_H     = 0.145;
-    var TUBE_R      = 0.026;
-    var BASE_Y      = -1.82;   // justo sobre la cama
-    var TOTAL_SIDES = LAYERS * 4;
-
-    // Función: devuelve {p1, p2} para un lado/capa dados
-    function getSide(layer, side) {
-      var y = BASE_Y + (layer + 0.5) * LAYER_H;
-      var corners = [
-        [new THREE.Vector3(-h_sq, y, -h_sq), new THREE.Vector3( h_sq, y, -h_sq)], // frente: izq→der
-        [new THREE.Vector3( h_sq, y, -h_sq), new THREE.Vector3( h_sq, y,  h_sq)], // derecha: frente→fondo
-        [new THREE.Vector3( h_sq, y,  h_sq), new THREE.Vector3(-h_sq, y,  h_sq)], // fondo: der→izq
-        [new THREE.Vector3(-h_sq, y,  h_sq), new THREE.Vector3(-h_sq, y, -h_sq)], // izquierda: fondo→frente
-      ];
-      return corners[side];
+    function fmt(n) {
+      var v = parseFloat(n);
+      if (isNaN(v)) return '';
+      return '$ ' + v.toLocaleString('es-AR', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
     }
 
-    // Crear tubos (TubeGeometry) para cada lado de cada capa, inicialmente invisibles
-    var objectGroup = new THREE.Group();
-    scene.add(objectGroup);
+    function buildCard(p, idx) {
+      var item = document.createElement('div');
+      item.className = 'c-item' + (idx === 0 ? ' is-active' : '');
 
-    var sideData = [];
-    for (var l = 0; l < LAYERS; l++) {
-      var tl = l / Math.max(1, LAYERS - 1);
-      for (var s = 0; s < 4; s++) {
-        var pts   = getSide(l, s);
-        var curve = new THREE.LineCurve3(pts[0], pts[1]);
-        var tMat  = new THREE.MeshPhongMaterial({
-          color: new THREE.Color(1.0, 0.26 + tl * 0.26, 0.03 + tl * 0.09),
-          emissive: new THREE.Color(0.25, 0.04, 0),
-          transparent: true, opacity: 0
-        });
-        var tMesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 1, TUBE_R, 7, false), tMat);
-        objectGroup.add(tMesh);
-        sideData.push({ mesh: tMesh, mat: tMat, idx: l * 4 + s });
-      }
-    }
-
-    // === NOZZLE ===
-    var nozzleGroup = new THREE.Group();
-    scene.add(nozzleGroup);
-
-    // Cuerpo cilíndrico
-    nozzleGroup.add(new THREE.Mesh(
-      new THREE.CylinderGeometry(0.052, 0.042, 0.18, 8),
-      new THREE.MeshPhongMaterial({ color: 0x909090, specular: 0x444444, shininess: 90 })
-    ));
-    // Punta cónica hacia abajo
-    var nTip = new THREE.Mesh(
-      new THREE.ConeGeometry(0.042, 0.10, 8),
-      new THREE.MeshPhongMaterial({ color: 0x686868, shininess: 100 })
-    );
-    nTip.rotation.z = Math.PI;
-    nTip.position.y = -0.14;
-    nozzleGroup.add(nTip);
-
-    // Hot-end incandescente
-    var hotMat = new THREE.MeshBasicMaterial({ color: 0xff6b2b, transparent: true, opacity: 0.95 });
-    var hotDot = new THREE.Mesh(new THREE.SphereGeometry(0.036, 8, 8), hotMat);
-    hotDot.position.y = -0.19;
-    nozzleGroup.add(hotDot);
-
-    // Luz puntual en el hot-end
-    var nozzleLight = new THREE.PointLight(0xff6b2b, 4, 1.8);
-    nozzleLight.position.y = -0.19;
-    nozzleGroup.add(nozzleLight);
-
-    // === LUCES GLOBALES ===
-    scene.add(new THREE.AmbientLight(0xffffff, 0.18));
-    var keyLight  = new THREE.PointLight(0xffffff, 2.8, 16);
-    keyLight.position.set(3.5, 4, 3);
-    scene.add(keyLight);
-    var fillLight = new THREE.PointLight(0xff8f5e, 1.6, 10);
-    fillLight.position.set(-3, 1, 2);
-    scene.add(fillLight);
-
-    // === MOUSE PARALLAX ===
-    var mx = 0, my = 0, txm = 0, tym = 0;
-    window.addEventListener('mousemove', function(e) {
-      txm = (e.clientX / window.innerWidth  - 0.5);
-      tym = (e.clientY / window.innerHeight - 0.5);
-    }, { passive: true });
-
-    // === TIMING ===
-    var t = 0, lastNow = performance.now(), paused = false;
-    var SIDE_DUR    = isMobile ? 0.13 : 0.17; // segundos por lado
-    var BUILD_DUR   = TOTAL_SIDES * SIDE_DUR;
-    var RETRACT_DUR = 0.65;
-    var rafId = null, nozzleRetracted = false;
-    var retractStart = new THREE.Vector3();
-
-    function animate() {
-      if (paused) return;
-      rafId = requestAnimationFrame(animate);
-      var now = performance.now();
-      t += (now - lastNow) / 1000;
-      lastNow = now;
-
-      // ── FASE BUILD ──
-      var buildFrac  = Math.min(1, t / BUILD_DUR);
-      var exactSide  = buildFrac * TOTAL_SIDES;
-      var curSideIdx = Math.min(Math.floor(exactSide), TOTAL_SIDES - 1);
-      var sideProg   = exactSide - Math.floor(exactSide); // 0-1 dentro del lado actual
-
-      // Revelar tubos completados y el que se está depositando
-      for (var si = 0; si < sideData.length; si++) {
-        var sd = sideData[si];
-        if (sd.idx < curSideIdx) {
-          sd.mat.opacity = 0.85;
-        } else if (sd.idx === curSideIdx) {
-          // Aparece rápidamente al empezar el lado (como filamento caliente)
-          sd.mat.opacity = Math.min(0.85, sideProg * 6);
-        }
-      }
-
-      // Posicionar nozzle sobre el lado actual
-      if (buildFrac < 1) {
-        var curLayer = Math.floor(curSideIdx / 4);
-        var curSide  = curSideIdx % 4;
-        var pts      = getSide(curLayer, curSide);
-        var p1 = pts[0], p2 = pts[1];
-
-        nozzleGroup.position.x = p1.x + (p2.x - p1.x) * sideProg;
-        nozzleGroup.position.y = p1.y + 0.16;
-        nozzleGroup.position.z = p1.z + (p2.z - p1.z) * sideProg;
-        // Orientar el nozzle en la dirección de avance
-        nozzleGroup.rotation.y = -Math.atan2(p2.z - p1.z, p2.x - p1.x);
-
-        hotMat.opacity = 0.88 + Math.sin(t * 14) * 0.10;
-        retractStart.copy(nozzleGroup.position);
-      }
-
-      // ── FASE RETRACCIÓN ──
-      if (buildFrac >= 1 && !nozzleRetracted) {
-        var rt = Math.min(1, (t - BUILD_DUR) / RETRACT_DUR);
-        nozzleGroup.position.x = retractStart.x * (1 - rt * 0.6);
-        nozzleGroup.position.z = retractStart.z * (1 - rt * 0.6);
-        nozzleGroup.position.y = retractStart.y + rt * 2.8;
-        hotMat.opacity = 0.95 * (1 - rt);
-        nozzleLight.intensity = 4 * (1 - rt);
-        if (rt >= 1) { nozzleGroup.visible = false; nozzleRetracted = true; }
-      }
-
-      // ── FASE POST-BUILD: flota y rota ──
-      var postT = Math.max(0, t - BUILD_DUR - RETRACT_DUR);
-      if (postT > 0) {
-        objectGroup.position.y = Math.min(0.32, postT * 0.38) + Math.sin(t * 0.72) * 0.07;
-        objectGroup.rotation.y = postT * 0.34;
-      }
-
-      // Mouse parallax
-      mx += (txm - mx) * 0.038;
-      my += (tym - my) * 0.038;
-      scene.rotation.y = mx * 0.18;
-      scene.rotation.x = -my * 0.10;
-
-      renderer.render(scene, camera);
-    }
-
-    animate();
-
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden) {
-        paused = true;
-        if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
+      if (p.image_url) {
+        var img = document.createElement('img');
+        img.src = p.image_url;
+        img.alt = p.name || '';
+        img.loading = idx === 0 ? 'eager' : 'lazy';
+        img.onerror = function() { item.classList.add('no-img'); };
+        item.appendChild(img);
       } else {
-        paused = false;
-        lastNow = performance.now();
-        animate();
+        item.classList.add('no-img');
       }
-    });
-  }
-  </script>
-  <script src="js/three.min.js"></script>
-  <script>
-    if (typeof THREE !== 'undefined') {
-      requestAnimationFrame(function() { requestAnimationFrame(initHero3D); });
+
+      var ov = document.createElement('div');
+      ov.className = 'c-overlay';
+
+      if (p.category) {
+        var badge = document.createElement('span');
+        badge.className = 'c-badge';
+        badge.textContent = p.category;
+        ov.appendChild(badge);
+      }
+
+      var name = document.createElement('p');
+      name.className = 'c-name';
+      name.textContent = p.name || 'Producto';
+      ov.appendChild(name);
+
+      var priceRow = document.createElement('div');
+      priceRow.className = 'c-price-row';
+
+      var disc = Number(p.transfer_discount || 0);
+      var showPrice = disc > 0 ? p.price * (1 - disc / 100) : p.price;
+      var origPrice = disc > 0 ? p.price : null;
+
+      if (origPrice) {
+        var orig = document.createElement('span');
+        orig.className = 'c-price-orig';
+        orig.textContent = fmt(origPrice);
+        priceRow.appendChild(orig);
+      }
+      if (showPrice) {
+        var pr = document.createElement('span');
+        pr.className = 'c-price';
+        pr.textContent = fmt(showPrice);
+        priceRow.appendChild(pr);
+      }
+      ov.appendChild(priceRow);
+      item.appendChild(ov);
+      return item;
     }
+
+    function buildDot(idx) {
+      var d = document.createElement('button');
+      d.className = 'c-dot' + (idx === 0 ? ' is-active' : '');
+      d.setAttribute('aria-label', 'Producto ' + (idx + 1));
+      d.addEventListener('click', function() { goTo(idx); kick(); });
+      return d;
+    }
+
+    function init(prods) {
+      products = prods;
+      stage.innerHTML = '';
+      dotsWrap.innerHTML = '';
+      prods.forEach(function(p, i) {
+        stage.appendChild(buildCard(p, i));
+        dotsWrap.appendChild(buildDot(i));
+      });
+      kick();
+    }
+
+    function goTo(idx) {
+      var items = stage.querySelectorAll('.c-item');
+      var dots  = dotsWrap.querySelectorAll('.c-dot');
+      if (items[current]) items[current].classList.remove('is-active');
+      if (dots[current])  dots[current].classList.remove('is-active');
+      current = (idx + products.length) % products.length;
+      if (items[current]) items[current].classList.add('is-active');
+      if (dots[current])  dots[current].classList.add('is-active');
+    }
+
+    function kick() {
+      clearInterval(timer);
+      timer = setInterval(function() { goTo(current + 1); }, DELAY);
+    }
+
+    prevBtn.addEventListener('click', function() { goTo(current - 1); kick(); });
+    nextBtn.addEventListener('click', function() { goTo(current + 1); kick(); });
+
+    stage.addEventListener('mouseenter', function() { clearInterval(timer); });
+    stage.addEventListener('mouseleave', kick);
+
+    var tx = 0;
+    stage.addEventListener('touchstart', function(e) { tx = e.touches[0].clientX; }, { passive: true });
+    stage.addEventListener('touchend',   function(e) {
+      var d = tx - e.changedTouches[0].clientX;
+      if (Math.abs(d) > 40) { goTo(current + (d > 0 ? 1 : -1)); kick(); }
+    });
+
+    fetch('api/products.php?limit=10')
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        var list = Array.isArray(data) ? data : (data.data || data.products || []);
+        var valid = list.filter(function(p) { return p.image_url; });
+        if (!valid.length) { hide(); return; }
+        init(valid);
+      })
+      .catch(hide);
+
+    function hide() {
+      var vis = document.querySelector('.hero-visual');
+      if (vis) vis.style.display = 'none';
+    }
+  })();
   </script>
 </body>
 
