@@ -73,10 +73,6 @@
         </div>
       </div>
 
-      <div class="hero-visual">
-        <div class="hero-image-glow"></div>
-        <img class="hero-logo-img" src="assets/logo/logo-nuevo-pb.jpg" alt="Printing Bruno - Arte fuera de serie">
-      </div>
     </div>
   </section>
 
