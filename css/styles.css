@@ -797,6 +797,17 @@ select {
   background: var(--accent);
 }
 
+.hero-logo-img {
+  width: 100%;
+  max-width: 520px;
+  height: auto;
+  display: block;
+  border-radius: var(--border-radius-xl);
+  animation: fadeInUp 0.8s ease-out 0.3s both;
+  z-index: 2;
+  position: relative;
+}
+
 .hero-image-glow {
   position: absolute;
   top: 50%;
