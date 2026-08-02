@@ -468,7 +468,12 @@
     });
   }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.134.0/build/three.min.js" onload="initHero3D()" defer></script>
+  <script src="js/three.min.js"></script>
+  <script>
+    if (typeof THREE !== 'undefined') {
+      requestAnimationFrame(function() { requestAnimationFrame(initHero3D); });
+    }
+  </script>
 </body>
 
 </html>
