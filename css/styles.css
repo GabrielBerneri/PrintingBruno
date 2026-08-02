@@ -541,6 +541,8 @@ select {
 .hero-content {
   max-width: 720px;
   width: 100%;
+  text-align: center;
+  margin: 0 auto;
 }
 
 .hero-title {
