@@ -311,11 +311,11 @@
     var container = canvas.parentElement;
     var isMobile = window.innerWidth < 768;
 
-    // Scene + camera
+    // Scene + camera: 3/4 view desde arriba-derecha para ver la cama y el cubo
     var scene = new THREE.Scene();
     var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
-    camera.position.set(0, 0.5, 5.0);
-    camera.lookAt(0, -0.4, 0);
+    camera.position.set(2.8, 2.2, 4.8);
+    camera.lookAt(0, -0.3, 0);
 
     var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !isMobile, alpha: true, powerPreference: 'high-performance' });
     renderer.setClearColor(0x000000, 0);
@@ -332,97 +332,97 @@
     window.addEventListener('resize', setSize, { passive: true });
 
     // === PRINT BED ===
-    var grid = new THREE.GridHelper(3.6, 14, 0x2a1208, 0x160a04);
+    var grid = new THREE.GridHelper(4.0, 16, 0x2a1208, 0x160a04);
     grid.position.y = -1.85;
     scene.add(grid);
 
-    // Bed glow plane
-    var bedMesh = new THREE.Mesh(
-      new THREE.PlaneGeometry(3.6, 3.6),
-      new THREE.MeshBasicMaterial({ color: 0x0e0700, transparent: true, opacity: 0.55, side: THREE.DoubleSide })
+    var bedPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(4.0, 4.0),
+      new THREE.MeshBasicMaterial({ color: 0x0d0600, transparent: true, opacity: 0.6, side: THREE.DoubleSide })
     );
-    bedMesh.rotation.x = -Math.PI / 2;
-    bedMesh.position.y = -1.85;
-    scene.add(bedMesh);
+    bedPlane.rotation.x = -Math.PI / 2;
+    bedPlane.position.y = -1.85;
+    scene.add(bedPlane);
 
-    // === VASE SHAPE: stacked filament rings ===
-    // Profile: narrow base, wide middle, narrow top — iconic vase shape
-    var LAYERS = isMobile ? 18 : 26;
-    var LAYER_H = 2.7 / LAYERS;
-    var BASE_Y  = -1.8;
+    // === CUBO DE FILAMENTO: capas de tubos cuadrados ===
+    var SQ    = 1.55;          // lado del cuadrado
+    var h_sq  = SQ / 2;
+    var LAYERS      = isMobile ? 10 : 15;
+    var LAYER_H     = 0.145;
+    var TUBE_R      = 0.026;
+    var BASE_Y      = -1.82;   // justo sobre la cama
+    var TOTAL_SIDES = LAYERS * 4;
 
+    // Función: devuelve {p1, p2} para un lado/capa dados
+    function getSide(layer, side) {
+      var y = BASE_Y + (layer + 0.5) * LAYER_H;
+      var corners = [
+        [new THREE.Vector3(-h_sq, y, -h_sq), new THREE.Vector3( h_sq, y, -h_sq)], // frente: izq→der
+        [new THREE.Vector3( h_sq, y, -h_sq), new THREE.Vector3( h_sq, y,  h_sq)], // derecha: frente→fondo
+        [new THREE.Vector3( h_sq, y,  h_sq), new THREE.Vector3(-h_sq, y,  h_sq)], // fondo: der→izq
+        [new THREE.Vector3(-h_sq, y,  h_sq), new THREE.Vector3(-h_sq, y, -h_sq)], // izquierda: fondo→frente
+      ];
+      return corners[side];
+    }
+
+    // Crear tubos (TubeGeometry) para cada lado de cada capa, inicialmente invisibles
     var objectGroup = new THREE.Group();
     scene.add(objectGroup);
 
-    var rings = [];
-    for (var i = 0; i < LAYERS; i++) {
-      var tl = i / (LAYERS - 1);
-      // Vase profile: sin curve gives wide middle, narrow ends
-      var radius = 0.42 + Math.sin(tl * Math.PI) * 0.62;
-      var yPos   = BASE_Y + (i + 0.5) * LAYER_H;
-
-      var ringMat = new THREE.MeshBasicMaterial({
-        color: new THREE.Color(1.0, 0.30 + tl * 0.22, 0.04 + tl * 0.08),
-        transparent: true,
-        opacity: 0
-      });
-      var ringMesh = new THREE.Mesh(
-        new THREE.TorusGeometry(radius, 0.022, 6, isMobile ? 28 : 48),
-        ringMat
-      );
-      ringMesh.position.y = yPos;
-      objectGroup.add(ringMesh);
-      rings.push({ mesh: ringMesh, mat: ringMat, radius: radius, y: yPos });
+    var sideData = [];
+    for (var l = 0; l < LAYERS; l++) {
+      var tl = l / Math.max(1, LAYERS - 1);
+      for (var s = 0; s < 4; s++) {
+        var pts   = getSide(l, s);
+        var curve = new THREE.LineCurve3(pts[0], pts[1]);
+        var tMat  = new THREE.MeshPhongMaterial({
+          color: new THREE.Color(1.0, 0.26 + tl * 0.26, 0.03 + tl * 0.09),
+          emissive: new THREE.Color(0.25, 0.04, 0),
+          transparent: true, opacity: 0
+        });
+        var tMesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 1, TUBE_R, 7, false), tMat);
+        objectGroup.add(tMesh);
+        sideData.push({ mesh: tMesh, mat: tMat, idx: l * 4 + s });
+      }
     }
 
-    // === NOZZLE EXTRUDER ===
+    // === NOZZLE ===
     var nozzleGroup = new THREE.Group();
     scene.add(nozzleGroup);
 
-    // Body
-    nozzleGroup.add(Object.assign(
-      new THREE.Mesh(
-        new THREE.CylinderGeometry(0.05, 0.04, 0.17, 8),
-        new THREE.MeshPhongMaterial({ color: 0x909090, specular: 0x555555, shininess: 80 })
-      )
+    // Cuerpo cilíndrico
+    nozzleGroup.add(new THREE.Mesh(
+      new THREE.CylinderGeometry(0.052, 0.042, 0.18, 8),
+      new THREE.MeshPhongMaterial({ color: 0x909090, specular: 0x444444, shininess: 90 })
     ));
-    // Tip cone (pointing down)
-    var tipMesh = new THREE.Mesh(
-      new THREE.ConeGeometry(0.04, 0.09, 8),
-      new THREE.MeshPhongMaterial({ color: 0x707070, shininess: 100 })
+    // Punta cónica hacia abajo
+    var nTip = new THREE.Mesh(
+      new THREE.ConeGeometry(0.042, 0.10, 8),
+      new THREE.MeshPhongMaterial({ color: 0x686868, shininess: 100 })
     );
-    tipMesh.rotation.z = Math.PI;
-    tipMesh.position.y = -0.13;
-    nozzleGroup.add(tipMesh);
+    nTip.rotation.z = Math.PI;
+    nTip.position.y = -0.14;
+    nozzleGroup.add(nTip);
 
-    // Hot-end glow dot
+    // Hot-end incandescente
     var hotMat = new THREE.MeshBasicMaterial({ color: 0xff6b2b, transparent: true, opacity: 0.95 });
-    var hotDot = new THREE.Mesh(new THREE.SphereGeometry(0.034, 8, 8), hotMat);
-    hotDot.position.y = -0.18;
+    var hotDot = new THREE.Mesh(new THREE.SphereGeometry(0.036, 8, 8), hotMat);
+    hotDot.position.y = -0.19;
     nozzleGroup.add(hotDot);
 
-    // === LIGHTS ===
-    scene.add(new THREE.AmbientLight(0xffffff, 0.18));
-    var keyLight = new THREE.PointLight(0xff8f5e, 3.5, 14);
-    keyLight.position.set(3, 2, 3);
-    scene.add(keyLight);
-    var fillLight = new THREE.PointLight(0xff6b2b, 1.5, 10);
-    fillLight.position.set(-3, 0, 2);
-    scene.add(fillLight);
+    // Luz puntual en el hot-end
+    var nozzleLight = new THREE.PointLight(0xff6b2b, 4, 1.8);
+    nozzleLight.position.y = -0.19;
+    nozzleGroup.add(nozzleLight);
 
-    // === FLOATING PARTICLES ===
-    var pCount = isMobile ? 40 : 90;
-    var pPos = new Float32Array(pCount * 3);
-    for (var pi = 0; pi < pCount; pi++) {
-      pPos[pi*3]   = (Math.random()-0.5) * 5;
-      pPos[pi*3+1] = (Math.random()-0.5) * 4;
-      pPos[pi*3+2] = (Math.random()-0.5) * 2 - 1;
-    }
-    var pGeo = new THREE.BufferGeometry();
-    pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-    scene.add(new THREE.Points(pGeo,
-      new THREE.PointsMaterial({ color: 0xff6b2b, size: 0.028, transparent: true, opacity: 0.28 })
-    ));
+    // === LUCES GLOBALES ===
+    scene.add(new THREE.AmbientLight(0xffffff, 0.18));
+    var keyLight  = new THREE.PointLight(0xffffff, 2.8, 16);
+    keyLight.position.set(3.5, 4, 3);
+    scene.add(keyLight);
+    var fillLight = new THREE.PointLight(0xff8f5e, 1.6, 10);
+    fillLight.position.set(-3, 1, 2);
+    scene.add(fillLight);
 
     // === MOUSE PARALLAX ===
     var mx = 0, my = 0, txm = 0, tym = 0;
@@ -431,87 +431,78 @@
       tym = (e.clientY / window.innerHeight - 0.5);
     }, { passive: true });
 
-    // === TIMING (pausa-safe con performance.now) ===
+    // === TIMING ===
     var t = 0, lastNow = performance.now(), paused = false;
-    var LAYER_DUR  = isMobile ? 0.10 : 0.13; // seg por capa
-    var BUILD_DUR  = LAYERS * LAYER_DUR;
-    var RETRACT_DUR = 0.7;
-    var rafId = null;
-    var nozzleRetracted = false;
-
-    // Guarda posición del nozzle al entrar en retracción
-    var retractStartX = 0, retractStartZ = 0, retractStartY = 0;
+    var SIDE_DUR    = isMobile ? 0.13 : 0.17; // segundos por lado
+    var BUILD_DUR   = TOTAL_SIDES * SIDE_DUR;
+    var RETRACT_DUR = 0.65;
+    var rafId = null, nozzleRetracted = false;
+    var retractStart = new THREE.Vector3();
 
     function animate() {
       if (paused) return;
       rafId = requestAnimationFrame(animate);
-
       var now = performance.now();
       t += (now - lastNow) / 1000;
       lastNow = now;
 
       // ── FASE BUILD ──
       var buildFrac  = Math.min(1, t / BUILD_DUR);
-      var exactLayer = buildFrac * LAYERS;
-      var curIdx     = Math.min(Math.floor(exactLayer), LAYERS - 1);
+      var exactSide  = buildFrac * TOTAL_SIDES;
+      var curSideIdx = Math.min(Math.floor(exactSide), TOTAL_SIDES - 1);
+      var sideProg   = exactSide - Math.floor(exactSide); // 0-1 dentro del lado actual
 
-      for (var li = 0; li < rings.length; li++) {
-        var rd = rings[li];
-        if (li < curIdx) {
-          rd.mat.opacity = 0.78;
-        } else if (li === curIdx) {
-          var layerFrac = exactLayer - li;
-          rd.mat.opacity = layerFrac * 0.78;
+      // Revelar tubos completados y el que se está depositando
+      for (var si = 0; si < sideData.length; si++) {
+        var sd = sideData[si];
+        if (sd.idx < curSideIdx) {
+          sd.mat.opacity = 0.85;
+        } else if (sd.idx === curSideIdx) {
+          // Aparece rápidamente al empezar el lado (como filamento caliente)
+          sd.mat.opacity = Math.min(0.85, sideProg * 6);
         }
       }
 
+      // Posicionar nozzle sobre el lado actual
       if (buildFrac < 1) {
-        var curRing  = rings[curIdx];
-        var nAngle   = t * 4.2;
-        var nR       = curRing.radius + 0.02;
-        nozzleGroup.position.x = Math.cos(nAngle) * nR;
-        nozzleGroup.position.z = Math.sin(nAngle) * nR;
-        nozzleGroup.position.y = curRing.y + 0.13;
-        nozzleGroup.rotation.y = -(nAngle + Math.PI * 0.5);
-        hotMat.opacity = 0.82 + Math.sin(t * 12) * 0.13;
+        var curLayer = Math.floor(curSideIdx / 4);
+        var curSide  = curSideIdx % 4;
+        var pts      = getSide(curLayer, curSide);
+        var p1 = pts[0], p2 = pts[1];
 
-        // Guarda para retracción
-        retractStartX = nozzleGroup.position.x;
-        retractStartZ = nozzleGroup.position.z;
-        retractStartY = nozzleGroup.position.y;
+        nozzleGroup.position.x = p1.x + (p2.x - p1.x) * sideProg;
+        nozzleGroup.position.y = p1.y + 0.16;
+        nozzleGroup.position.z = p1.z + (p2.z - p1.z) * sideProg;
+        // Orientar el nozzle en la dirección de avance
+        nozzleGroup.rotation.y = -Math.atan2(p2.z - p1.z, p2.x - p1.x);
+
+        hotMat.opacity = 0.88 + Math.sin(t * 14) * 0.10;
+        retractStart.copy(nozzleGroup.position);
       }
 
       // ── FASE RETRACCIÓN ──
       if (buildFrac >= 1 && !nozzleRetracted) {
         var rt = Math.min(1, (t - BUILD_DUR) / RETRACT_DUR);
-        nozzleGroup.position.x = retractStartX * (1 - rt);
-        nozzleGroup.position.z = retractStartZ * (1 - rt);
-        nozzleGroup.position.y = retractStartY + rt * 2.2;
+        nozzleGroup.position.x = retractStart.x * (1 - rt * 0.6);
+        nozzleGroup.position.z = retractStart.z * (1 - rt * 0.6);
+        nozzleGroup.position.y = retractStart.y + rt * 2.8;
         hotMat.opacity = 0.95 * (1 - rt);
-        if (rt >= 1) {
-          nozzleGroup.visible = false;
-          nozzleRetracted = true;
-        }
+        nozzleLight.intensity = 4 * (1 - rt);
+        if (rt >= 1) { nozzleGroup.visible = false; nozzleRetracted = true; }
       }
 
       // ── FASE POST-BUILD: flota y rota ──
       var postT = Math.max(0, t - BUILD_DUR - RETRACT_DUR);
       if (postT > 0) {
-        var floatY = Math.min(0.28, postT * 0.35) + Math.sin(t * 0.75) * 0.07;
-        objectGroup.position.y = floatY;
-        objectGroup.rotation.y = postT * 0.38;
+        objectGroup.position.y = Math.min(0.32, postT * 0.38) + Math.sin(t * 0.72) * 0.07;
+        objectGroup.rotation.y = postT * 0.34;
       }
 
-      // Parallax mouse
+      // Mouse parallax
       mx += (txm - mx) * 0.038;
       my += (tym - my) * 0.038;
-      scene.rotation.y = mx * 0.22;
-      scene.rotation.x = -my * 0.14;
-
-      // Luz orbital
-      keyLight.position.x = Math.cos(t * 0.38) * 4;
-      keyLight.position.z = Math.sin(t * 0.38) * 4;
-      keyLight.intensity  = 3.2 + Math.sin(t * 1.3) * 0.6;
+      scene.rotation.y = mx * 0.18;
+      scene.rotation.x = -my * 0.10;
 
       renderer.render(scene, camera);
     }
