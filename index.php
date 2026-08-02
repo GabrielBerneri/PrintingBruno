@@ -311,18 +311,18 @@
     var container = canvas.parentElement;
     var isMobile = window.innerWidth < 768;
 
+    // Scene + camera
     var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
-    camera.position.z = 5.5;
+    var camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
+    camera.position.set(0, 0.5, 5.0);
+    camera.lookAt(0, -0.4, 0);
 
     var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: !isMobile, alpha: true, powerPreference: 'high-performance' });
     renderer.setClearColor(0x000000, 0);
-    renderer.localClippingEnabled = true;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, isMobile ? 1 : 1.5));
 
     function setSize() {
-      var w = container.offsetWidth;
-      var h = container.offsetHeight;
+      var w = container.offsetWidth, h = container.offsetHeight;
       if (!w || !h) return;
       camera.aspect = w / h;
       camera.updateProjectionMatrix();
@@ -331,125 +331,187 @@
     setSize();
     window.addEventListener('resize', setSize, { passive: true });
 
-    // Clip plane: normal (0,-1,0), clips where y > constant
-    // constant=-2: all clipped (y≥-1.5 > -2); constant=2: nothing clipped (y≤1.5 < 2)
-    // Reveals bottom-to-top as constant rises from -2 to 2
-    var clipPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), -2);
+    // === PRINT BED ===
+    var grid = new THREE.GridHelper(3.6, 14, 0x2a1208, 0x160a04);
+    grid.position.y = -1.85;
+    scene.add(grid);
 
-    var segs  = isMobile ? 80  : 140;
-    var rSegs = isMobile ? 12  : 16;
-    var torusGeo = new THREE.TorusKnotGeometry(1.1, 0.35, segs, rSegs, 2, 3);
+    // Bed glow plane
+    var bedMesh = new THREE.Mesh(
+      new THREE.PlaneGeometry(3.6, 3.6),
+      new THREE.MeshBasicMaterial({ color: 0x0e0700, transparent: true, opacity: 0.55, side: THREE.DoubleSide })
+    );
+    bedMesh.rotation.x = -Math.PI / 2;
+    bedMesh.position.y = -1.85;
+    scene.add(bedMesh);
 
-    var solidMat = new THREE.MeshPhongMaterial({
-      color: 0x0e0e1a, emissive: 0x120800, specular: 0x222222, shininess: 50,
-      clippingPlanes: [clipPlane],
-    });
-    var solid = new THREE.Mesh(torusGeo, solidMat);
-    scene.add(solid);
+    // === VASE SHAPE: stacked filament rings ===
+    // Profile: narrow base, wide middle, narrow top — iconic vase shape
+    var LAYERS = isMobile ? 18 : 26;
+    var LAYER_H = 2.7 / LAYERS;
+    var BASE_Y  = -1.8;
 
-    var wireMat = new THREE.LineBasicMaterial({
-      color: 0xff6b2b, transparent: true, opacity: 0.55,
-      clippingPlanes: [clipPlane],
-    });
-    var wire = new THREE.LineSegments(new THREE.WireframeGeometry(torusGeo), wireMat);
-    solid.add(wire);
+    var objectGroup = new THREE.Group();
+    scene.add(objectGroup);
 
-    var glowGeo = new THREE.TorusKnotGeometry(1.1, 0.39, segs, rSegs, 2, 3);
-    var glowMat = new THREE.MeshBasicMaterial({
-      color: 0xff6b2b, side: THREE.BackSide, transparent: true, opacity: 0.05,
-      depthWrite: false, clippingPlanes: [clipPlane],
-    });
-    var glowMesh = new THREE.Mesh(glowGeo, glowMat);
-    scene.add(glowMesh);
+    var rings = [];
+    for (var i = 0; i < LAYERS; i++) {
+      var tl = i / (LAYERS - 1);
+      // Vase profile: sin curve gives wide middle, narrow ends
+      var radius = 0.42 + Math.sin(tl * Math.PI) * 0.62;
+      var yPos   = BASE_Y + (i + 0.5) * LAYER_H;
 
-    // Scan line (printer head moving upward during reveal)
-    var scanGeo = new THREE.TorusGeometry(1.9, 0.007, 8, 64);
-    var scanMat = new THREE.MeshBasicMaterial({ color: 0xff6b2b, transparent: true, opacity: 0 });
-    var scanLine = new THREE.Mesh(scanGeo, scanMat);
-    scanLine.rotation.x = Math.PI / 2;
-    scene.add(scanLine);
+      var ringMat = new THREE.MeshBasicMaterial({
+        color: new THREE.Color(1.0, 0.30 + tl * 0.22, 0.04 + tl * 0.08),
+        transparent: true,
+        opacity: 0
+      });
+      var ringMesh = new THREE.Mesh(
+        new THREE.TorusGeometry(radius, 0.022, 6, isMobile ? 28 : 48),
+        ringMat
+      );
+      ringMesh.position.y = yPos;
+      objectGroup.add(ringMesh);
+      rings.push({ mesh: ringMesh, mat: ringMat, radius: radius, y: yPos });
+    }
 
-    // Particles
-    var pCount = isMobile ? 60 : 160;
+    // === NOZZLE EXTRUDER ===
+    var nozzleGroup = new THREE.Group();
+    scene.add(nozzleGroup);
+
+    // Body
+    nozzleGroup.add(Object.assign(
+      new THREE.Mesh(
+        new THREE.CylinderGeometry(0.05, 0.04, 0.17, 8),
+        new THREE.MeshPhongMaterial({ color: 0x909090, specular: 0x555555, shininess: 80 })
+      )
+    ));
+    // Tip cone (pointing down)
+    var tipMesh = new THREE.Mesh(
+      new THREE.ConeGeometry(0.04, 0.09, 8),
+      new THREE.MeshPhongMaterial({ color: 0x707070, shininess: 100 })
+    );
+    tipMesh.rotation.z = Math.PI;
+    tipMesh.position.y = -0.13;
+    nozzleGroup.add(tipMesh);
+
+    // Hot-end glow dot
+    var hotMat = new THREE.MeshBasicMaterial({ color: 0xff6b2b, transparent: true, opacity: 0.95 });
+    var hotDot = new THREE.Mesh(new THREE.SphereGeometry(0.034, 8, 8), hotMat);
+    hotDot.position.y = -0.18;
+    nozzleGroup.add(hotDot);
+
+    // === LIGHTS ===
+    scene.add(new THREE.AmbientLight(0xffffff, 0.18));
+    var keyLight = new THREE.PointLight(0xff8f5e, 3.5, 14);
+    keyLight.position.set(3, 2, 3);
+    scene.add(keyLight);
+    var fillLight = new THREE.PointLight(0xff6b2b, 1.5, 10);
+    fillLight.position.set(-3, 0, 2);
+    scene.add(fillLight);
+
+    // === FLOATING PARTICLES ===
+    var pCount = isMobile ? 40 : 90;
     var pPos = new Float32Array(pCount * 3);
-    for (var i = 0; i < pCount; i++) {
-      var r = 2.5 + Math.random() * 2;
-      var theta = Math.random() * Math.PI * 2;
-      var phi = Math.acos(2 * Math.random() - 1);
-      pPos[i * 3]     = r * Math.sin(phi) * Math.cos(theta);
-      pPos[i * 3 + 1] = r * Math.sin(phi) * Math.sin(theta);
-      pPos[i * 3 + 2] = r * Math.cos(phi);
+    for (var pi = 0; pi < pCount; pi++) {
+      pPos[pi*3]   = (Math.random()-0.5) * 5;
+      pPos[pi*3+1] = (Math.random()-0.5) * 4;
+      pPos[pi*3+2] = (Math.random()-0.5) * 2 - 1;
     }
     var pGeo = new THREE.BufferGeometry();
     pGeo.setAttribute('position', new THREE.BufferAttribute(pPos, 3));
-    var pMat = new THREE.PointsMaterial({ color: 0xff6b2b, size: 0.04, transparent: true, opacity: 0.45 });
-    var particles = new THREE.Points(pGeo, pMat);
-    scene.add(particles);
+    scene.add(new THREE.Points(pGeo,
+      new THREE.PointsMaterial({ color: 0xff6b2b, size: 0.028, transparent: true, opacity: 0.28 })
+    ));
 
-    // Lights
-    scene.add(new THREE.AmbientLight(0xffffff, 0.15));
-    var orbLight = new THREE.PointLight(0xff6b2b, 4, 14);
-    scene.add(orbLight);
-    var fillLight = new THREE.PointLight(0xff8f5e, 1.5, 10);
-    fillLight.position.set(-3, -1.5, 2);
-    scene.add(fillLight);
-    var rimLight = new THREE.PointLight(0xffffff, 0.5, 8);
-    rimLight.position.set(0, 3, -2);
-    scene.add(rimLight);
-
-    // Mouse parallax
+    // === MOUSE PARALLAX ===
     var mx = 0, my = 0, txm = 0, tym = 0;
     window.addEventListener('mousemove', function(e) {
       txm = (e.clientX / window.innerWidth  - 0.5);
       tym = (e.clientY / window.innerHeight - 0.5);
     }, { passive: true });
 
-    var clock = new THREE.Clock();
-    var REVEAL = 2.8;
+    // === TIMING (pausa-safe con performance.now) ===
+    var t = 0, lastNow = performance.now(), paused = false;
+    var LAYER_DUR  = isMobile ? 0.10 : 0.13; // seg por capa
+    var BUILD_DUR  = LAYERS * LAYER_DUR;
+    var RETRACT_DUR = 0.7;
     var rafId = null;
-    var running = true;
+    var nozzleRetracted = false;
+
+    // Guarda posición del nozzle al entrar en retracción
+    var retractStartX = 0, retractStartZ = 0, retractStartY = 0;
 
     function animate() {
-      if (!running) return;
+      if (paused) return;
       rafId = requestAnimationFrame(animate);
-      var t = clock.getElapsedTime();
 
-      // Ease-out cubic reveal
-      var rev  = Math.min(1, t / REVEAL);
-      var ease = 1 - Math.pow(1 - rev, 3);
+      var now = performance.now();
+      t += (now - lastNow) / 1000;
+      lastNow = now;
 
-      // Clip plane rises from -2 to 2 (bottom to top reveal)
-      clipPlane.constant = -2 + ease * 4;
+      // ── FASE BUILD ──
+      var buildFrac  = Math.min(1, t / BUILD_DUR);
+      var exactLayer = buildFrac * LAYERS;
+      var curIdx     = Math.min(Math.floor(exactLayer), LAYERS - 1);
 
-      // Scan line follows clip boundary and fades in/out
-      scanLine.position.y = clipPlane.constant;
-      var scanAlpha = rev < 0.08 ? rev * 12.5 : (rev > 0.85 ? (1 - rev) / 0.15 : 1);
-      scanMat.opacity = 0.85 * Math.max(0, Math.min(1, scanAlpha));
+      for (var li = 0; li < rings.length; li++) {
+        var rd = rings[li];
+        if (li < curIdx) {
+          rd.mat.opacity = 0.78;
+        } else if (li === curIdx) {
+          var layerFrac = exactLayer - li;
+          rd.mat.opacity = layerFrac * 0.78;
+        }
+      }
 
-      // Rotation starts mid-reveal
-      var rotFactor = Math.max(0, (rev - 0.3) / 0.7);
-      solid.rotation.x    = t * 0.16 * rotFactor;
-      solid.rotation.y    = t * 0.24 * rotFactor;
-      glowMesh.rotation.copy(solid.rotation);
+      if (buildFrac < 1) {
+        var curRing  = rings[curIdx];
+        var nAngle   = t * 4.2;
+        var nR       = curRing.radius + 0.02;
+        nozzleGroup.position.x = Math.cos(nAngle) * nR;
+        nozzleGroup.position.z = Math.sin(nAngle) * nR;
+        nozzleGroup.position.y = curRing.y + 0.13;
+        nozzleGroup.rotation.y = -(nAngle + Math.PI * 0.5);
+        hotMat.opacity = 0.82 + Math.sin(t * 12) * 0.13;
 
-      // Float
-      var fy = Math.sin(t * 0.65) * 0.12;
-      solid.position.y    = fy;
-      glowMesh.position.y = fy;
+        // Guarda para retracción
+        retractStartX = nozzleGroup.position.x;
+        retractStartZ = nozzleGroup.position.z;
+        retractStartY = nozzleGroup.position.y;
+      }
 
-      // Mouse parallax (smooth lerp)
-      mx += (txm - mx) * 0.035;
-      my += (tym - my) * 0.035;
-      scene.rotation.y = mx * 0.3;
-      scene.rotation.x = -my * 0.2;
+      // ── FASE RETRACCIÓN ──
+      if (buildFrac >= 1 && !nozzleRetracted) {
+        var rt = Math.min(1, (t - BUILD_DUR) / RETRACT_DUR);
+        nozzleGroup.position.x = retractStartX * (1 - rt);
+        nozzleGroup.position.z = retractStartZ * (1 - rt);
+        nozzleGroup.position.y = retractStartY + rt * 2.2;
+        hotMat.opacity = 0.95 * (1 - rt);
+        if (rt >= 1) {
+          nozzleGroup.visible = false;
+          nozzleRetracted = true;
+        }
+      }
 
-      // Orbiting key light
-      orbLight.position.set(Math.cos(t * 0.4) * 5, 2, Math.sin(t * 0.4) * 5);
-      orbLight.intensity = 3.5 + Math.sin(t * 1.1) * 0.8;
+      // ── FASE POST-BUILD: flota y rota ──
+      var postT = Math.max(0, t - BUILD_DUR - RETRACT_DUR);
+      if (postT > 0) {
+        var floatY = Math.min(0.28, postT * 0.35) + Math.sin(t * 0.75) * 0.07;
+        objectGroup.position.y = floatY;
+        objectGroup.rotation.y = postT * 0.38;
+      }
 
-      // Particles drift
-      particles.rotation.y = t * 0.04;
-      particles.rotation.z = t * 0.012;
+      // Parallax mouse
+      mx += (txm - mx) * 0.038;
+      my += (tym - my) * 0.038;
+      scene.rotation.y = mx * 0.22;
+      scene.rotation.x = -my * 0.14;
+
+      // Luz orbital
+      keyLight.position.x = Math.cos(t * 0.38) * 4;
+      keyLight.position.z = Math.sin(t * 0.38) * 4;
+      keyLight.intensity  = 3.2 + Math.sin(t * 1.3) * 0.6;
 
       renderer.render(scene, camera);
     }
@@ -458,11 +520,11 @@
 
     document.addEventListener('visibilitychange', function() {
       if (document.hidden) {
-        running = false;
+        paused = true;
         if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
       } else {
-        running = true;
-        clock.start();
+        paused = false;
+        lastNow = performance.now();
         animate();
       }
     });
