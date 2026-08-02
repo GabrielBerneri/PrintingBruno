@@ -286,6 +286,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-
+  // ===== Theme Toggle =====
+  const themeToggle = document.getElementById('themeToggle');
+  if (themeToggle) {
+    function updateThemeBtn() {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      themeToggle.setAttribute('aria-label', isLight ? 'Cambiar a tema oscuro' : 'Cambiar a tema claro');
+    }
+    updateThemeBtn();
+    themeToggle.addEventListener('click', () => {
+      const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+      if (isLight) {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('pb_theme', 'dark');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('pb_theme', 'light');
+      }
+      updateThemeBtn();
+    });
+  }
 
 });

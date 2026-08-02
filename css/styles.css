@@ -74,6 +74,39 @@
   --transition-spring: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
+/* ---------- Light Theme Overrides ---------- */
+[data-theme="light"] {
+  --bg-primary: #f5f5f7;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f0f0f8;
+  --bg-elevated: #e8e8f0;
+  --bg-glass: rgba(255, 255, 255, 0.75);
+  --bg-glass-strong: rgba(255, 255, 255, 0.95);
+  --text-primary: #111118;
+  --text-secondary: #4a4a65;
+  --text-muted: #8080a0;
+  --border-subtle: rgba(0, 0, 0, 0.07);
+  --border-light: rgba(0, 0, 0, 0.12);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.07);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.14);
+  --shadow-accent: 0 4px 20px rgba(255, 107, 43, 0.18);
+  --shadow-accent-lg: 0 8px 40px rgba(255, 107, 43, 0.25);
+}
+
+/* Scrolled header in light mode */
+[data-theme="light"] .header.scrolled {
+  background: rgba(245, 245, 247, 0.85);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* Hero text stays light (dark photo background) */
+[data-theme="light"] .hero-title,
+[data-theme="light"] .hero-description {
+  color: #f0f0f5;
+}
+
 /* ---------- Reset & Base ---------- */
 *,
 *::before,
@@ -3372,6 +3405,42 @@ select {
   width: 18px;
   height: 18px;
 }
+
+/* Theme toggle button */
+.theme-toggle {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--border-radius-full);
+  border: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  background: transparent;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(255, 107, 43, 0.1);
+}
+
+.theme-toggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Dark mode (default): show sun to switch to light */
+.theme-toggle .icon-sun  { display: block; }
+.theme-toggle .icon-moon { display: none; }
+
+/* Light mode: show moon to switch to dark */
+[data-theme="light"] .theme-toggle .icon-sun  { display: none; }
+[data-theme="light"] .theme-toggle .icon-moon { display: block; }
 
 .cart-badge {
   position: absolute;
