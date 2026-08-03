@@ -3473,7 +3473,7 @@ select {
   width: 400px;
   max-width: 90vw;
   height: 100vh;
-  background: rgba(17, 17, 24, 0.85);
+  background: var(--bg-glass-strong);
   backdrop-filter: blur(25px);
   -webkit-backdrop-filter: blur(25px);
   border-left: 1px solid var(--border-subtle);
@@ -3632,7 +3632,7 @@ select {
 .cart-drawer-footer {
   padding: var(--space-lg) var(--space-xl);
   border-top: 1px solid var(--border-subtle);
-  background: rgba(22, 22, 31, 0.9);
+  background: var(--bg-elevated);
 }
 
 .cart-drawer-total {
