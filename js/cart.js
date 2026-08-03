@@ -250,13 +250,6 @@ const Cart = {
             if (phoneInput && !phoneInput.value.trim()) phoneInput.value = String(context.customer.phone || '').trim();
         }
 
-        if (helperText) {
-            helperText.style.display = 'block';
-            helperText.textContent = context.authenticated
-                ? 'La dirección elegida va a quedar guardada en este pedido para que el admin la vea tal como fue comprada.'
-                : 'Si completás una dirección ahora, también va a quedar asociada al pedido.';
-        }
-
         if (!savedAddressGroup || !savedAddressSelect) {
             return;
         }
@@ -494,8 +487,7 @@ const Cart = {
           </div>
           <div class="form-group" style="margin-bottom: var(--space-lg);">
             <label style="display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;font-weight:500;">Dirección de entrega <span style="color:var(--accent)">*</span></label>
-            <p id="checkoutAccountHint" style="display:none;margin:0 0 0.75rem;font-size:0.82rem;color:var(--text-muted);line-height:1.5;"></p>
-            <div id="checkoutSavedAddressGroup" hidden style="margin-bottom:0.75rem;">
+<div id="checkoutSavedAddressGroup" hidden style="margin-bottom:0.75rem;">
               <label for="checkoutSavedAddress" style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.35rem;">Direcciones guardadas</label>
               <select id="checkoutSavedAddress" class="form-select">
                 <option value="">Ingresar otra dirección</option>
