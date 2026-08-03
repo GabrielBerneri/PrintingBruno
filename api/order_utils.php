@@ -12,7 +12,7 @@ const PB_RESERVATION_EXPIRED = 'expired';
 const PB_RESERVATION_RESTORED = 'restored';
 const PB_RESERVATION_TTL_MINUTES = 30;
 const PB_PAYMENT_STATUSES = ['pending', 'under_review', 'approved', 'rejected', 'cancelled', 'refunded', 'charged_back'];
-const PB_FULFILLMENT_STATUSES = ['queued', 'in_production', 'ready', 'shipped', 'delivered', 'cancelled'];
+const PB_FULFILLMENT_STATUSES = ['queued', 'ready', 'shipped', 'delivered', 'cancelled'];
 const PB_PAYMENT_TRANSITIONS = [
     'pending' => ['pending', 'under_review', 'approved', 'rejected', 'cancelled'],
     'under_review' => ['under_review', 'pending', 'approved', 'rejected', 'cancelled'],
@@ -23,8 +23,7 @@ const PB_PAYMENT_TRANSITIONS = [
     'charged_back' => ['charged_back'],
 ];
 const PB_FULFILLMENT_TRANSITIONS = [
-    'queued' => ['queued', 'in_production', 'ready', 'cancelled'],
-    'in_production' => ['in_production', 'ready', 'cancelled'],
+    'queued' => ['queued', 'ready', 'cancelled'],
     'ready' => ['ready', 'shipped', 'delivered', 'cancelled'],
     'shipped' => ['shipped', 'delivered'],
     'delivered' => ['delivered'],
@@ -90,7 +89,7 @@ function pbMapLegacyStatusToLifecycle(?string $status, ?string $checkoutStatus =
         ],
         'in_process' => [
             'payment_status' => $checkoutStatus === 'completed' ? 'approved' : 'under_review',
-            'fulfillment_status' => $checkoutStatus === 'completed' ? 'in_production' : 'queued',
+            'fulfillment_status' => 'queued',
         ],
         'shipped' => [
             'payment_status' => 'approved',

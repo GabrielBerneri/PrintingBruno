@@ -346,7 +346,7 @@ function determineQueueBucket(array $order): string {
     }
 
     return match ($fulfillmentStatus) {
-        'queued', 'in_production' => 'production',
+        'queued' => 'production',
         'ready' => 'ready',
         'shipped' => 'delivery',
         'delivered' => 'completed',
@@ -369,7 +369,7 @@ function getQueueWhereClause(string $queue): array {
             [],
         ],
         'production' => [
-            "COALESCE(o.payment_status, 'pending') = 'approved' AND COALESCE(o.fulfillment_status, 'queued') IN ('queued', 'in_production')",
+            "COALESCE(o.payment_status, 'pending') = 'approved' AND COALESCE(o.fulfillment_status, 'queued') = 'queued'",
             [],
         ],
         'ready' => [

@@ -55,7 +55,6 @@ const Account = {
     this.verificationMessage = document.getElementById('verificationMessage');
     this.ordersOverviewTotal = document.getElementById('ordersOverviewTotal');
     this.ordersOverviewPending = document.getElementById('ordersOverviewPending');
-    this.ordersOverviewProduction = document.getElementById('ordersOverviewProduction');
     this.ordersOverviewShipped = document.getElementById('ordersOverviewShipped');
   },
 
@@ -144,7 +143,6 @@ const Account = {
       },
       fulfillment: {
         queued: 'Pendiente de producción',
-        in_production: 'En producción',
         ready: 'Listo para despachar',
         shipped: 'Enviado',
         delivered: 'Entregado',
@@ -182,7 +180,7 @@ const Account = {
 
   isOrderInProduction(order = {}) {
     const fulfillmentStatus = String(order.fulfillment_status || '').trim().toLowerCase();
-    return ['queued', 'in_production', 'ready'].includes(fulfillmentStatus) && !this.isOrderCancelled(order);
+    return ['queued', 'ready'].includes(fulfillmentStatus) && !this.isOrderCancelled(order);
   },
 
   isOrderShipped(order = {}) {
@@ -736,12 +734,10 @@ const Account = {
   renderOrdersOverview(orders = []) {
     const total = orders.length;
     const pending = orders.filter(order => this.isOrderPending(order)).length;
-    const production = orders.filter(order => this.isOrderInProduction(order)).length;
     const shipped = orders.filter(order => this.isOrderShipped(order)).length;
 
     if (this.ordersOverviewTotal) this.ordersOverviewTotal.textContent = total.toLocaleString('es-AR');
     if (this.ordersOverviewPending) this.ordersOverviewPending.textContent = pending.toLocaleString('es-AR');
-    if (this.ordersOverviewProduction) this.ordersOverviewProduction.textContent = production.toLocaleString('es-AR');
     if (this.ordersOverviewShipped) this.ordersOverviewShipped.textContent = shipped.toLocaleString('es-AR');
   },
 

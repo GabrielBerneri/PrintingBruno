@@ -631,7 +631,6 @@ if ($verifiedState === 'success') {
         .order-badge.payment-pending,
         .order-badge.payment-under_review,
         .order-badge.fulfillment-queued,
-        .order-badge.fulfillment-in_production,
         .order-badge.fulfillment-ready {
             background: rgba(255, 107, 43, 0.12);
             border-color: rgba(255, 107, 43, 0.18);
@@ -928,14 +927,12 @@ if ($verifiedState === 'success') {
                             <div class="orders-overview" id="ordersOverview">
                                 <div class="orders-overview-card"><strong>Total pedidos</strong><span id="ordersOverviewTotal">—</span></div>
                                 <div class="orders-overview-card"><strong>Pendientes de pago</strong><span id="ordersOverviewPending">—</span></div>
-                                <div class="orders-overview-card"><strong>En producción</strong><span id="ordersOverviewProduction">—</span></div>
                                 <div class="orders-overview-card"><strong>Enviados</strong><span id="ordersOverviewShipped">—</span></div>
                             </div>
                             <div class="orders-toolbar">
                                 <div class="orders-filters" id="ordersFilters">
                                     <button type="button" class="active" data-order-filter="all">Todos</button>
                                     <button type="button" data-order-filter="pending">Pendientes</button>
-                                    <button type="button" data-order-filter="production">En producción</button>
                                     <button type="button" data-order-filter="shipped">Enviados</button>
                                     <button type="button" data-order-filter="cancelled">Cancelados</button>
                                 </div>

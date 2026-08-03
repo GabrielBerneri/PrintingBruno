@@ -1051,7 +1051,6 @@
                         <span class="admin-help-kicker">Ejemplos</span>
                         <ul>
                             <li><strong>Pendiente de pago:</strong> todavía no hay cobro confirmado.</li>
-                            <li><strong>Pagado · En producción:</strong> ya se cobró y el pedido se está haciendo.</li>
                             <li><strong>Cancelado:</strong> el pedido no sigue activo.</li>
                         </ul>
                     </div>
@@ -1093,7 +1092,6 @@
                         <select class="form-select" id="orderFulfillmentFilter" style="width:auto">
                             <option value="">Toda la operación</option>
                             <option value="queued">En cola</option>
-                            <option value="in_production">En producción</option>
                             <option value="ready">Listo</option>
                             <option value="shipped">Enviado</option>
                             <option value="delivered">Entregado</option>
@@ -1279,7 +1277,6 @@
 
         const fulfillmentStatusLabels = {
             queued: 'En cola',
-            in_production: 'En producción',
             ready: 'Listo',
             shipped: 'Enviado',
             delivered: 'Entregado',
@@ -1357,11 +1354,6 @@
                     label: 'Pagado · En cola',
                     className: 'approved',
                     detail: 'El cobro está confirmado y el pedido todavía está esperando turno de trabajo.',
-                },
-                in_production: {
-                    label: 'Pagado · En producción',
-                    className: 'in_process',
-                    detail: 'El cobro está confirmado y el pedido ya se está produciendo.',
                 },
                 ready: {
                     label: 'Pagado · Listo',
@@ -2569,7 +2561,6 @@
 
         const orderQuickActionDefinitions = {
             confirm_payment: { label: 'Confirmar cobro', payload: { payment_status: 'approved' } },
-            start_production: { label: 'Iniciar producción', payload: { fulfillment_status: 'in_production' } },
             mark_ready: { label: 'Marcar listo', payload: { fulfillment_status: 'ready' } },
             mark_shipped: { label: 'Marcar enviado', payload: { fulfillment_status: 'shipped' } },
             mark_delivered: { label: 'Marcar entregado', payload: { fulfillment_status: 'delivered' } },
@@ -2612,8 +2603,6 @@
 
             switch (fulfillmentStatus) {
                 case 'queued':
-                    return { code: 'start_production', ...orderQuickActionDefinitions.start_production };
-                case 'in_production':
                     return { code: 'mark_ready', ...orderQuickActionDefinitions.mark_ready };
                 case 'ready':
                     return { code: 'mark_shipped', ...orderQuickActionDefinitions.mark_shipped };
@@ -2963,7 +2952,7 @@
 
                 const quickAction = getOrderQuickAction(o);
                 const paymentStatusOptions = ['pending', 'under_review', 'approved', 'rejected', 'cancelled', 'refunded', 'charged_back'];
-                const fulfillmentStatusOptions = ['queued', 'in_production', 'ready', 'shipped', 'delivered', 'cancelled'];
+                const fulfillmentStatusOptions = ['queued', 'ready', 'shipped', 'delivered', 'cancelled'];
                 const paymentStatusSelect = paymentStatusOptions.map(status =>
                     `<option value="${status}" ${o.payment_status === status ? 'selected' : ''}>${paymentStatusLabels[status] || status}</option>`
                 ).join('');
