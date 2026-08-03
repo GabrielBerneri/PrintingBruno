@@ -789,6 +789,7 @@
                 <button class="admin-tab" data-tab="colors">🎨 Colores</button>
                 <button class="admin-tab" data-tab="orders">🧾 Pedidos <span class="tab-badge" id="pendingBadge" style="display:none">0</span></button>
                 <button class="admin-tab" data-tab="emails">📧 Correos</button>
+                <button class="admin-tab" data-tab="shipping">🚚 Envíos</button>
                 <button class="admin-tab" data-tab="settings">⚙️ Configuración</button>
             </div>
 
@@ -1157,6 +1158,16 @@
                 <div class="pagination" id="emailsPagination"></div>
             </div>
 
+            <!-- Shipping Tab -->
+            <div class="admin-panel" id="shippingPanel" style="display:none">
+                <h2 style="font-family:var(--font-heading);font-size:1.2rem;margin-bottom:var(--space-lg)">🚚 Zonas de envío</h2>
+                <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:var(--space-xl)">
+                    Configurá el precio y el plazo estimado para cada zona. Los códigos postales están predefinidos.
+                </p>
+                <div id="shippingZonesAlert" style="display:none;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-xl)"></div>
+                <div id="shippingZonesContainer" style="max-width:680px">Cargando...</div>
+            </div>
+
             <!-- Settings Tab -->
             <div class="admin-panel" id="settingsPanel" style="display:none">
                 <h2 style="font-family:var(--font-heading);font-size:1.2rem;margin-bottom:var(--space-2xl)">⚙️ Configuración</h2>
@@ -1510,8 +1521,10 @@
                 document.getElementById('ordersPanel').style.display = t === 'orders' ? '' : 'none';
                 document.getElementById('emailsPanel').style.display = t === 'emails' ? '' : 'none';
                 document.getElementById('settingsPanel').style.display = t === 'settings' ? '' : 'none';
+                document.getElementById('shippingPanel').style.display = t === 'shipping' ? '' : 'none';
                 if (t === 'colors') loadColors();
                 if (t === 'emails') loadEmails();
+                if (t === 'shipping') loadShippingZones();
             });
         });
 
@@ -3237,6 +3250,80 @@
         document.getElementById('emailModalOverlay').addEventListener('click', (e) => {
             if (e.target === e.currentTarget) window.closeEmailModal();
         });
+
+        // ═══════════════════════════════════════════════
+        //  ZONAS DE ENVÍO
+        // ═══════════════════════════════════════════════
+        function cpRangesLabel(ranges) {
+            if (!ranges || !ranges.length) return 'Sin rangos';
+            return ranges.map(r => `CP ${r.from}–${r.to}`).join('  ·  ');
+        }
+
+        async function loadShippingZones() {
+            const container = document.getElementById('shippingZonesContainer');
+            container.innerHTML = 'Cargando...';
+            try {
+                const res = await fetch(`${API}/shipping_zones.php`, { credentials: 'same-origin' });
+                const d = await res.json();
+                if (isUnauthorizedResponse(res, d)) { handleAdminUnauthorized(); return; }
+                if (!res.ok) throw new Error(d.error || 'Error cargando zonas');
+
+                if (!d.zones || d.zones.length === 0) {
+                    container.innerHTML = '<p style="color:var(--text-muted)">No hay zonas configuradas.</p>';
+                    return;
+                }
+
+                container.innerHTML = d.zones.map(z => `
+                    <div class="admin-form-card" style="margin-bottom:var(--space-lg)">
+                        <div style="display:flex;align-items:baseline;gap:var(--space-md);margin-bottom:var(--space-sm)">
+                            <span style="font-size:1.05rem;font-weight:700;font-family:var(--font-heading)">${esc(z.name)}</span>
+                            <span style="font-size:0.82rem;color:var(--text-muted)">${esc(z.description || '')}</span>
+                        </div>
+                        <div style="font-size:0.8rem;color:var(--text-muted);background:var(--bg-elevated);padding:0.35rem 0.75rem;border-radius:var(--border-radius-sm);display:inline-block;margin-bottom:var(--space-lg)">
+                            ${esc(cpRangesLabel(z.cp_ranges))}
+                        </div>
+                        <div style="display:grid;grid-template-columns:160px 1fr auto;gap:var(--space-md);align-items:end">
+                            <div class="form-group" style="margin:0">
+                                <label class="form-label">Precio ($)</label>
+                                <input type="number" class="form-input" id="sz-price-${z.id}" value="${z.price}" min="0" step="50">
+                            </div>
+                            <div class="form-group" style="margin:0">
+                                <label class="form-label">Plazo estimado</label>
+                                <input type="text" class="form-input" id="sz-days-${z.id}" value="${escAttr(z.days)}" placeholder="Ej: 3 a 5 días hábiles">
+                            </div>
+                            <button class="btn btn-primary btn-sm" onclick="saveShippingZone(${z.id})">Guardar</button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch(e) {
+                container.innerHTML = `<p style="color:var(--accent)">Error al cargar las zonas de envío.</p>`;
+            }
+        }
+
+        window.saveShippingZone = async function(id) {
+            const price = parseFloat(document.getElementById(`sz-price-${id}`)?.value || 0);
+            const days  = (document.getElementById(`sz-days-${id}`)?.value || '').trim();
+            const alertEl = document.getElementById('shippingZonesAlert');
+
+            try {
+                const res = await fetch(`${API}/shipping_zones.php?id=${id}`, {
+                    method: 'PUT',
+                    credentials: 'same-origin',
+                    headers: authHeaders({ 'Content-Type': 'application/json' }),
+                    body: JSON.stringify({ price, days }),
+                });
+                const d = await res.json();
+                if (isUnauthorizedResponse(res, d)) { handleAdminUnauthorized(); return; }
+                if (!res.ok) throw new Error(d.error || 'Error al guardar');
+
+                alertEl.style.cssText = 'display:block;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.3);color:#25D366;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-xl)';
+                alertEl.textContent = '✓ Zona guardada correctamente.';
+                setTimeout(() => { alertEl.style.display = 'none'; }, 3000);
+            } catch(e) {
+                alertEl.style.cssText = 'display:block;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-xl)';
+                alertEl.textContent = '✗ Error al guardar: ' + e.message;
+            }
+        };
 
         // Init
         checkAuth();
