@@ -317,7 +317,7 @@ select {
   display: flex;
   align-items: center;
   transition: all var(--transition-base);
-  background: transparent;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, transparent 100%);
 }
 
 .header.scrolled {
