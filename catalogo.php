@@ -1,13 +1,13 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-        content="Catálogo de productos de impresión 3D de PrintingBruno. Figuras, decoración, piezas funcionales y más.">
-    <title>Catálogo | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260803-2">
+        content="CatÃ¡logo de productos de impresiÃ³n 3D de PrintingBruno. Figuras, decoraciÃ³n, piezas funcionales y mÃ¡s.">
+    <title>CatÃ¡logo | PrintingBruno</title>
+    <link rel="stylesheet" href="css/styles.css?v=20260803-3">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';
@@ -23,11 +23,11 @@
     <!-- PAGE HEADER -->
     <section class="page-header">
         <div class="container">
-            <h1 class="page-title">Nuestro <span class="accent-text">Catálogo</span></h1>
+            <h1 class="page-title">Nuestro <span class="accent-text">CatÃ¡logo</span></h1>
             <div class="page-breadcrumb">
                 <a href="index.html">Inicio</a>
                 <span class="separator">/</span>
-                <span>Catálogo</span>
+                <span>CatÃ¡logo</span>
             </div>
         </div>
     </section>
@@ -44,7 +44,7 @@
                                 stroke-width="2">
                                 <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
                             </svg>
-                            Categorías
+                            CategorÃ­as
                         </h3>
                         <label class="filter-option active" data-filter="all">
                             <input type="radio" name="category" value="all" checked> Todos los productos
@@ -71,7 +71,7 @@
                                     <option value="name-desc">Nombre Z-A</option>
                                     <option value="price-asc">Precio: Menor a Mayor</option>
                                     <option value="price-desc">Precio: Mayor a Menor</option>
-                                    <option value="newest">Más recientes</option>
+                                    <option value="newest">MÃ¡s recientes</option>
                                 </select>
                             </label>
                         </div>
@@ -96,7 +96,7 @@
                             <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
                         </svg>
                         <input type="text" id="catalogSearch" class="catalog-search-input" placeholder="Buscar productos..." autocomplete="off">
-                        <button class="catalog-search-clear" id="catalogSearchClear" type="button" aria-label="Limpiar búsqueda" style="display:none">✕</button>
+                        <button class="catalog-search-clear" id="catalogSearchClear" type="button" aria-label="Limpiar bÃºsqueda" style="display:none">âœ•</button>
                     </div>
 
                     <div class="products-grid" id="catalogGrid">
@@ -112,7 +112,7 @@
         <div class="cta-bg"></div>
         <div class="container">
             <div class="cta-content reveal">
-                <h2 class="cta-title">¿No encontrás lo que buscás?</h2>
+                <h2 class="cta-title">Â¿No encontrÃ¡s lo que buscÃ¡s?</h2>
                 <p class="cta-text">Podemos crear cualquier pieza a medida. Escribinos y contanos tu idea.</p>
                 <div class="cta-buttons">
                     <a href="https://wa.me/5491137022937?text=Hola!%20Quiero%20un%20producto%20personalizado"

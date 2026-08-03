@@ -1,12 +1,12 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Conocé a PrintingBruno - Impresión 3D de alta calidad.">
+    <meta name="description" content="ConocÃ© a PrintingBruno - ImpresiÃ³n 3D de alta calidad.">
     <title>Nosotros | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260803-2">
+    <link rel="stylesheet" href="css/styles.css?v=20260803-3">
     <link rel="icon" type="image/jpeg" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';
@@ -32,14 +32,14 @@
             <div class="about-hero">
                 <div class="about-text reveal">
                     <h2>Hola, somos <span class="accent-text">PrintingBruno</span></h2>
-                    <p>Estamos en General Pacheco y nos apasiona la tecnología 3D. Creamos piezas funcionales,
-                        prototipos y objetos personalizados con la máxima dedicación.</p>
-                    <p>Además de imprimir tus ideas, somos tu punto de referencia en Zona Norte para conseguir insumos
+                    <p>Estamos en General Pacheco y nos apasiona la tecnologÃ­a 3D. Creamos piezas funcionales,
+                        prototipos y objetos personalizados con la mÃ¡xima dedicaciÃ³n.</p>
+                    <p>AdemÃ¡s de imprimir tus ideas, somos tu punto de referencia en Zona Norte para conseguir insumos
                         y filamentos. Queremos que tu impresora nunca se detenga, por eso te asesoramos de forma
                         personalizada para que te lleves siempre lo mejor.</p>
-                    <p>¡Escribinos y materialicemos ese proyecto!</p>
+                    <p>Â¡Escribinos y materialicemos ese proyecto!</p>
                     <div style="margin-top: var(--space-xl); display: flex; gap: var(--space-md); flex-wrap: wrap;">
-                        <a href="catalogo.html" class="btn btn-primary">Ver Catálogo</a>
+                        <a href="catalogo.html" class="btn btn-primary">Ver CatÃ¡logo</a>
                         <a href="contacto.html" class="btn btn-secondary">Contactanos</a>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
         style="background: var(--bg-secondary); border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle);">
         <div class="container">
             <h2 class="section-title reveal">Nuestro <span class="accent-text">Proceso</span></h2>
-            <p class="section-subtitle reveal">Así trabajamos para que tu idea se convierta en realidad.</p>
+            <p class="section-subtitle reveal">AsÃ­ trabajamos para que tu idea se convierta en realidad.</p>
             <div class="features-grid">
                 <div class="feature-card reveal reveal-delay-1">
                     <div class="feature-icon">
@@ -64,7 +64,7 @@
                             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                         </svg>
                     </div>
-                    <h3 class="feature-title">Consultá</h3>
+                    <h3 class="feature-title">ConsultÃ¡</h3>
                     <p class="feature-text">Escribinos por WhatsApp o Instagram con tu idea, fotos o archivos 3D.</p>
                 </div>
                 <div class="feature-card reveal reveal-delay-2">
@@ -76,8 +76,8 @@
                             <circle cx="11" cy="11" r="2"></circle>
                         </svg>
                     </div>
-                    <h3 class="feature-title">Diseñamos</h3>
-                    <p class="feature-text">Preparamos el diseño 3D y te enviamos una vista previa para aprobación.</p>
+                    <h3 class="feature-title">DiseÃ±amos</h3>
+                    <p class="feature-text">Preparamos el diseÃ±o 3D y te enviamos una vista previa para aprobaciÃ³n.</p>
                 </div>
                 <div class="feature-card reveal reveal-delay-3">
                     <div class="feature-icon">
@@ -89,7 +89,7 @@
                         </svg>
                     </div>
                     <h3 class="feature-title">Imprimimos</h3>
-                    <p class="feature-text">Configuramos la impresora con los mejores parámetros para máxima calidad.
+                    <p class="feature-text">Configuramos la impresora con los mejores parÃ¡metros para mÃ¡xima calidad.
                     </p>
                 </div>
                 <div class="feature-card reveal reveal-delay-4">
@@ -102,7 +102,7 @@
                         </svg>
                     </div>
                     <h3 class="feature-title">Entregamos</h3>
-                    <p class="feature-text">Limpiamos, terminamos y empaquetamos. Envíos a todo el país o retiro.</p>
+                    <p class="feature-text">Limpiamos, terminamos y empaquetamos. EnvÃ­os a todo el paÃ­s o retiro.</p>
                 </div>
             </div>
         </div>
@@ -110,7 +110,7 @@
 
     <section class="section">
         <div class="container">
-            <h2 class="section-title reveal">Nuestros <span class="accent-text">Números</span></h2>
+            <h2 class="section-title reveal">Nuestros <span class="accent-text">NÃºmeros</span></h2>
             <div class="features-grid reveal">
                 <div class="feature-card" style="text-align:center">
                     <div style="font-size:2.5rem;font-weight:900;font-family:var(--font-heading);color:var(--accent);margin-bottom:var(--space-sm)"
@@ -125,12 +125,12 @@
                 <div class="feature-card" style="text-align:center">
                     <div style="font-size:2.5rem;font-weight:900;font-family:var(--font-heading);color:var(--accent);margin-bottom:var(--space-sm)"
                         data-count="50" class="counter">0+</div>
-                    <p class="feature-text">Diseños únicos</p>
+                    <p class="feature-text">DiseÃ±os Ãºnicos</p>
                 </div>
                 <div class="feature-card" style="text-align:center">
                     <div style="font-size:2.5rem;font-weight:900;font-family:var(--font-heading);color:var(--accent);margin-bottom:var(--space-sm)"
                         data-count="3" class="counter">0+</div>
-                    <p class="feature-text">Años de experiencia</p>
+                    <p class="feature-text">AÃ±os de experiencia</p>
                 </div>
             </div>
         </div>
@@ -140,7 +140,7 @@
         <div class="cta-bg"></div>
         <div class="container">
             <div class="cta-content reveal">
-                <h2 class="cta-title">¿Querés trabajar con nosotros?</h2>
+                <h2 class="cta-title">Â¿QuerÃ©s trabajar con nosotros?</h2>
                 <p class="cta-text">Contactanos y contanos tu idea. Te asesoramos sin compromiso.</p>
                 <div class="cta-buttons"><a href="https://wa.me/5491137022937?text=Hola!" target="_blank"
                         class="btn btn-whatsapp btn-lg">Escribinos por WhatsApp</a></div>

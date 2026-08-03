@@ -317,7 +317,13 @@ select {
   display: flex;
   align-items: center;
   transition: all var(--transition-base);
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.55) 0%, transparent 100%);
+  background: rgba(10, 10, 20, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.header:not(.scrolled) .nav-link {
+  color: rgba(255, 255, 255, 0.88);
 }
 
 .header.scrolled {

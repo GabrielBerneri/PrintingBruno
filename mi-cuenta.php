@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 $accountPageStatus = null;
 
 if (!empty($_GET['verify'])) {
@@ -52,18 +52,18 @@ if ($verifiedState === 'success') {
     $accountPageStatus = [
         'type' => 'success',
         'message' => $claimedOrders > 0
-            ? "Tu cuenta ya quedó verificada. Además vinculamos {$claimedOrders} pedido(s) hecho(s) como invitado."
-            : 'Tu cuenta ya quedó verificada.',
+            ? "Tu cuenta ya quedÃ³ verificada. AdemÃ¡s vinculamos {$claimedOrders} pedido(s) hecho(s) como invitado."
+            : 'Tu cuenta ya quedÃ³ verificada.',
     ];
 } elseif ($verifiedState === 'invalid') {
     $accountPageStatus = [
         'type' => 'error',
-        'message' => 'El enlace de verificación es inválido o ya venció.',
+        'message' => 'El enlace de verificaciÃ³n es invÃ¡lido o ya venciÃ³.',
     ];
 } elseif ($verifiedState === 'error') {
     $accountPageStatus = [
         'type' => 'error',
-        'message' => 'No se pudo verificar la cuenta. Intentá nuevamente.',
+        'message' => 'No se pudo verificar la cuenta. IntentÃ¡ nuevamente.',
     ];
 }
 ?>
@@ -75,7 +75,7 @@ if ($verifiedState === 'success') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Mi cuenta | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260803-2">
+    <link rel="stylesheet" href="css/styles.css?v=20260803-3">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';
@@ -794,7 +794,7 @@ if ($verifiedState === 'success') {
             <div class="account-hero">
                 <span class="account-banner">Cuenta cliente</span>
                 <h1>Tu cuenta, pedidos y datos en un solo lugar.</h1>
-                <p>Iniciá sesión para ver tus pedidos, actualizar tus datos, administrar direcciones y volver a comprar sin repetir información.</p>
+                <p>IniciÃ¡ sesiÃ³n para ver tus pedidos, actualizar tus datos, administrar direcciones y volver a comprar sin repetir informaciÃ³n.</p>
             </div>
             <?php if ($accountPageStatus): ?>
                 <div class="account-page-status" data-type="<?php echo htmlspecialchars($accountPageStatus['type'], ENT_QUOTES, 'UTF-8'); ?>">
@@ -818,7 +818,7 @@ if ($verifiedState === 'success') {
                                 <input class="form-input" id="loginEmail" type="email" autocomplete="email" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label" for="loginPassword">Contraseña</label>
+                                <label class="form-label" for="loginPassword">ContraseÃ±a</label>
                                 <input class="form-input" id="loginPassword" type="password" autocomplete="current-password" required>
                             </div>
                             <button class="btn btn-primary" type="submit">Ingresar</button>
@@ -843,7 +843,7 @@ if ($verifiedState === 'success') {
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label class="form-label" for="registerPhone">Teléfono</label>
+                                <label class="form-label" for="registerPhone">TelÃ©fono</label>
                                 <input class="form-input" id="registerPhone" type="tel" autocomplete="tel">
                             </div>
                             <div class="form-group">
@@ -855,14 +855,14 @@ if ($verifiedState === 'success') {
                                 <input class="form-input" id="registerEmailConfirm" type="email" autocomplete="email" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label" for="registerPassword">Contraseña</label>
+                                <label class="form-label" for="registerPassword">ContraseÃ±a</label>
                                 <input class="form-input" id="registerPassword" type="password" autocomplete="new-password" minlength="12" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label" for="registerPasswordConfirm">Repetir contraseña</label>
+                                <label class="form-label" for="registerPasswordConfirm">Repetir contraseÃ±a</label>
                                 <input class="form-input" id="registerPasswordConfirm" type="password" autocomplete="new-password" minlength="12" required>
                             </div>
-                            <p class="account-note">El email se usa para validar tu cuenta. La contraseña debe tener al menos 12 caracteres, con letras y números.</p>
+                            <p class="account-note">El email se usa para validar tu cuenta. La contraseÃ±a debe tener al menos 12 caracteres, con letras y nÃºmeros.</p>
                             <button class="btn btn-primary" type="submit">Crear cuenta</button>
                             <div class="account-message" id="registerMessage"></div>
                         </form>
@@ -874,7 +874,7 @@ if ($verifiedState === 'success') {
                                 <label class="form-label" for="resetEmail">Email de la cuenta</label>
                                 <input class="form-input" id="resetEmail" type="email" autocomplete="email" required>
                             </div>
-                            <button class="btn btn-secondary" type="submit">Solicitar recuperación</button>
+                            <button class="btn btn-secondary" type="submit">Solicitar recuperaciÃ³n</button>
                             <div class="account-message" id="resetMessage"></div>
                         </form>
                     </div>
@@ -884,14 +884,14 @@ if ($verifiedState === 'success') {
                             <input type="hidden" id="resetPasswordToken">
                             <input type="email" id="resetPasswordUsername" autocomplete="username" hidden>
                             <div class="form-group">
-                                <label class="form-label" for="resetNewPassword">Nueva contraseña</label>
+                                <label class="form-label" for="resetNewPassword">Nueva contraseÃ±a</label>
                                 <input class="form-input" id="resetNewPassword" type="password" autocomplete="new-password" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label" for="resetConfirmPassword">Confirmar contraseña</label>
+                                <label class="form-label" for="resetConfirmPassword">Confirmar contraseÃ±a</label>
                                 <input class="form-input" id="resetConfirmPassword" type="password" autocomplete="new-password" required>
                             </div>
-                            <button class="btn btn-primary" type="submit">Cambiar contraseña</button>
+                            <button class="btn btn-primary" type="submit">Cambiar contraseÃ±a</button>
                             <div class="account-message" id="resetPasswordMessage"></div>
                         </form>
                     </div>
@@ -901,17 +901,17 @@ if ($verifiedState === 'success') {
                     <div class="dashboard-shell">
                         <div class="dashboard-head">
                             <div>
-                                <span class="account-banner" style="margin-bottom:var(--space-sm)">Sesión activa</span>
+                                <span class="account-banner" style="margin-bottom:var(--space-sm)">SesiÃ³n activa</span>
                                 <h2 style="font-family:var(--font-heading);margin:0" id="customerGreeting">Hola</h2>
                                 <p id="sessionMeta" style="margin:6px 0 0;color:var(--text-muted);font-size:0.86rem" hidden></p>
                             </div>
-                            <button class="btn btn-secondary btn-sm" id="logoutBtn" type="button">Cerrar sesión</button>
+                            <button class="btn btn-secondary btn-sm" id="logoutBtn" type="button">Cerrar sesiÃ³n</button>
                         </div>
 
                         <div class="account-verification-banner" id="accountVerificationNotice" hidden>
                             <div>
-                                <strong>Verificá tu email para terminar de activar la cuenta</strong>
-                                <p>Mientras tanto podés navegar y ver tu cuenta, pero la verificación te permite recuperar acceso y vincular pedidos hechos como invitado con más seguridad.</p>
+                                <strong>VerificÃ¡ tu email para terminar de activar la cuenta</strong>
+                                <p>Mientras tanto podÃ©s navegar y ver tu cuenta, pero la verificaciÃ³n te permite recuperar acceso y vincular pedidos hechos como invitado con mÃ¡s seguridad.</p>
                                 <div class="account-verification-message" id="verificationMessage" hidden></div>
                             </div>
                             <button class="btn btn-primary btn-sm" id="resendVerificationBtn" type="button">Reenviar email</button>
@@ -925,9 +925,9 @@ if ($verifiedState === 'success') {
 
                         <div class="dashboard-panel" data-dashboard-panel="orders">
                             <div class="orders-overview" id="ordersOverview">
-                                <div class="orders-overview-card"><strong>Total pedidos</strong><span id="ordersOverviewTotal">—</span></div>
-                                <div class="orders-overview-card"><strong>Pendientes de pago</strong><span id="ordersOverviewPending">—</span></div>
-                                <div class="orders-overview-card"><strong>Enviados</strong><span id="ordersOverviewShipped">—</span></div>
+                                <div class="orders-overview-card"><strong>Total pedidos</strong><span id="ordersOverviewTotal">â€”</span></div>
+                                <div class="orders-overview-card"><strong>Pendientes de pago</strong><span id="ordersOverviewPending">â€”</span></div>
+                                <div class="orders-overview-card"><strong>Enviados</strong><span id="ordersOverviewShipped">â€”</span></div>
                             </div>
                             <div class="orders-toolbar">
                                 <div class="orders-filters" id="ordersFilters">
@@ -964,33 +964,33 @@ if ($verifiedState === 'success') {
                                     <input class="form-input" id="profileEmail" type="email" autocomplete="email" required>
                                 </div>
                                 <div class="form-group">
-                                    <label class="form-label" for="profilePhone">Teléfono</label>
+                                    <label class="form-label" for="profilePhone">TelÃ©fono</label>
                                     <input class="form-input" id="profilePhone" type="tel" autocomplete="tel">
                                 </div>
                                 <button class="btn btn-primary" type="submit">Guardar cambios</button>
                                 <div class="account-message" id="profileMessage"></div>
                             </form>
                             <div class="account-subpanel">
-                                <h3>Cambiar contraseña</h3>
-                                <p>Usá tu contraseña actual para definir una nueva clave de acceso para tu cuenta.</p>
+                                <h3>Cambiar contraseÃ±a</h3>
+                                <p>UsÃ¡ tu contraseÃ±a actual para definir una nueva clave de acceso para tu cuenta.</p>
                                 <form class="account-form" id="passwordForm">
                                     <input type="email" id="passwordUsername" autocomplete="username" hidden>
                                     <div class="form-group">
-                                        <label class="form-label" for="currentPassword">Contraseña actual</label>
+                                        <label class="form-label" for="currentPassword">ContraseÃ±a actual</label>
                                         <input class="form-input" id="currentPassword" type="password" autocomplete="current-password" required>
                                     </div>
                                     <div class="form-row">
                                         <div class="form-group">
-                                            <label class="form-label" for="newPassword">Nueva contraseña</label>
+                                            <label class="form-label" for="newPassword">Nueva contraseÃ±a</label>
                                             <input class="form-input" id="newPassword" type="password" autocomplete="new-password" minlength="12" required>
                                         </div>
                                         <div class="form-group">
-                                            <label class="form-label" for="newPasswordConfirm">Repetir nueva contraseña</label>
+                                            <label class="form-label" for="newPasswordConfirm">Repetir nueva contraseÃ±a</label>
                                             <input class="form-input" id="newPasswordConfirm" type="password" autocomplete="new-password" minlength="12" required>
                                         </div>
                                     </div>
-                                    <p class="account-note">La nueva contraseña debe tener al menos 12 caracteres, con letras y números.</p>
-                                    <button class="btn btn-primary" type="submit">Actualizar contraseña</button>
+                                    <p class="account-note">La nueva contraseÃ±a debe tener al menos 12 caracteres, con letras y nÃºmeros.</p>
+                                    <button class="btn btn-primary" type="submit">Actualizar contraseÃ±a</button>
                                     <div class="account-message" id="passwordMessage"></div>
                                 </form>
                             </div>
@@ -1030,11 +1030,11 @@ if ($verifiedState === 'success') {
                                         </div>
                                         <div class="form-row">
                                             <div class="form-group">
-                                                <label class="form-label" for="addressPostalCode">Código postal</label>
+                                                <label class="form-label" for="addressPostalCode">CÃ³digo postal</label>
                                                 <input class="form-input" id="addressPostalCode" type="text">
                                             </div>
                                             <div class="form-group">
-                                                <label class="form-label" for="addressPhone">Teléfono</label>
+                                                <label class="form-label" for="addressPhone">TelÃ©fono</label>
                                                 <input class="form-input" id="addressPhone" type="tel">
                                             </div>
                                         </div>
@@ -1044,10 +1044,10 @@ if ($verifiedState === 'success') {
                                         </div>
                                         <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer">
                                             <input type="checkbox" id="addressDefault">
-                                            Dirección principal
+                                            DirecciÃ³n principal
                                         </label>
                                         <div style="display:flex;gap:var(--space-sm);flex-wrap:wrap">
-                                            <button class="btn btn-primary" type="submit">Guardar dirección</button>
+                                            <button class="btn btn-primary" type="submit">Guardar direcciÃ³n</button>
                                             <button class="btn btn-secondary" type="button" id="addressResetBtn">Limpiar</button>
                                         </div>
                                         <div class="account-message" id="addressMessage"></div>
