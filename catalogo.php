@@ -7,7 +7,7 @@
     <meta name="description"
         content="Catálogo de productos de impresión 3D de PrintingBruno. Figuras, decoración, piezas funcionales y más.">
     <title>Catálogo | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260802-3">
+    <link rel="stylesheet" href="css/styles.css?v=20260803-1">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';
@@ -131,9 +131,9 @@
     <?php pb_render_footer(); ?>
     <?php pb_render_cart_drawer(); ?>
 
-    <script src="js/cart.js?v=20260802-3"></script>
+    <script src="js/cart.js?v=20260803-1"></script>
     <script src="js/products.js?v=20260331-1"></script>
-    <script src="js/main.js?v=20260802-3"></script>
+    <script src="js/main.js?v=20260803-1"></script>
     <script>Products.loadCatalog('catalogGrid');</script>
 </body>
 

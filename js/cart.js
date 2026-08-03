@@ -250,6 +250,16 @@ const Cart = {
             if (phoneInput && !phoneInput.value.trim()) phoneInput.value = String(context.customer.phone || '').trim();
         }
 
+        // Listener en campo código postal para cotizar envío al salir del campo
+        const postalInput = overlay.querySelector('#checkoutPostalCode');
+        if (postalInput) {
+            postalInput.addEventListener('blur', () => {
+                if (postalInput.value.trim()) {
+                    this.fetchShippingQuote(postalInput.value, overlay);
+                }
+            });
+        }
+
         if (!savedAddressGroup || !savedAddressSelect) {
             return;
         }
@@ -273,17 +283,26 @@ const Cart = {
         if (defaultAddress) {
             savedAddressSelect.value = String(defaultAddress.id);
             this.applyCheckoutAddressToForm(defaultAddress);
+            // Cotizar automáticamente con la dirección por defecto
+            if (defaultAddress.postal_code) {
+                this.fetchShippingQuote(defaultAddress.postal_code, overlay);
+            }
         }
 
         savedAddressSelect.addEventListener('change', () => {
             const selectedId = Number(savedAddressSelect.value || 0);
             if (!selectedId) {
                 this.applyCheckoutAddressToForm({});
+                const wrap = overlay.querySelector('#shippingOptionsWrap');
+                if (wrap) wrap.innerHTML = '';
                 return;
             }
             const selected = context.addresses.find(address => Number(address.id) === selectedId);
             if (selected) {
                 this.applyCheckoutAddressToForm(selected);
+                if (selected.postal_code) {
+                    this.fetchShippingQuote(selected.postal_code, overlay);
+                }
             }
         });
     },
@@ -391,7 +410,7 @@ const Cart = {
             shippingNotice.style.textAlign = 'center';
             shippingNotice.style.marginTop = '0.75rem';
             shippingNotice.style.marginBottom = '0';
-            shippingNotice.textContent = 'El costo de envío se coordina por WhatsApp.';
+            shippingNotice.textContent = 'El costo de envío se calcula al ingresar tu código postal.';
             footer.appendChild(shippingNotice);
         }
 
@@ -515,6 +534,7 @@ const Cart = {
               <input type="text" class="form-input" id="checkoutPostalCode" placeholder=" " required>
               <label class="form-floating-label" for="checkoutPostalCode">Código postal</label>
             </div>
+            <div id="shippingOptionsWrap" style="margin-top:0.75rem;"></div>
           </div>
           <div class="form-floating-group" style="margin-bottom: var(--space-xl);">
             <textarea class="form-input" id="checkoutNotes" placeholder=" " rows="2" style="resize: vertical; min-height: 50px;"></textarea>
@@ -545,7 +565,7 @@ const Cart = {
             </div>
             <div class="checkout-summary-row" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-muted);">
               <span>Envío</span>
-              <span>A coordinar</span>
+              <span id="checkoutShippingDisplay">Ingresá tu código postal</span>
             </div>
             <div class="checkout-summary-row" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--border);">
               <span><strong>Total</strong></span>
@@ -586,14 +606,12 @@ const Cart = {
 
                 const descuento = this.getTransferDiscountAmount();
                 if (isDescuento && descuento > 0) {
-                    const totalFinal = Math.round((subtotal - descuento) * 100) / 100;
                     discountRow.style.display = '';
                     discountAmountEl.textContent = `-$${descuento.toLocaleString('es-AR')}`;
-                    totalEl.textContent = `$${totalFinal.toLocaleString('es-AR')}`;
                 } else {
                     discountRow.style.display = 'none';
-                    totalEl.textContent = `$${subtotal.toLocaleString('es-AR')}`;
                 }
+                this.updateShippingTotal(overlay);
 
                 if (e.target.value === 'mercadopago') {
                     submitBtn.innerHTML = `
@@ -675,6 +693,10 @@ const Cart = {
                             phone: document.getElementById('checkoutPhone').value,
                         },
                         shipping_address: this.buildCheckoutShippingPayload(),
+                        shipping_option: (() => {
+                            const sel = document.querySelector('input[name="shippingOption"]:checked');
+                            return sel ? { code: sel.value, name: sel.dataset.name, price: Number(sel.dataset.price || 0) } : null;
+                        })(),
                         notes: document.getElementById('checkoutNotes')?.value || '',
                         payment_method: paymentMethod,
                         idempotency_key: this.getCheckoutToken()
@@ -721,6 +743,67 @@ const Cart = {
                 console.error('Checkout error:', err);
             }
         });
+    },
+
+    // ===== Shipping Quote =====
+    async fetchShippingQuote(postalCode, overlay) {
+        const cp = String(postalCode || '').replace(/\D/g, '');
+        const wrap = overlay.querySelector('#shippingOptionsWrap');
+        const display = overlay.querySelector('#checkoutShippingDisplay');
+        if (!wrap || cp.length < 4) return;
+
+        wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--text-muted);margin:0.25rem 0 0">Calculando costo de envío...</p>';
+        if (display) display.textContent = 'Calculando...';
+
+        try {
+            const res = await fetch(`${this.getApiBase()}/shipping_quote.php?postal_code=${encodeURIComponent(cp)}`);
+            const data = await res.json();
+
+            if (!data.options || !data.options.length) {
+                wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--text-muted);margin:0.25rem 0 0">El costo de envío se coordinará por WhatsApp.</p>';
+                if (display) display.textContent = 'A coordinar';
+                return;
+            }
+
+            wrap.innerHTML = data.options.map((opt, i) => `
+                <label style="display:flex;align-items:center;gap:0.5rem;margin-top:0.4rem;font-size:0.88rem;cursor:pointer;">
+                    <input type="radio" name="shippingOption" value="${this.escapeAttr(opt.code)}"
+                           data-price="${Number(opt.price)}" data-name="${this.escapeAttr(opt.name)}"
+                           ${i === 0 ? 'checked' : ''}>
+                    <span style="flex:1">${this.escapeHTML(opt.name)}</span>
+                    <strong>$${Number(opt.price).toLocaleString('es-AR')}</strong>
+                    <span style="font-size:0.75rem;color:var(--text-muted)">${this.escapeHTML(opt.days)}</span>
+                </label>
+            `).join('');
+
+            wrap.querySelectorAll('input[name="shippingOption"]').forEach(r =>
+                r.addEventListener('change', () => this.updateShippingTotal(overlay))
+            );
+
+            this.updateShippingTotal(overlay);
+        } catch (_) {
+            wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--text-muted);margin:0.25rem 0 0">El costo de envío se coordinará por WhatsApp.</p>';
+            if (display) display.textContent = 'A coordinar';
+        }
+    },
+
+    updateShippingTotal(overlay) {
+        const selected = overlay.querySelector('input[name="shippingOption"]:checked');
+        const display = overlay.querySelector('#checkoutShippingDisplay');
+        const totalEl = overlay.querySelector('#checkoutTotal');
+
+        const shippingPrice = selected ? Number(selected.dataset.price || 0) : 0;
+        const subtotal = this.getTotal();
+        const paymentMethod = overlay.querySelector('input[name="checkoutPayment"]:checked')?.value || 'mercadopago';
+        const discount = ['transferencia', 'efectivo'].includes(paymentMethod) ? this.getTransferDiscountAmount() : 0;
+        const total = Math.round((subtotal - discount + shippingPrice) * 100) / 100;
+
+        if (display) {
+            display.textContent = shippingPrice > 0
+                ? `$${shippingPrice.toLocaleString('es-AR')}`
+                : 'A coordinar';
+        }
+        if (totalEl) totalEl.textContent = `$${total.toLocaleString('es-AR')}`;
     },
 
     // ===== HTML Escaping (anti-XSS) =====

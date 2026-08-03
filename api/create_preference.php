@@ -251,6 +251,20 @@ try {
         $orderItems[] = $orderItem;
     }
     
+    // Agregar costo de envío al total
+    $shippingOption = isset($body['shipping_option']) && is_array($body['shipping_option']) ? $body['shipping_option'] : null;
+    $shippingCost = $shippingOption ? max(0, (float)($shippingOption['price'] ?? 0)) : 0;
+    if ($shippingCost > 0) {
+        $total += $shippingCost;
+        $mpItems[] = [
+            'id'          => 'shipping',
+            'title'       => $shippingOption['name'] ?? 'Envío',
+            'quantity'    => 1,
+            'unit_price'  => $shippingCost,
+            'currency_id' => 'ARS',
+        ];
+    }
+
     // Create order in DB
     $linkedCustomerId = null;
     if ($customerSession && pbCustomerNormalizeEmail($body['customer']['email'] ?? '') === pbCustomerNormalizeEmail($customerSession['customer']['email'] ?? '')) {
@@ -323,6 +337,15 @@ try {
         $checkoutNotes = trim($body['notes'] ?? '');
         if ($checkoutNotes !== '' && pbHasColumn($db, 'orders', 'notes')) {
             $db->prepare("UPDATE orders SET notes = ? WHERE id = ?")->execute([$checkoutNotes, $orderId]);
+        }
+
+        // Guardar datos de la opción de envío elegida
+        if ($shippingCost > 0 && pbHasColumn($db, 'orders', 'shipping_cost')) {
+            $db->prepare("UPDATE orders SET shipping_cost = ? WHERE id = ?")->execute([$shippingCost, $orderId]);
+        }
+        $shippingMethodName = $shippingOption ? trim((string)($shippingOption['name'] ?? '')) : '';
+        if ($shippingMethodName !== '' && pbHasColumn($db, 'orders', 'shipping_method')) {
+            $db->prepare("UPDATE orders SET shipping_method = ? WHERE id = ?")->execute([$shippingMethodName, $orderId]);
         }
 
         // Insert order items
