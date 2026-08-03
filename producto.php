@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -44,7 +44,7 @@
             <div class="page-breadcrumb">
                 <a href="index.html">Inicio</a>
                 <span class="separator">/</span>
-                <a href="catalogo.html">CatÃ¡logo</a>
+                <a href="catalogo.html">Catálogo</a>
                 <span class="separator">/</span>
                 <span id="productBreadcrumbCurrent">Producto</span>
             </div>
@@ -55,7 +55,7 @@
         <div class="container">
             <div id="productDetailRoot" class="product-detail-empty">
                 <h2 style="font-family:var(--font-heading);margin-bottom:var(--space-md)">Cargando producto...</h2>
-                <p style="color:var(--text-secondary)">Estamos trayendo toda la informaciÃ³n del producto.</p>
+                <p style="color:var(--text-secondary)">Estamos trayendo toda la información del producto.</p>
             </div>
         </div>
     </section>
@@ -64,7 +64,7 @@
         <div class="cta-bg"></div>
         <div class="container">
             <div class="cta-content reveal">
-                <h2 class="cta-title">Â¿QuerÃ©s personalizar este producto?</h2>
+                <h2 class="cta-title">¿Querés personalizar este producto?</h2>
                 <p class="cta-text">Escribinos por WhatsApp y te ayudamos a llevarlo a tu idea exacta.</p>
                 <div class="cta-buttons">
                     <a href="https://wa.me/5491137022937?text=Hola!%20Quiero%20consultar%20por%20un%20producto" target="_blank" class="btn btn-whatsapp btn-lg">

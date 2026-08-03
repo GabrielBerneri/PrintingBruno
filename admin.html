@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -749,14 +749,14 @@
             <div class="logo" style="justify-content:center;margin-bottom:var(--space-xl)">
                 <img class="logo-icon" src="assets/logo/logo.png" alt="PrintingBruno">Printing<span>Bruno</span>
             </div>
-            <h1>Panel de AdministraciÃ³n</h1>
+            <h1>Panel de Administración</h1>
             <form id="loginForm">
                 <div class="form-group"><input type="text" class="form-input" id="loginUser" placeholder="Usuario" autocomplete="username" required></div>
-                <div class="form-group"><input type="password" class="form-input" id="loginPass" placeholder="ContraseÃ±a" autocomplete="current-password" required></div>
+                <div class="form-group"><input type="password" class="form-input" id="loginPass" placeholder="Contraseña" autocomplete="current-password" required></div>
                 <button type="submit" class="btn btn-primary btn-lg" style="width:100%" id="loginBtn">Ingresar</button>
                 <p id="loginError" style="color:#e74c3c;font-size:0.85rem;margin-top:var(--space-md);display:none"></p>
                 <p style="margin-top:var(--space-md);text-align:center">
-                    <a href="admin-reset.php" style="color:var(--text-secondary);font-size:0.85rem">OlvidÃ© mi contraseÃ±a</a>
+                    <a href="admin-reset.php" style="color:var(--text-secondary);font-size:0.85rem">Olvidé mi contraseña</a>
                 </p>
             </form>
         </div>
@@ -774,45 +774,45 @@
                         <span style="color:var(--text-secondary);font-size:0.9rem" id="adminUsername"></span>
                         <span class="admin-version-chip" id="adminVersion" style="display:none"></span>
                     </div>
-                    <button class="btn btn-secondary btn-sm" id="logoutBtn">Cerrar SesiÃ³n</button>
+                    <button class="btn btn-secondary btn-sm" id="logoutBtn">Cerrar Sesión</button>
                 </div>
             </div>
         </header>
 
         <div class="container" style="padding-top:calc(var(--header-height) + var(--space-2xl));padding-bottom:var(--space-3xl)">
             <h1 style="font-family:var(--font-heading);font-size:1.8rem;font-weight:800;margin-bottom:var(--space-xl)">
-                Panel de AdministraciÃ³n</h1>
+                Panel de Administración</h1>
 
 <div class="admin-tabs">
-                <button class="admin-tab active" data-tab="dashboard">ðŸ“Š Dashboard</button>
-                <button class="admin-tab" data-tab="products">ðŸ“¦ Productos</button>
-                <button class="admin-tab" data-tab="colors">ðŸŽ¨ Colores</button>
-                <button class="admin-tab" data-tab="orders">ðŸ§¾ Pedidos <span class="tab-badge" id="pendingBadge" style="display:none">0</span></button>
-                <button class="admin-tab" data-tab="emails">ðŸ“§ Correos</button>
-                <button class="admin-tab" data-tab="shipping">ðŸšš EnvÃ­os</button>
-                <button class="admin-tab" data-tab="settings">âš™ï¸ ConfiguraciÃ³n</button>
+                <button class="admin-tab active" data-tab="dashboard">📊 Dashboard</button>
+                <button class="admin-tab" data-tab="products">📦 Productos</button>
+                <button class="admin-tab" data-tab="colors">🎨 Colores</button>
+                <button class="admin-tab" data-tab="orders">🧾 Pedidos <span class="tab-badge" id="pendingBadge" style="display:none">0</span></button>
+                <button class="admin-tab" data-tab="emails">📧 Correos</button>
+                <button class="admin-tab" data-tab="shipping">🚚 Envíos</button>
+                <button class="admin-tab" data-tab="settings">⚙️ Configuración</button>
             </div>
 
             <!-- Dashboard Tab -->
             <div class="admin-panel" id="dashboardPanel">
                 <div class="kpi-grid" id="kpiGrid">
-                    <div class="kpi-card accent"><div class="kpi-icon">ðŸ’°</div><div class="kpi-value" id="kpiRevenue">â€”</div><div class="kpi-label">Ventas Cobradas</div></div>
-                    <div class="kpi-card success"><div class="kpi-icon">âœ…</div><div class="kpi-value" id="kpiApproved">â€”</div><div class="kpi-label">Cobros Confirmados</div></div>
-                    <div class="kpi-card warning"><div class="kpi-icon">â³</div><div class="kpi-value" id="kpiPending">â€”</div><div class="kpi-label">Cobros Pendientes</div></div>
-                    <div class="kpi-card"><div class="kpi-icon">ðŸ“¦</div><div class="kpi-value" id="kpiProducts">â€”</div><div class="kpi-label">Productos Activos</div></div>
-                    <div class="kpi-card danger"><div class="kpi-icon">âš ï¸</div><div class="kpi-value" id="kpiLowStock">â€”</div><div class="kpi-label">Stock Bajo (&lt;5)</div></div>
-                    <div class="kpi-card"><div class="kpi-icon">ðŸ“‹</div><div class="kpi-value" id="kpiTotalOrders">â€”</div><div class="kpi-label">Pedidos Totales</div></div>
+                    <div class="kpi-card accent"><div class="kpi-icon">💰</div><div class="kpi-value" id="kpiRevenue">—</div><div class="kpi-label">Ventas Cobradas</div></div>
+                    <div class="kpi-card success"><div class="kpi-icon">✅</div><div class="kpi-value" id="kpiApproved">—</div><div class="kpi-label">Cobros Confirmados</div></div>
+                    <div class="kpi-card warning"><div class="kpi-icon">⏳</div><div class="kpi-value" id="kpiPending">—</div><div class="kpi-label">Cobros Pendientes</div></div>
+                    <div class="kpi-card"><div class="kpi-icon">📦</div><div class="kpi-value" id="kpiProducts">—</div><div class="kpi-label">Productos Activos</div></div>
+                    <div class="kpi-card danger"><div class="kpi-icon">⚠️</div><div class="kpi-value" id="kpiLowStock">—</div><div class="kpi-label">Stock Bajo (&lt;5)</div></div>
+                    <div class="kpi-card"><div class="kpi-icon">📋</div><div class="kpi-value" id="kpiTotalOrders">—</div><div class="kpi-label">Pedidos Totales</div></div>
                 </div>
 
                 <div class="dashboard-grid">
                     <div class="dashboard-panel">
-                        <h3>ðŸ† MÃ¡s Vendidos</h3>
+                        <h3>🏆 Más Vendidos</h3>
                         <table class="mini-table" id="topProductsTable">
                             <tr><td colspan="3" style="text-align:center;color:var(--text-muted)">Cargando...</td></tr>
                         </table>
                     </div>
                     <div class="dashboard-panel">
-                        <h3>âš ï¸ Stock Bajo</h3>
+                        <h3>⚠️ Stock Bajo</h3>
                         <table class="mini-table" id="lowStockTable">
                             <tr><td colspan="3" style="text-align:center;color:var(--text-muted)">Cargando...</td></tr>
                         </table>
@@ -820,7 +820,7 @@
                 </div>
 
                 <div class="dashboard-panel">
-                    <h3>ðŸ• Ãšltimos Pedidos</h3>
+                    <h3>🕐 Últimos Pedidos</h3>
                     <table class="mini-table" id="recentOrdersTable">
                         <tr><td colspan="5" style="text-align:center;color:var(--text-muted)">Cargando...</td></tr>
                     </table>
@@ -836,11 +836,11 @@
 
                 <!-- Toolbar -->
                 <div class="toolbar">
-                    <input type="text" class="search-input" id="productSearch" placeholder="ðŸ” Buscar por nombre...">
+                    <input type="text" class="search-input" id="productSearch" placeholder="🔍 Buscar por nombre...">
                     <select id="filterCategory">
-                        <option value="">Todas las categorÃ­as</option>
+                        <option value="">Todas las categorías</option>
                         <option value="figuras">Figuras</option>
-                        <option value="decoracion">DecoraciÃ³n</option>
+                        <option value="decoracion">Decoración</option>
                         <option value="funcional">Funcional</option>
                         <option value="personalizado">Personalizado</option>
                         <option value="mates">Mates</option>
@@ -863,7 +863,7 @@
                     <div class="product-modal">
                         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
                             <h3 style="font-family:var(--font-heading);font-size:1.3rem;margin:0" id="productFormTitle">Nuevo Producto</h3>
-                            <button class="btn btn-secondary btn-sm" id="closeProductBtn" type="button" onclick="closeProductModal()">âœ•</button>
+                            <button class="btn btn-secondary btn-sm" id="closeProductBtn" type="button" onclick="closeProductModal()">✕</button>
                         </div>
                         <form id="productForm">
                             <input type="hidden" id="productId">
@@ -873,8 +873,8 @@
                                     <div id="imageUploadArea" style="border:2px dashed var(--border-subtle);border-radius:var(--border-radius);padding:var(--space-lg) var(--space-sm);text-align:center;cursor:pointer;transition:border-color 0.2s;position:relative;background:var(--bg-card)">
                                         <img id="imagePreview" src="" alt="Preview" style="max-height:160px;max-width:100%;display:none;margin:0 auto var(--space-sm);border-radius:var(--border-radius);object-fit:cover">
                                         <div id="imageUploadPlaceholder">
-                                            <div style="font-size:2rem;margin-bottom:var(--space-sm)">ðŸ–¼ï¸</div>
-                                            <div style="color:var(--text-secondary);font-size:0.85rem;line-height:1.4">ArrastrÃ¡ o<br><strong>hacÃ© click</strong><br>para agregar imÃ¡genes</div>
+                                            <div style="font-size:2rem;margin-bottom:var(--space-sm)">🖼️</div>
+                                            <div style="color:var(--text-secondary);font-size:0.85rem;line-height:1.4">Arrastrá o<br><strong>hacé click</strong><br>para agregar imágenes</div>
                                         </div>
                                         <div id="imageUploadStatus" style="display:none;font-size:0.8rem;margin-top:var(--space-sm)"></div>
                                         <input type="file" id="pImageFile" accept="image/jpeg,image/png,image/webp,image/gif" multiple style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">
@@ -886,7 +886,7 @@
                                     
                                     <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--border-radius);padding:var(--space-md);display:flex;flex-direction:column;gap:var(--space-md)">
                                         <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pActive" checked> Activo</label>
-                                        <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pFeatured"> Destacado â­</label>
+                                        <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pFeatured"> Destacado ⭐</label>
                                     </div>
                                 </div>
 
@@ -894,10 +894,10 @@
                                 <div style="flex:1;min-width:300px;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
                                     <div class="form-group" style="grid-column:1/-1"><label class="form-label">Nombre *</label><input type="text" class="form-input" id="pName" required></div>
                                     <div class="form-group"><label class="form-label">Precio *</label><input type="number" class="form-input" id="pPrice" step="0.01" required></div>
-                                    <div class="form-group"><label class="form-label">CategorÃ­a *</label>
+                                    <div class="form-group"><label class="form-label">Categoría *</label>
                                         <select class="form-select" id="pCategory" required>
                                             <option value="figuras">Figuras</option>
-                                            <option value="decoracion">DecoraciÃ³n</option>
+                                            <option value="decoracion">Decoración</option>
                                             <option value="funcional">Funcional</option>
                                             <option value="personalizado">Personalizado</option>
                                             <option value="mates">Mates</option>
@@ -910,24 +910,24 @@
                                     </div>
                                     <div class="form-group"><label class="form-label">Material</label><input type="text" class="form-input" id="pMaterial" value="PLA"></div>
                                     <div class="form-group"><label class="form-label">Stock total</label><input type="number" class="form-input" id="pStock" value="0" readonly></div>
-                                    <div class="form-group" style="grid-column:1/-1"><label class="form-label">Badge</label><input type="text" class="form-input" id="pBadge" placeholder="Ej: Nuevo, EdiciÃ³n Limitada"></div>
+                                    <div class="form-group" style="grid-column:1/-1"><label class="form-label">Badge</label><input type="text" class="form-input" id="pBadge" placeholder="Ej: Nuevo, Edición Limitada"></div>
                                     <div class="form-group" style="grid-column:1/-1">
                                         <label class="form-label" for="pTransferDiscount">% OFF transferencia/efectivo</label>
                                         <div style="display:flex;align-items:center;gap:var(--space-sm)">
                                             <input type="number" class="form-input" id="pTransferDiscount" min="0" max="100" step="1" value="0" style="max-width:90px;text-align:center">
-                                            <span style="color:var(--text-muted)">â†’</span>
+                                            <span style="color:var(--text-muted)">→</span>
                                             <span id="pTransferDiscountPreview" style="font-weight:600;color:var(--accent)">Sin descuento</span>
                                         </div>
                                         <div class="field-help">0 = sin descuento para este producto.</div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group" style="margin-top:var(--space-md)"><label class="form-label">DescripciÃ³n</label><textarea class="form-textarea" id="pDescription" rows="4"></textarea></div>
+                            <div class="form-group" style="margin-top:var(--space-md)"><label class="form-label">Descripción</label><textarea class="form-textarea" id="pDescription" rows="4"></textarea></div>
                             <div class="form-group" style="margin-top:var(--space-xl)">
                                 <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-md);margin-bottom:var(--space-md);flex-wrap:wrap">
                                     <div>
                                         <label class="form-label" style="margin-bottom:0">Variantes de color</label>
-                                        <div class="field-help">Cada variante define sus colores, stock y fotos. Si tiene mÃ¡s de una, el cliente deberÃ¡ elegir una opciÃ³n en la ficha del producto.</div>
+                                        <div class="field-help">Cada variante define sus colores, stock y fotos. Si tiene más de una, el cliente deberá elegir una opción en la ficha del producto.</div>
                                     </div>
                                     <button type="button" class="btn btn-secondary btn-sm" id="addVariantBtn">+ Agregar variante</button>
                                 </div>
@@ -946,10 +946,10 @@
                         <thead>
                             <tr>
                                 <th>Imagen</th>
-                                <th class="sortable" data-sort="name">Nombre <span class="sort-icon">â†•</span></th>
-                                <th class="sortable" data-sort="category">CategorÃ­a <span class="sort-icon">â†•</span></th>
-                                <th class="sortable" data-sort="price">Precio <span class="sort-icon">â†•</span></th>
-                                <th class="sortable" data-sort="stock">Stock <span class="sort-icon">â†•</span></th>
+                                <th class="sortable" data-sort="name">Nombre <span class="sort-icon">↕</span></th>
+                                <th class="sortable" data-sort="category">Categoría <span class="sort-icon">↕</span></th>
+                                <th class="sortable" data-sort="price">Precio <span class="sort-icon">↕</span></th>
+                                <th class="sortable" data-sort="stock">Stock <span class="sort-icon">↕</span></th>
                                 <th>Estado</th>
                                 <th>Acciones</th>
                             </tr>
@@ -1000,7 +1000,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Slug</label>
-                                <input type="text" class="form-input" id="colorSlug" placeholder="se completa solo si lo dejÃ¡s vacÃ­o">
+                                <input type="text" class="form-input" id="colorSlug" placeholder="se completa solo si lo dejás vacío">
                             </div>
                             <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
                                 <div class="form-group">
@@ -1034,23 +1034,23 @@
             <!-- Orders Tab -->
             <div class="admin-panel" id="ordersPanel" style="display:none">
                 <div class="admin-help-card">
-                    <span class="admin-help-kicker">CÃ³mo leer pedidos</span>
-                    <strong>Las listas te muestran un estado resumido. El detalle separa cobro y operaciÃ³n.</strong>
-                    <p>UsÃ¡ el resumen para entender rÃ¡pido quÃ© estÃ¡ pasando. EntrÃ¡ al detalle cuando necesites cambiar el cobro o avanzar el trabajo.</p>
+                    <span class="admin-help-kicker">Cómo leer pedidos</span>
+                    <strong>Las listas te muestran un estado resumido. El detalle separa cobro y operación.</strong>
+                    <p>Usá el resumen para entender rápido qué está pasando. Entrá al detalle cuando necesites cambiar el cobro o avanzar el trabajo.</p>
                     <div class="admin-help-grid">
                         <div>
                             <strong>Cobro</strong>
-                            <p>Indica si el pago estÃ¡ pendiente, en revisiÃ³n, aprobado, rechazado, cancelado o reembolsado.</p>
+                            <p>Indica si el pago está pendiente, en revisión, aprobado, rechazado, cancelado o reembolsado.</p>
                         </div>
                         <div>
-                            <strong>OperaciÃ³n</strong>
-                            <p>Indica la etapa del trabajo: en cola, en producciÃ³n, listo, enviado o entregado.</p>
+                            <strong>Operación</strong>
+                            <p>Indica la etapa del trabajo: en cola, en producción, listo, enviado o entregado.</p>
                         </div>
                     </div>
                     <div class="admin-help-examples">
                         <span class="admin-help-kicker">Ejemplos</span>
                         <ul>
-                            <li><strong>Pendiente de pago:</strong> todavÃ­a no hay cobro confirmado.</li>
+                            <li><strong>Pendiente de pago:</strong> todavía no hay cobro confirmado.</li>
                             <li><strong>Cancelado:</strong> el pedido no sigue activo.</li>
                         </ul>
                     </div>
@@ -1060,12 +1060,12 @@
                 </div>
                 <div class="order-toolbar">
                     <div class="order-toolbar-row">
-                        <input class="order-search" id="orderSearch" type="search" placeholder="Buscar por orden, cliente, mail o telÃ©fono">
+                        <input class="order-search" id="orderSearch" type="search" placeholder="Buscar por orden, cliente, mail o teléfono">
                         <select class="form-select" id="orderQueueFilter" style="width:auto">
                             <option value="">Todas las colas</option>
-                            <option value="requires_action">Requiere acciÃ³n</option>
+                            <option value="requires_action">Requiere acción</option>
                             <option value="manual_review">Cobros manuales</option>
-                            <option value="production">ProducciÃ³n</option>
+                            <option value="production">Producción</option>
                             <option value="ready">Listos</option>
                             <option value="delivery">En entrega</option>
                             <option value="completed">Cerrados</option>
@@ -1082,7 +1082,7 @@
                         <select class="form-select" id="orderPaymentFilter" style="width:auto">
                             <option value="">Todos los cobros</option>
                             <option value="pending">Pendiente</option>
-                            <option value="under_review">En revisiÃ³n</option>
+                            <option value="under_review">En revisión</option>
                             <option value="approved">Aprobado</option>
                             <option value="rejected">Rechazado</option>
                             <option value="cancelled">Cancelado</option>
@@ -1090,7 +1090,7 @@
                             <option value="charged_back">Chargeback</option>
                         </select>
                         <select class="form-select" id="orderFulfillmentFilter" style="width:auto">
-                            <option value="">Toda la operaciÃ³n</option>
+                            <option value="">Toda la operación</option>
                             <option value="queued">En cola</option>
                             <option value="ready">Listo</option>
                             <option value="shipped">Enviado</option>
@@ -1102,20 +1102,20 @@
                     </div>
                     <div class="order-toolbar-meta">
                         <span id="orderResultCount">Cargando pedidos...</span>
-                        <span>UsÃ¡ la cola para entrar por tarea y el detalle para confirmar cobros o avanzar producciÃ³n.</span>
+                        <span>Usá la cola para entrar por tarea y el detalle para confirmar cobros o avanzar producción.</span>
                     </div>
                 </div>
                 <div style="overflow-x:auto">
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th>NÂ° Orden</th>
+                                <th>N° Orden</th>
                                 <th>Cliente</th>
                                 <th>Estado</th>
                                 <th>Medio</th>
                                 <th>Total</th>
                                 <th>Fecha</th>
-                                <th>AcciÃ³n rÃ¡pida</th>
+                                <th>Acción rápida</th>
                             </tr>
                         </thead>
                         <tbody id="ordersTableBody">
@@ -1132,20 +1132,20 @@
                     <h2 style="font-family:var(--font-heading);font-size:1.2rem">Historial de Correos</h2>
                     <select class="form-select" id="emailStatusFilter" style="width:auto">
                         <option value="">Todos</option>
-                        <option value="sent">Enviados (âœ…)</option>
-                        <option value="failed">Fallidos (âŒ)</option>
+                        <option value="sent">Enviados (✅)</option>
+                        <option value="failed">Fallidos (❌)</option>
                     </select>
                 </div>
                 <div style="overflow-x:auto">
                     <table class="admin-table">
                         <thead>
                             <tr>
-                                <th>NÂ° Orden</th>
+                                <th>N° Orden</th>
                                 <th>Destinatario</th>
                                 <th>Asunto</th>
                                 <th>Estado</th>
                                 <th>Fecha</th>
-                                <th>AcciÃ³n</th>
+                                <th>Acción</th>
                             </tr>
                         </thead>
                         <tbody id="emailsTableBody">
@@ -1158,9 +1158,9 @@
 
             <!-- Shipping Tab -->
             <div class="admin-panel" id="shippingPanel" style="display:none">
-                <h2 style="font-family:var(--font-heading);font-size:1.2rem;margin-bottom:var(--space-lg)">ðŸšš Zonas de envÃ­o</h2>
+                <h2 style="font-family:var(--font-heading);font-size:1.2rem;margin-bottom:var(--space-lg)">🚚 Zonas de envío</h2>
                 <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:var(--space-xl)">
-                    ConfigurÃ¡ el precio y el plazo estimado para cada zona. Los cÃ³digos postales estÃ¡n predefinidos.
+                    Configurá el precio y el plazo estimado para cada zona. Los códigos postales están predefinidos.
                 </p>
                 <div id="shippingZonesAlert" style="display:none;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-xl)"></div>
                 <div id="shippingZonesContainer" style="max-width:680px">Cargando...</div>
@@ -1168,12 +1168,12 @@
 
             <!-- Settings Tab -->
             <div class="admin-panel" id="settingsPanel" style="display:none">
-                <h2 style="font-family:var(--font-heading);font-size:1.2rem;margin-bottom:var(--space-2xl)">âš™ï¸ ConfiguraciÃ³n</h2>
+                <h2 style="font-family:var(--font-heading);font-size:1.2rem;margin-bottom:var(--space-2xl)">⚙️ Configuración</h2>
 
                 <div style="max-width:480px;display:grid;gap:var(--space-xl)">
 
                     <div class="admin-form-card">
-                        <h3>ðŸ‘¤ Cambiar nombre de usuario</h3>
+                        <h3>👤 Cambiar nombre de usuario</h3>
                         <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:var(--space-lg)">
                             Usuario actual: <strong id="currentUsernameDisplay" style="color:var(--text-primary)"></strong>
                         </p>
@@ -1184,10 +1184,10 @@
                             <div class="form-group" style="margin-bottom:var(--space-md)">
                                 <label class="form-label">Nuevo nombre de usuario</label>
                                 <input type="text" class="form-input" id="unNew" minlength="3" pattern="[a-zA-Z0-9_\-\.]+" required>
-                                <p style="font-size:0.78rem;color:var(--text-muted);margin-top:4px">Letras, nÃºmeros, puntos, guiones y guiones bajos.</p>
+                                <p style="font-size:0.78rem;color:var(--text-muted);margin-top:4px">Letras, números, puntos, guiones y guiones bajos.</p>
                             </div>
                             <div class="form-group" style="margin-bottom:var(--space-xl)">
-                                <label class="form-label">ConfirmÃ¡ tu contraseÃ±a</label>
+                                <label class="form-label">Confirmá tu contraseña</label>
                                 <input type="password" class="form-input" id="unPassword" autocomplete="current-password" required>
                             </div>
                             <button type="submit" class="btn btn-primary" id="unChangeBtn">Actualizar usuario</button>
@@ -1195,28 +1195,28 @@
                     </div>
 
                     <div class="admin-form-card">
-                        <h3>ðŸ”’ Cambiar contraseÃ±a</h3>
+                        <h3>🔒 Cambiar contraseña</h3>
                         <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:var(--space-lg)">
-                            IngresÃ¡ tu contraseÃ±a actual y la nueva para actualizarla.
+                            Ingresá tu contraseña actual y la nueva para actualizarla.
                         </p>
 
                         <div id="pwChangeAlert" style="display:none;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-lg)"></div>
 
                         <form id="changePasswordForm" autocomplete="off">
                             <div class="form-group" style="margin-bottom:var(--space-md)">
-                                <label class="form-label">ContraseÃ±a actual</label>
+                                <label class="form-label">Contraseña actual</label>
                                 <input type="password" class="form-input" id="pwCurrent" autocomplete="current-password" required>
                             </div>
                             <div class="form-group" style="margin-bottom:var(--space-md)">
-                                <label class="form-label">Nueva contraseÃ±a</label>
+                                <label class="form-label">Nueva contraseña</label>
                                 <input type="password" class="form-input" id="pwNew" autocomplete="new-password" minlength="8" required>
-                                <p style="font-size:0.78rem;color:var(--text-muted);margin-top:4px">MÃ­nimo 8 caracteres.</p>
+                                <p style="font-size:0.78rem;color:var(--text-muted);margin-top:4px">Mínimo 8 caracteres.</p>
                             </div>
                             <div class="form-group" style="margin-bottom:var(--space-xl)">
-                                <label class="form-label">Confirmar nueva contraseÃ±a</label>
+                                <label class="form-label">Confirmar nueva contraseña</label>
                                 <input type="password" class="form-input" id="pwConfirm" autocomplete="new-password" required>
                             </div>
-                            <button type="submit" class="btn btn-primary" id="pwChangeBtn">Actualizar contraseÃ±a</button>
+                            <button type="submit" class="btn btn-primary" id="pwChangeBtn">Actualizar contraseña</button>
                         </form>
                     </div>
                 </div>
@@ -1229,7 +1229,7 @@
         <div class="order-modal">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
                 <h2 id="orderModalTitle">Pedido #</h2>
-                <button class="btn btn-secondary btn-sm" onclick="closeOrderModal()">âœ•</button>
+                <button class="btn btn-secondary btn-sm" onclick="closeOrderModal()">✕</button>
             </div>
             <div id="orderModalContent">Cargando...</div>
         </div>
@@ -1240,7 +1240,7 @@
         <div class="order-modal" style="max-width:800px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:var(--space-lg)">
                 <h2 id="emailModalTitle">Asunto del Correo</h2>
-                <button class="btn btn-secondary btn-sm" onclick="closeEmailModal()">âœ•</button>
+                <button class="btn btn-secondary btn-sm" onclick="closeEmailModal()">✕</button>
             </div>
             <div id="emailModalMeta" style="margin-bottom:var(--space-md);font-size:0.9rem;color:var(--text-muted);background:var(--bg-card);padding:var(--space-md);border-radius:var(--border-radius-sm);border:1px solid var(--border-subtle)">
                 Cargando metadatos...
@@ -1267,7 +1267,7 @@
 
         const paymentStatusLabels = {
             pending: 'Pendiente',
-            under_review: 'En revisiÃ³n',
+            under_review: 'En revisión',
             approved: 'Aprobado',
             rejected: 'Rechazado',
             cancelled: 'Cancelado',
@@ -1290,7 +1290,7 @@
         };
 
         function paymentMethodLabel(method) {
-            return paymentMethodLabels[method] || method || 'â€”';
+            return paymentMethodLabels[method] || method || '—';
         }
 
         function getOrderStateSummary(order) {
@@ -1309,7 +1309,7 @@
                 return {
                     label: 'Pago rechazado',
                     className: 'rejected',
-                    detail: 'El cobro no fue aceptado. RevisÃ¡ si hay que contactar al cliente o cerrar el pedido.',
+                    detail: 'El cobro no fue aceptado. Revisá si hay que contactar al cliente o cerrar el pedido.',
                 };
             }
 
@@ -1331,63 +1331,63 @@
 
             if (paymentStatus === 'under_review') {
                 return {
-                    label: 'Cobro en revisiÃ³n',
+                    label: 'Cobro en revisión',
                     className: 'in_process',
-                    detail: 'El pago todavÃ­a no estÃ¡ confirmado. No conviene avanzar la operaciÃ³n final hasta validar el cobro.',
+                    detail: 'El pago todavía no está confirmado. No conviene avanzar la operación final hasta validar el cobro.',
                 };
             }
 
             if (paymentStatus === 'pending') {
                 const label = (order.payment_method === 'transferencia' || order.payment_method === 'efectivo')
-                    ? 'Esperando confirmaciÃ³n de cobro'
+                    ? 'Esperando confirmación de cobro'
                     : 'Pendiente de pago';
 
                 return {
                     label,
                     className: 'pending',
-                    detail: 'TodavÃ­a no hay cobro confirmado.',
+                    detail: 'Todavía no hay cobro confirmado.',
                 };
             }
 
             const approvedStates = {
                 queued: {
-                    label: 'Pagado Â· En cola',
+                    label: 'Pagado · En cola',
                     className: 'approved',
-                    detail: 'El cobro estÃ¡ confirmado y el pedido todavÃ­a estÃ¡ esperando turno de trabajo.',
+                    detail: 'El cobro está confirmado y el pedido todavía está esperando turno de trabajo.',
                 },
                 ready: {
-                    label: 'Pagado Â· Listo',
+                    label: 'Pagado · Listo',
                     className: 'approved',
-                    detail: 'El pedido estÃ¡ terminado y listo para retiro o envÃ­o.',
+                    detail: 'El pedido está terminado y listo para retiro o envío.',
                 },
                 shipped: {
-                    label: 'Pagado Â· Enviado',
+                    label: 'Pagado · Enviado',
                     className: 'shipped',
-                    detail: 'El pedido ya saliÃ³ hacia el cliente.',
+                    detail: 'El pedido ya salió hacia el cliente.',
                 },
                 delivered: {
-                    label: 'Pagado Â· Entregado',
+                    label: 'Pagado · Entregado',
                     className: 'delivered',
                     detail: 'El pedido ya fue entregado.',
                 },
                 cancelled: {
-                    label: 'Pagado Â· Cancelado',
+                    label: 'Pagado · Cancelado',
                     className: 'cancelled',
-                    detail: 'El pedido se cancelÃ³ despuÃ©s de haber sido cobrado.',
+                    detail: 'El pedido se canceló después de haber sido cobrado.',
                 },
             };
 
             return approvedStates[fulfillmentStatus] || {
                 label: 'Pagado',
                 className: 'approved',
-                detail: 'El cobro ya estÃ¡ confirmado.',
+                detail: 'El cobro ya está confirmado.',
             };
         }
 
         function renderOrderStateSummary(order, options = {}) {
             const { compact = false, showMeta = false } = options;
             const summary = getOrderStateSummary(order);
-            const meta = `Cobro: ${paymentStatusLabels[order.payment_status] || order.payment_status} Â· OperaciÃ³n: ${fulfillmentStatusLabels[order.fulfillment_status] || order.fulfillment_status}`;
+            const meta = `Cobro: ${paymentStatusLabels[order.payment_status] || order.payment_status} · Operación: ${fulfillmentStatusLabels[order.fulfillment_status] || order.fulfillment_status}`;
 
             return `
                 <div class="admin-state-summary ${compact ? 'compact' : ''}">
@@ -1397,9 +1397,9 @@
             `;
         }
 
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         //  AUTH
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         let csrfToken = '';
         const DEFAULT_COLOR_OPTIONS = ['Rojo', 'Blanco', 'Negro', 'Gris', 'Azul', 'Verde', 'Dorado', 'Celeste', 'Rosa'];
         let allColors = [];
@@ -1411,7 +1411,7 @@
             return res.status === 401 || (data && data.error === 'Unauthorized');
         }
 
-        function handleAdminUnauthorized(message = 'La sesiÃ³n de admin venciÃ³. VolvÃ© a iniciar sesiÃ³n.') {
+        function handleAdminUnauthorized(message = 'La sesión de admin venció. Volvé a iniciar sesión.') {
             csrfToken = '';
             document.getElementById('adminView').style.display = 'none';
             document.getElementById('loginView').style.display = '';
@@ -1484,11 +1484,11 @@
                 if (res.ok && data.success) {
                     const confirmed = await checkAuth();
                     if (!confirmed) {
-                        throw new Error('No se pudo confirmar la sesiÃ³n. IntentÃ¡ nuevamente.');
+                        throw new Error('No se pudo confirmar la sesión. Intentá nuevamente.');
                     }
                 }
-                else { document.getElementById('loginError').textContent = data.error || 'Credenciales invÃ¡lidas'; document.getElementById('loginError').style.display = 'block'; }
-            } catch (err) { document.getElementById('loginError').textContent = err.message || 'Error de conexiÃ³n'; document.getElementById('loginError').style.display = 'block'; }
+                else { document.getElementById('loginError').textContent = data.error || 'Credenciales inválidas'; document.getElementById('loginError').style.display = 'block'; }
+            } catch (err) { document.getElementById('loginError').textContent = err.message || 'Error de conexión'; document.getElementById('loginError').style.display = 'block'; }
             btn.textContent = 'Ingresar'; btn.disabled = false;
         });
 
@@ -1499,9 +1499,9 @@
             document.getElementById('adminView').style.display = 'none';
         });
 
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         //  TABS
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         document.querySelectorAll('.admin-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
@@ -1520,9 +1520,9 @@
             });
         });
 
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         //  DASHBOARD
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         async function loadDashboard() {
             try {
                 const res = await fetch(`${API}/dashboard.php`, { credentials: 'same-origin' });
@@ -1562,7 +1562,7 @@
                         </tr>
                     `).join('');
                 } else {
-                    topTable.innerHTML = '<tr><td style="text-align:center;color:var(--text-muted)">Sin ventas aÃºn</td></tr>';
+                    topTable.innerHTML = '<tr><td style="text-align:center;color:var(--text-muted)">Sin ventas aún</td></tr>';
                 }
 
                 // Low stock
@@ -1577,7 +1577,7 @@
                         </tr>
                     `).join('');
                 } else {
-                    lowTable.innerHTML = '<tr><td style="text-align:center;color:#25D366">âœ“ Todo en stock</td></tr>';
+                    lowTable.innerHTML = '<tr><td style="text-align:center;color:#25D366">✓ Todo en stock</td></tr>';
                 }
 
                 // Recent orders
@@ -1607,7 +1607,7 @@
                             <td style="text-align:right">
                                 <div style="font-weight:700;color:var(--accent);font-size:1rem">$${o.total.toLocaleString('es-AR')}</div>
                             </td>
-                            <td style="width:24px;text-align:right;color:var(--text-muted);font-size:0.8rem">â†’</td>
+                            <td style="width:24px;text-align:right;color:var(--text-muted);font-size:0.8rem">→</td>
                         </tr>
                     `).join('');
                 } else {
@@ -1619,9 +1619,9 @@
             }
         }
 
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         //  PRODUCTS (with search, filter, sort, pagination)
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         let allProducts = [];
         let filteredProducts = [];
         let currentPage = 1;
@@ -1693,7 +1693,7 @@
                     <tr>
                         <td><img src="${esc(p.image_url)}" alt="${esc(p.name)}" onerror="this.style.display='none'"></td>
                         <td>
-                            <strong>${esc(p.name)}</strong>${p.featured == 1 ? ' â­' : ''}${parseInt(p.transfer_discount || 0) > 0 ? ` <span style="background:#22c55e;color:#fff;font-size:0.65rem;padding:1px 5px;border-radius:4px;font-weight:700;">${parseInt(p.transfer_discount)}% OFF</span>` : ''}
+                            <strong>${esc(p.name)}</strong>${p.featured == 1 ? ' ⭐' : ''}${parseInt(p.transfer_discount || 0) > 0 ? ` <span style="background:#22c55e;color:#fff;font-size:0.65rem;padding:1px 5px;border-radius:4px;font-weight:700;">${parseInt(p.transfer_discount)}% OFF</span>` : ''}
                             <div style="font-size:0.72rem;color:var(--text-muted)">${parseInt(p.variant_count || 0)} variante${parseInt(p.variant_count || 0) === 1 ? '' : 's'}</div>
                         </td>
                         <td>${esc(p.category)}</td>
@@ -1720,15 +1720,15 @@
             const container = document.getElementById('productsPagination');
             if (totalPages <= 1) { container.innerHTML = ''; return; }
 
-            let html = `<button ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">â† Anterior</button>`;
+            let html = `<button ${currentPage === 1 ? 'disabled' : ''} onclick="goToPage(${currentPage - 1})">← Anterior</button>`;
             for (let i = 1; i <= totalPages; i++) {
                 if (totalPages > 7 && i > 3 && i < totalPages - 2 && Math.abs(i - currentPage) > 1) {
-                    if (i === 4) html += '<button disabled>â€¦</button>';
+                    if (i === 4) html += '<button disabled>…</button>';
                     continue;
                 }
                 html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
             }
-            html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">Siguiente â†’</button>`;
+            html += `<button ${currentPage === totalPages ? 'disabled' : ''} onclick="goToPage(${currentPage + 1})">Siguiente →</button>`;
             container.innerHTML = html;
         }
 
@@ -1755,10 +1755,10 @@
                 // Update header visuals
                 document.querySelectorAll('.admin-table th.sortable').forEach(h => {
                     h.classList.remove('asc', 'desc');
-                    h.querySelector('.sort-icon').textContent = 'â†•';
+                    h.querySelector('.sort-icon').textContent = '↕';
                 });
                 th.classList.add(currentSort.dir);
-                th.querySelector('.sort-icon').textContent = currentSort.dir === 'asc' ? 'â†‘' : 'â†“';
+                th.querySelector('.sort-icon').textContent = currentSort.dir === 'asc' ? '↑' : '↓';
                 sortProducts();
                 currentPage = 1;
                 renderProducts();
@@ -1906,7 +1906,7 @@
                 <div style="position:relative;border:1px solid var(--border-subtle);border-radius:var(--border-radius-sm);overflow:hidden;background:var(--bg-card)">
                     <img src="${esc(url)}" alt="Imagen ${idx + 1}" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block;cursor:pointer" onclick="setPrimaryImage(${idx})" title="Usar como portada">
                     ${idx === 0 ? '<span style="position:absolute;top:4px;left:4px;background:var(--accent);color:#fff;font-size:0.62rem;padding:2px 5px;border-radius:999px;font-weight:700">Portada</span>' : ''}
-                    <button type="button" onclick="removeImageAt(${idx})" style="position:absolute;top:4px;right:4px;width:18px;height:18px;border:none;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;line-height:18px;cursor:pointer">Ã—</button>
+                    <button type="button" onclick="removeImageAt(${idx})" style="position:absolute;top:4px;right:4px;width:18px;height:18px;border:none;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;line-height:18px;cursor:pointer">×</button>
                 </div>
             `).join('');
         }
@@ -2155,7 +2155,7 @@
         };
 
         window.deleteColor = async function (id) {
-            if (!id || !confirm('Â¿Eliminar este color?')) return;
+            if (!id || !confirm('¿Eliminar este color?')) return;
             try {
                 const res = await fetch(`${API}/colors.php?id=${encodeURIComponent(id)}`, {
                     method: 'DELETE',
@@ -2198,7 +2198,7 @@
                 delete payload.hex_secondary;
             }
             if (!payload.name || !payload.hex_primary) {
-                document.getElementById('colorFormStatus').textContent = 'CompletÃ¡ nombre y hex principal.';
+                document.getElementById('colorFormStatus').textContent = 'Completá nombre y hex principal.';
                 return;
             }
 
@@ -2269,8 +2269,8 @@
                     <img src="${escAttr(url)}" alt="Imagen variante ${idx + 1}" style="width:100%;aspect-ratio:1/1;object-fit:cover;display:block">
                     ${idx === 0 ? '<span style="position:absolute;top:4px;left:4px;background:var(--accent);color:#fff;font-size:0.62rem;padding:2px 5px;border-radius:999px;font-weight:700">Portada</span>' : ''}
                     <div style="position:absolute;right:4px;top:4px;display:flex;gap:4px">
-                        ${idx > 0 ? `<button type="button" class="variant-thumb-primary" data-index="${idx}" style="width:20px;height:20px;border:none;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;font-size:10px;line-height:20px;cursor:pointer" title="Usar como portada">â†‘</button>` : ''}
-                        <button type="button" class="variant-thumb-remove" data-index="${idx}" style="width:20px;height:20px;border:none;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;line-height:20px;cursor:pointer" title="Eliminar imagen">Ã—</button>
+                        ${idx > 0 ? `<button type="button" class="variant-thumb-primary" data-index="${idx}" style="width:20px;height:20px;border:none;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;font-size:10px;line-height:20px;cursor:pointer" title="Usar como portada">↑</button>` : ''}
+                        <button type="button" class="variant-thumb-remove" data-index="${idx}" style="width:20px;height:20px;border:none;border-radius:50%;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;line-height:20px;cursor:pointer" title="Eliminar imagen">×</button>
                     </div>
                 </div>
             `).join('');
@@ -2316,7 +2316,7 @@
                     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:var(--space-md);flex-wrap:wrap">
                         <div>
                             <strong class="variant-title" style="display:block;font-size:1rem">${esc(label)}</strong>
-                            <span style="display:block;color:var(--text-muted);font-size:0.8rem;margin-top:4px">El cliente va a elegir esta combinaciÃ³n dentro del producto.</span>
+                            <span style="display:block;color:var(--text-muted);font-size:0.8rem;margin-top:4px">El cliente va a elegir esta combinación dentro del producto.</span>
                         </div>
                         <button type="button" class="btn btn-secondary btn-sm variant-remove-btn">Quitar</button>
                     </div>
@@ -2342,7 +2342,7 @@
                         <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.9rem">
                             <input type="checkbox" class="variant-active" ${active ? 'checked' : ''}> Variante activa
                         </label>
-                        <span style="color:var(--text-muted);font-size:0.78rem">Si no subÃ­s fotos, usa las imÃ¡genes principales del producto.</span>
+                        <span style="color:var(--text-muted);font-size:0.78rem">Si no subís fotos, usa las imágenes principales del producto.</span>
                     </div>
                     <div style="margin-top:var(--space-md);display:grid;gap:var(--space-sm)">
                         <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-md);flex-wrap:wrap">
@@ -2437,7 +2437,7 @@
             const status = block.querySelector('.variant-image-status');
             status.style.display = 'block';
             status.style.color = 'var(--text-secondary)';
-            status.textContent = files.length > 1 ? `â³ Subiendo ${files.length} imÃ¡genes...` : 'â³ Subiendo imagen...';
+            status.textContent = files.length > 1 ? `⏳ Subiendo ${files.length} imágenes...` : '⏳ Subiendo imagen...';
             e.target.disabled = true;
 
             try {
@@ -2448,10 +2448,10 @@
                 }
                 setVariantImages(block, [...current, ...uploaded]);
                 status.style.color = '#27ae60';
-                status.textContent = uploaded.length > 1 ? `âœ“ ${uploaded.length} imÃ¡genes subidas correctamente` : 'âœ“ Imagen subida correctamente';
+                status.textContent = uploaded.length > 1 ? `✓ ${uploaded.length} imágenes subidas correctamente` : '✓ Imagen subida correctamente';
             } catch (_) {
                 status.style.color = '#e74c3c';
-                status.textContent = 'âœ— Error de red al subir la imagen';
+                status.textContent = '✗ Error de red al subir la imagen';
             } finally {
                 e.target.disabled = false;
                 e.target.value = '';
@@ -2510,7 +2510,7 @@
             if (files.length === 0) return;
             const status = document.getElementById('imageUploadStatus');
             status.style.display = 'block'; status.style.color = 'var(--text-secondary)';
-            status.textContent = files.length > 1 ? `â³ Subiendo ${files.length} imÃ¡genes...` : 'â³ Subiendo imagen...';
+            status.textContent = files.length > 1 ? `⏳ Subiendo ${files.length} imágenes...` : '⏳ Subiendo imagen...';
             this.disabled = true;
             try {
                 const current = getImageUrlsFromHidden();
@@ -2521,19 +2521,19 @@
                 }
                 setImagePreviews([...current, ...uploaded]);
                 status.style.color = '#27ae60';
-                status.textContent = uploaded.length > 1 ? `âœ“ ${uploaded.length} imÃ¡genes subidas correctamente` : 'âœ“ Imagen subida correctamente';
-            } catch (err) { status.style.color = '#e74c3c'; status.textContent = 'âœ— Error de red al subir la imagen'; }
+                status.textContent = uploaded.length > 1 ? `✓ ${uploaded.length} imágenes subidas correctamente` : '✓ Imagen subida correctamente';
+            } catch (err) { status.style.color = '#e74c3c'; status.textContent = '✗ Error de red al subir la imagen'; }
             finally { this.disabled = false; this.value = ''; }
         });
 
         window.deleteProduct = async function (id) {
-            if (!confirm('Â¿Eliminar este producto?')) return;
+            if (!confirm('¿Eliminar este producto?')) return;
             try {
                 const res = await fetch(`${API}/products.php?id=${id}`, { method: 'DELETE', headers: authHeaders() });
                 const data = await res.json();
                 
                 if (data.note) {
-                    alert('â„¹ï¸ Aviso: ' + data.note);
+                    alert('ℹ️ Aviso: ' + data.note);
                 } else if (data.success) {
                     // Deleted completely
                 } else {
@@ -2544,16 +2544,16 @@
             } catch (e) { alert('Error eliminando producto'); }
         };
 
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         //  ORDERS
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         let currentOrdersPage = 1;
         let orderSearchDebounceId = null;
 
         const orderQueueLabels = {
-            requires_action: 'Requiere acciÃ³n',
+            requires_action: 'Requiere acción',
             manual_review: 'Cobro manual',
-            production: 'ProducciÃ³n',
+            production: 'Producción',
             ready: 'Listo',
             delivery: 'Entrega',
             completed: 'Cerrado',
@@ -2567,9 +2567,9 @@
         };
 
         function formatDateTime(value, withTime = false) {
-            if (!value) return 'â€”';
+            if (!value) return '—';
             const date = new Date(value);
-            if (Number.isNaN(date.getTime())) return 'â€”';
+            if (Number.isNaN(date.getTime())) return '—';
             return withTime ? date.toLocaleString('es-AR') : date.toLocaleDateString('es-AR');
         }
 
@@ -2681,7 +2681,7 @@
 
             tbody.innerHTML = orders.map(o => {
                 const quickAction = getOrderQuickAction(o);
-                const phone = o.customer_phone ? ` Â· ${esc(o.customer_phone)}` : '';
+                const phone = o.customer_phone ? ` · ${esc(o.customer_phone)}` : '';
 
                 return `
                     <tr class="clickable" onclick="viewOrder(${parseInt(o.id)})">
@@ -2731,15 +2731,15 @@
                 return;
             }
 
-            let html = `<button ${page === 1 ? 'disabled' : ''} onclick="goToOrdersPage(${page - 1})">â† Anterior</button>`;
+            let html = `<button ${page === 1 ? 'disabled' : ''} onclick="goToOrdersPage(${page - 1})">← Anterior</button>`;
             for (let i = 1; i <= totalPages; i++) {
                 if (totalPages > 7 && i > 3 && i < totalPages - 2 && Math.abs(i - page) > 1) {
-                    if (i === 4) html += '<button disabled>â€¦</button>';
+                    if (i === 4) html += '<button disabled>…</button>';
                     continue;
                 }
                 html += `<button class="${i === page ? 'active' : ''}" onclick="goToOrdersPage(${i})">${i}</button>`;
             }
-            html += `<button ${page === totalPages ? 'disabled' : ''} onclick="goToOrdersPage(${page + 1})">Siguiente â†’</button>`;
+            html += `<button ${page === totalPages ? 'disabled' : ''} onclick="goToOrdersPage(${page + 1})">Siguiente →</button>`;
             container.innerHTML = html;
         }
 
@@ -2786,7 +2786,7 @@
             const data = await res.json();
             if (isUnauthorizedResponse(res, data)) {
                 handleAdminUnauthorized();
-                throw new Error('SesiÃ³n vencida');
+                throw new Error('Sesión vencida');
             }
             if (!res.ok || !data.success) {
                 throw new Error(data.error || 'No se pudo actualizar el pedido');
@@ -2828,9 +2828,9 @@
             }
         };
 
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-        //  CONFIGURACIÃ“N â€” poblar usuario actual al abrir tab
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
+        //  CONFIGURACIÓN — poblar usuario actual al abrir tab
+        // ═══════════════════════════════════════════════
         document.querySelectorAll('.admin-tab').forEach(tab => {
             if (tab.dataset.tab === 'settings') {
                 tab.addEventListener('click', () => {
@@ -2840,9 +2840,9 @@
             }
         });
 
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         //  CAMBIAR NOMBRE DE USUARIO
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         document.getElementById('changeUsernameForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const alertEl = document.getElementById('unChangeAlert');
@@ -2863,7 +2863,7 @@
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    alertEl.textContent = 'âœ… ' + data.message;
+                    alertEl.textContent = '✅ ' + data.message;
                     alertEl.style.cssText = 'display:block;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.3);color:#25D366;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-lg)';
                     document.getElementById('changeUsernameForm').reset();
                     // Actualizar nombre visible en el header y en el display
@@ -2874,11 +2874,11 @@
                         if (d) d.textContent = data.username;
                     }
                 } else {
-                    alertEl.textContent = 'âŒ ' + (data.error || 'Error al actualizar el usuario.');
+                    alertEl.textContent = '❌ ' + (data.error || 'Error al actualizar el usuario.');
                     alertEl.style.cssText = 'display:block;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-lg)';
                 }
             } catch {
-                alertEl.textContent = 'âŒ Error de conexiÃ³n. IntentÃ¡ nuevamente.';
+                alertEl.textContent = '❌ Error de conexión. Intentá nuevamente.';
                 alertEl.style.cssText = 'display:block;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-lg)';
             }
 
@@ -2886,9 +2886,9 @@
             btn.disabled = false;
         });
 
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-        //  CAMBIAR CONTRASEÃ‘A
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
+        //  CAMBIAR CONTRASEÑA
+        // ═══════════════════════════════════════════════
         document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const alert  = document.getElementById('pwChangeAlert');
@@ -2900,7 +2900,7 @@
             alert.style.display = 'none';
 
             if (newPass !== confirm) {
-                alert.textContent = 'Las contraseÃ±as nuevas no coinciden.';
+                alert.textContent = 'Las contraseñas nuevas no coinciden.';
                 alert.style.cssText = 'display:block;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-lg)';
                 return;
             }
@@ -2917,19 +2917,19 @@
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    alert.textContent = 'âœ… ' + data.message;
+                    alert.textContent = '✅ ' + data.message;
                     alert.style.cssText = 'display:block;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.3);color:#25D366;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-lg)';
                     document.getElementById('changePasswordForm').reset();
                 } else {
-                    alert.textContent = 'âŒ ' + (data.error || 'Error al actualizar la contraseÃ±a.');
+                    alert.textContent = '❌ ' + (data.error || 'Error al actualizar la contraseña.');
                     alert.style.cssText = 'display:block;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-lg)';
                 }
             } catch {
-                alert.textContent = 'âŒ Error de conexiÃ³n. IntentÃ¡ nuevamente.';
+                alert.textContent = '❌ Error de conexión. Intentá nuevamente.';
                 alert.style.cssText = 'display:block;background:rgba(231,76,60,0.12);border:1px solid rgba(231,76,60,0.3);color:#e74c3c;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-lg)';
             }
 
-            btn.textContent = 'Actualizar contraseÃ±a';
+            btn.textContent = 'Actualizar contraseña';
             btn.disabled = false;
         });
 
@@ -2962,7 +2962,7 @@
                 const orderSummary = getOrderStateSummary(o);
                 const paymentVerifiedInfo = o.payment_verified_by_username && o.payment_verified_at
                     ? `Verificado por ${o.payment_verified_by_username} el ${formatDateTime(o.payment_verified_at, true)}`
-                    : 'TodavÃ­a no hay verificaciÃ³n registrada.';
+                    : 'Todavía no hay verificación registrada.';
                 const shipping = o.shipping_address || null;
                 const shippingLines = shipping ? [
                     shipping.label ? `<div style="font-weight:700">${esc(shipping.label)}</div>` : '',
@@ -2976,13 +2976,13 @@
                 ].filter(Boolean).join('') : '';
                 const shippingCard = shipping ? `
                     <div class="manual-payment-card" style="margin:0 0 var(--space-md)">
-                        <span class="admin-help-kicker">DirecciÃ³n de entrega</span>
+                        <span class="admin-help-kicker">Dirección de entrega</span>
                         ${shippingLines}
                     </div>
                 ` : `
                     <div class="manual-payment-card" style="margin:0 0 var(--space-md)">
-                        <span class="admin-help-kicker">DirecciÃ³n de entrega</span>
-                        <p>Este pedido no tiene una direcciÃ³n de envÃ­o asociada.</p>
+                        <span class="admin-help-kicker">Dirección de entrega</span>
+                        <p>Este pedido no tiene una dirección de envío asociada.</p>
                     </div>
                 `;
 
@@ -2994,7 +2994,7 @@
                                 <img src="${esc(item.image_url)}" onerror="this.style.display='none'">
                                 <div style="flex:1">
                                     <div>${esc(item.product_name)}</div>
-                                    ${item.variant_label && !['base', 'Ãºnica', 'unica'].includes(String(item.variant_label).toLowerCase()) ? `<div style="font-size:0.78rem;color:var(--text-muted)">Variante: ${esc(item.variant_label)}</div>` : ''}
+                                    ${item.variant_label && !['base', 'única', 'unica'].includes(String(item.variant_label).toLowerCase()) ? `<div style="font-size:0.78rem;color:var(--text-muted)">Variante: ${esc(item.variant_label)}</div>` : ''}
                                 </div>
                                 <div style="color:var(--text-muted)">x${item.quantity}</div>
                                 <div style="font-weight:600">$${parseFloat(item.unit_price).toLocaleString('es-AR')}</div>
@@ -3006,14 +3006,14 @@
                     <div class="manual-payment-card">
                         <span class="admin-help-kicker">Cobro manual</span>
                         <strong>Este pedido no se confirma solo.</strong>
-                        <p>UsÃ¡ referencia y notas para dejar asentado quÃ© comprobante viste o quÃ© acordaste. Cuando el dinero estÃ© validado, cambiÃ¡ <strong>Cobro</strong> a aprobado o usÃ¡ la acciÃ³n rÃ¡pida.</p>
+                        <p>Usá referencia y notas para dejar asentado qué comprobante viste o qué acordaste. Cuando el dinero esté validado, cambiá <strong>Cobro</strong> a aprobado o usá la acción rápida.</p>
                         <div class="manual-payment-grid">
                             <div>
                                 <strong style="margin-bottom:4px">Medio</strong>
                                 <p>${esc(paymentMethodLabel(o.payment_method))}</p>
                             </div>
                             <div>
-                                <strong style="margin-bottom:4px">VerificaciÃ³n</strong>
+                                <strong style="margin-bottom:4px">Verificación</strong>
                                 <p>${esc(paymentVerifiedInfo)}</p>
                             </div>
                         </div>
@@ -3029,14 +3029,14 @@
                             <div class="state-summary-meta">${esc(orderSummary.detail)}</div>
                         </div>
                     </div>
-                    <div class="order-detail-row"><span class="label">NÂ° Orden</span><span style="font-family:monospace;font-weight:700;color:var(--accent)">${esc(o.order_number || '#' + o.id)}</span></div>
+                    <div class="order-detail-row"><span class="label">N° Orden</span><span style="font-family:monospace;font-weight:700;color:var(--accent)">${esc(o.order_number || '#' + o.id)}</span></div>
                     <div class="order-detail-row"><span class="label">Cliente</span><span>${esc(o.customer_name)}</span></div>
                     <div class="order-detail-row"><span class="label">Email</span><span>${esc(o.customer_email)}</span></div>
-                    <div class="order-detail-row"><span class="label">TelÃ©fono</span><span>${esc(o.customer_phone) || 'â€”'}</span></div>
+                    <div class="order-detail-row"><span class="label">Teléfono</span><span>${esc(o.customer_phone) || '—'}</span></div>
                     <div class="order-detail-row"><span class="label">Total</span><span style="font-weight:700;color:var(--accent);font-size:1.1rem">$${parseFloat(o.total).toLocaleString('es-AR')}</span></div>
                     <div class="order-detail-row"><span class="label">Medio de P.</span><span style="font-weight:600">${esc(paymentMethodLabel(o.payment_method))}</span></div>
                     <div class="order-detail-row"><span class="label">Fecha</span><span>${formatDateTime(o.created_at, true)}</span></div>
-                    <div class="order-detail-row"><span class="label">MercadoPago ID</span><span style="font-family:monospace;font-size:0.85rem">${esc(o.mp_payment_id) || 'â€”'}</span></div>
+                    <div class="order-detail-row"><span class="label">MercadoPago ID</span><span style="font-family:monospace;font-size:0.85rem">${esc(o.mp_payment_id) || '—'}</span></div>
                     ${shippingCard}
 
                     <div class="order-form-stack">
@@ -3046,31 +3046,31 @@
                                 <select id="orderPaymentStatusSelect" class="order-field-input">
                                     ${paymentStatusSelect}
                                 </select>
-                                <div class="field-help">Define si el dinero estÃ¡ pendiente, en revisiÃ³n o confirmado. Este cambio impacta reservas y stock.</div>
+                                <div class="field-help">Define si el dinero está pendiente, en revisión o confirmado. Este cambio impacta reservas y stock.</div>
                             </div>
                         </div>
                         <div class="order-detail-row" style="align-items:center">
-                            <span class="label">OperaciÃ³n</span>
+                            <span class="label">Operación</span>
                             <div style="display:flex;flex-direction:column;align-items:flex-end;gap:8px;max-width:320px;width:100%">
                                 <select id="orderFulfillmentStatusSelect" class="order-field-input">
                                     ${fulfillmentStatusSelect}
                                 </select>
-                                <div class="field-help">Marca el avance del trabajo: en cola, producciÃ³n, listo, enviado o entregado. No reemplaza el estado del cobro.</div>
+                                <div class="field-help">Marca el avance del trabajo: en cola, producción, listo, enviado o entregado. No reemplaza el estado del cobro.</div>
                             </div>
                         </div>
                         ${manualPaymentCard}
                         <div class="order-field-block">
                             <label for="orderPaymentReferenceInput">Referencia o comprobante</label>
-                            <input id="orderPaymentReferenceInput" class="order-field-input" type="text" maxlength="120" placeholder="Alias, nÃºmero de comprobante o detalle corto" value="${esc(o.payment_reference || '')}">
-                            <div class="field-help">Sirve para dejar un identificador rÃ¡pido del cobro manual.</div>
+                            <input id="orderPaymentReferenceInput" class="order-field-input" type="text" maxlength="120" placeholder="Alias, número de comprobante o detalle corto" value="${esc(o.payment_reference || '')}">
+                            <div class="field-help">Sirve para dejar un identificador rápido del cobro manual.</div>
                         </div>
                         <div class="order-field-block">
                             <label for="orderPaymentNotesInput">Notas internas del cobro</label>
-                            <textarea id="orderPaymentNotesInput" class="order-field-textarea" rows="3" placeholder="QuÃ© recibiste, quÃ© falta validar o quÃ© hablÃ³ el cliente">${esc(o.payment_notes || '')}</textarea>
+                            <textarea id="orderPaymentNotesInput" class="order-field-textarea" rows="3" placeholder="Qué recibiste, qué falta validar o qué habló el cliente">${esc(o.payment_notes || '')}</textarea>
                         </div>
                         <div class="order-field-block">
                             <label for="orderNotesInput">Notas operativas del pedido</label>
-                            <textarea id="orderNotesInput" class="order-field-textarea" rows="3" placeholder="Observaciones de producciÃ³n, entrega o seguimiento">${esc(o.notes || '')}</textarea>
+                            <textarea id="orderNotesInput" class="order-field-textarea" rows="3" placeholder="Observaciones de producción, entrega o seguimiento">${esc(o.notes || '')}</textarea>
                         </div>
                     </div>
 
@@ -3101,7 +3101,7 @@
 
             feedback.style.display = 'inline';
             feedback.style.color = 'var(--text-muted)';
-            feedback.textContent = 'â³ Guardando...';
+            feedback.textContent = '⏳ Guardando...';
             paymentSelect.disabled = true;
             fulfillmentSelect.disabled = true;
             if (paymentReferenceInput) paymentReferenceInput.disabled = true;
@@ -3119,13 +3119,13 @@
                 });
 
                 feedback.style.color = '#25D366';
-                feedback.textContent = 'âœ“ Pedido actualizado';
+                feedback.textContent = '✓ Pedido actualizado';
                 await loadOrders(currentOrdersPage);
                 await loadDashboard();
                 await viewOrder(orderId);
             } catch (e) {
                 feedback.style.color = '#e74c3c';
-                feedback.textContent = `âœ— ${e.message || 'Error'}`;
+                feedback.textContent = `✗ ${e.message || 'Error'}`;
             } finally {
                 paymentSelect.disabled = false;
                 fulfillmentSelect.disabled = false;
@@ -3146,9 +3146,9 @@
             if (e.target === e.currentTarget) closeOrderModal();
         });
 
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         //  EMAILS (LOGS)
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
         let currentEmailsPage = 1;
 
         document.getElementById('emailStatusFilter').addEventListener('change', () => {
@@ -3217,7 +3217,7 @@
                 document.getElementById('emailModalMeta').innerHTML = `
                     <strong>Destinatario:</strong> ${esc(log.recipient_email)} <br>
                     <strong>Fecha:</strong> ${new Date(log.created_at).toLocaleString('es-AR')} <br>
-                    <strong>Estado:</strong> ${log.status === 'sent' ? 'âœ… Enviado' : 'âŒ Fallido'}<br>
+                    <strong>Estado:</strong> ${log.status === 'sent' ? '✅ Enviado' : '❌ Fallido'}<br>
                     ${log.error_message ? `<strong style="color:#e74c3c">Error:</strong> ${esc(log.error_message)}` : ''}
                 `;
                 
@@ -3240,12 +3240,12 @@
             if (e.target === e.currentTarget) window.closeEmailModal();
         });
 
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-        //  ZONAS DE ENVÃO
-        // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+        // ═══════════════════════════════════════════════
+        //  ZONAS DE ENVÍO
+        // ═══════════════════════════════════════════════
         function cpRangesLabel(ranges) {
             if (!ranges || !ranges.length) return 'Sin rangos';
-            return ranges.map(r => `CP ${r.from}â€“${r.to}`).join('  Â·  ');
+            return ranges.map(r => `CP ${r.from}–${r.to}`).join('  ·  ');
         }
 
         async function loadShippingZones() {
@@ -3278,14 +3278,14 @@
                             </div>
                             <div class="form-group" style="margin:0">
                                 <label class="form-label">Plazo estimado</label>
-                                <input type="text" class="form-input" id="sz-days-${z.id}" value="${escAttr(z.days)}" placeholder="Ej: 3 a 5 dÃ­as hÃ¡biles">
+                                <input type="text" class="form-input" id="sz-days-${z.id}" value="${escAttr(z.days)}" placeholder="Ej: 3 a 5 días hábiles">
                             </div>
                             <button class="btn btn-primary btn-sm" onclick="saveShippingZone(${z.id})">Guardar</button>
                         </div>
                     </div>
                 `).join('');
             } catch(e) {
-                container.innerHTML = `<p style="color:var(--accent)">Error al cargar las zonas de envÃ­o.</p>`;
+                container.innerHTML = `<p style="color:var(--accent)">Error al cargar las zonas de envío.</p>`;
             }
         }
 
@@ -3306,11 +3306,11 @@
                 if (!res.ok) throw new Error(d.error || 'Error al guardar');
 
                 alertEl.style.cssText = 'display:block;background:rgba(37,211,102,0.12);border:1px solid rgba(37,211,102,0.3);color:#25D366;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-xl)';
-                alertEl.textContent = 'âœ“ Zona guardada correctamente.';
+                alertEl.textContent = '✓ Zona guardada correctamente.';
                 setTimeout(() => { alertEl.style.display = 'none'; }, 3000);
             } catch(e) {
                 alertEl.style.cssText = 'display:block;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);color:#f87171;padding:0.75rem 1rem;border-radius:var(--border-radius-sm);font-size:0.88rem;margin-bottom:var(--space-xl)';
-                alertEl.textContent = 'âœ— Error al guardar: ' + e.message;
+                alertEl.textContent = '✗ Error al guardar: ' + e.message;
             }
         };
 

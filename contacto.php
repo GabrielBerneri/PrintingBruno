@@ -1,10 +1,10 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="ContactÃ¡ a PrintingBruno para consultas sobre impresiÃ³n 3D.">
+    <meta name="description" content="Contactá a PrintingBruno para consultas sobre impresión 3D.">
     <title>Contacto | PrintingBruno</title>
     <link rel="stylesheet" href="css/styles.css?v=20260803-3">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
@@ -36,7 +36,7 @@
                             <span class="contact-form-eyebrow">Formulario de consulta</span>
                             <h2 class="contact-form-title">Envianos los datos del proyecto</h2>
                         </div>
-                        <p class="contact-form-intro">Elegi el tipo de consulta y dejÃ¡ todo lo importante en un solo mensaje.</p>
+                        <p class="contact-form-intro">Elegi el tipo de consulta y dejá todo lo importante en un solo mensaje.</p>
                     </div>
 
                     <form id="contactForm" novalidate>
@@ -55,8 +55,8 @@
                                 </label>
                                 <label class="contact-topic-card">
                                     <input type="radio" name="subject" value="personalizado">
-                                    <span>DiseÃ±o personalizado</span>
-                                    <small>Si todavia no tenes archivo y hay que diseÃ±arlo.</small>
+                                    <span>Diseño personalizado</span>
+                                    <small>Si todavia no tenes archivo y hay que diseñarlo.</small>
                                 </label>
                                 <label class="contact-topic-card">
                                     <input type="radio" name="subject" value="archivo">
@@ -112,7 +112,7 @@
                         </div>
 
                         <div class="contact-form-meta">
-                            <p class="contact-form-hint" id="contactDynamicHint">Tip: si tenes referencias visuales o STL, pegÃ¡ el link en el mensaje.</p>
+                            <p class="contact-form-hint" id="contactDynamicHint">Tip: si tenes referencias visuales o STL, pegá el link en el mensaje.</p>
                             <div class="contact-message-counter" id="contactMessageCounter">0 / 800</div>
                         </div>
 
@@ -131,7 +131,7 @@
                         <div class="contact-process-step">
                             <span>1</span>
                             <div>
-                                <strong>Nos contÃ¡s la idea</strong>
+                                <strong>Nos contás la idea</strong>
                                 <p>Con medidas, referencias o archivo STL si ya lo tenes.</p>
                             </div>
                         </div>
