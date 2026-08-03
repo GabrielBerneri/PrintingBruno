@@ -493,7 +493,7 @@ const Cart = {
             <label class="form-floating-label" for="checkoutPhone">Teléfono (WhatsApp activo) *</label>
           </div>
           <div class="form-group" style="margin-bottom: var(--space-lg);">
-            <label style="display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;font-weight:500;">Dirección de entrega</label>
+            <label style="display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;font-weight:500;">Dirección de entrega <span style="color:var(--accent)">*</span></label>
             <p id="checkoutAccountHint" style="display:none;margin:0 0 0.75rem;font-size:0.82rem;color:var(--text-muted);line-height:1.5;"></p>
             <div id="checkoutSavedAddressGroup" hidden style="margin-bottom:0.75rem;">
               <label for="checkoutSavedAddress" style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.35rem;">Direcciones guardadas</label>
@@ -506,21 +506,21 @@ const Cart = {
               <label class="form-floating-label" for="checkoutRecipient">Destinatario</label>
             </div>
             <div class="form-floating-group">
-              <input type="text" class="form-input" id="checkoutStreet" placeholder=" ">
+              <input type="text" class="form-input" id="checkoutStreet" placeholder=" " required>
               <label class="form-floating-label" for="checkoutStreet">Calle y altura</label>
             </div>
             <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-md);">
               <div class="form-floating-group">
-                <input type="text" class="form-input" id="checkoutCity" placeholder=" ">
+                <input type="text" class="form-input" id="checkoutCity" placeholder=" " required>
                 <label class="form-floating-label" for="checkoutCity">Ciudad</label>
               </div>
               <div class="form-floating-group">
-                <input type="text" class="form-input" id="checkoutProvince" placeholder=" ">
+                <input type="text" class="form-input" id="checkoutProvince" placeholder=" " required>
                 <label class="form-floating-label" for="checkoutProvince">Provincia</label>
               </div>
             </div>
             <div class="form-floating-group" style="margin-bottom:0;">
-              <input type="text" class="form-input" id="checkoutPostalCode" placeholder=" ">
+              <input type="text" class="form-input" id="checkoutPostalCode" placeholder=" " required>
               <label class="form-floating-label" for="checkoutPostalCode">Código postal</label>
             </div>
           </div>
@@ -658,6 +658,15 @@ const Cart = {
 
             try {
                 const paymentMethod = document.querySelector('input[name="checkoutPayment"]:checked').value;
+
+                const streetVal = (document.getElementById('checkoutStreet')?.value || '').trim();
+                const cityVal = (document.getElementById('checkoutCity')?.value || '').trim();
+                const provinceVal = (document.getElementById('checkoutProvince')?.value || '').trim();
+                const postalVal = (document.getElementById('checkoutPostalCode')?.value || '').trim();
+                if (!streetVal || !cityVal || !provinceVal || !postalVal) {
+                    throw new Error('Completá la dirección de entrega (calle, ciudad, provincia y código postal).');
+                }
+
                 const response = await fetch(`${this.getApiBase()}/create_preference.php`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },

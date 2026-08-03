@@ -78,6 +78,15 @@ try {
         jsonResponse(['error' => 'Email inválido'], 400);
     }
 
+    $shippingBody = isset($body['shipping_address']) && is_array($body['shipping_address']) ? $body['shipping_address'] : null;
+    if (!$shippingBody
+        || empty(trim((string)($shippingBody['street'] ?? '')))
+        || empty(trim((string)($shippingBody['city'] ?? '')))
+        || empty(trim((string)($shippingBody['province'] ?? '')))
+        || empty(trim((string)($shippingBody['postal_code'] ?? '')))) {
+        jsonResponse(['error' => 'Por favor completá la dirección de entrega (calle, ciudad, provincia y código postal).'], 400);
+    }
+
     pbExpireReservations($db);
 
     $idempotencyKey = pbBuildCheckoutIdempotencyKey($body);
@@ -309,6 +318,12 @@ try {
         // Generate order number: PB-YYYYMMDD-NNNN
         $orderNumber = 'PB-' . date('Ymd') . '-' . str_pad($orderId, 4, '0', STR_PAD_LEFT);
         $db->prepare("UPDATE orders SET order_number = ? WHERE id = ?")->execute([$orderNumber, $orderId]);
+
+        // Guardar notas del cliente
+        $checkoutNotes = trim($body['notes'] ?? '');
+        if ($checkoutNotes !== '' && pbHasColumn($db, 'orders', 'notes')) {
+            $db->prepare("UPDATE orders SET notes = ? WHERE id = ?")->execute([$checkoutNotes, $orderId]);
+        }
 
         // Insert order items
         if ($hasVariantColumns) {
