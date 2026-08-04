@@ -127,6 +127,14 @@ const Cart = {
         return Math.round(total * 100) / 100;
     },
 
+    // Detecta el medio de pago según los items del carrito
+    getPaymentMethod() {
+        const items = this.getItems();
+        if (items.length === 0) return 'mercadopago';
+        const allTransfer = items.every(i => i.payment_method === 'transferencia');
+        return allTransfer ? 'transferencia' : 'mercadopago';
+    },
+
     getCount() {
         return this.getItems().reduce((sum, item) => sum + item.quantity, 0);
     },
@@ -554,20 +562,6 @@ const Cart = {
             <textarea class="form-input" id="checkoutNotes" placeholder=" " rows="2" style="resize: vertical; min-height: 50px;"></textarea>
             <label class="form-floating-label" for="checkoutNotes">Notas adicionales (opcional)</label>
           </div>
-          <div class="form-group" style="margin-bottom: var(--space-xl);">
-            <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.5rem; font-weight: 500;">Medio de Pago *</label>
-            <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem;">
-                <input type="radio" name="checkoutPayment" value="mercadopago" checked> MercadoPago
-              </label>
-              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem;">
-                <input type="radio" name="checkoutPayment" value="transferencia"> Transferencia ${this.getTransferDiscountEligibleSubtotal() > 0 ? '<span style="background:#22c55e;color:#fff;font-size:0.68rem;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:2px;">Descuento en productos seleccionados</span>' : ''}
-              </label>
-              <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.95rem;">
-                <input type="radio" name="checkoutPayment" value="efectivo"> Efectivo ${this.getTransferDiscountEligibleSubtotal() > 0 ? '<span style="background:#22c55e;color:#fff;font-size:0.68rem;padding:1px 6px;border-radius:4px;font-weight:700;margin-left:2px;">Descuento en productos seleccionados</span>' : ''}
-              </label>
-            </div>
-          </div>
           <div class="checkout-summary">
             <div class="checkout-summary-row">
               <span>Subtotal (${this.getCount()} items)</span>
@@ -620,48 +614,14 @@ const Cart = {
             });
         });
 
-        // Handle payment method change
-        const paymentRadios = document.querySelectorAll('input[name="checkoutPayment"]');
+        // Configurar botón y texto según el método detectado del carrito
         const submitBtn = document.getElementById('checkoutSubmitBtn');
         const secureText = overlay.querySelector('p:last-of-type');
-        const subtotal = this.getTotal();
-
-        paymentRadios.forEach(radio => {
-            radio.addEventListener('change', (e) => {
-                const isDescuento = ['transferencia', 'efectivo'].includes(e.target.value);
-                const discountRow = document.getElementById('checkoutDiscountRow');
-                const discountAmountEl = document.getElementById('checkoutDiscountAmount');
-                const totalEl = document.getElementById('checkoutTotal');
-
-                const descuento = this.getTransferDiscountAmount();
-                if (isDescuento && descuento > 0) {
-                    discountRow.style.display = '';
-                    discountAmountEl.textContent = `-$${descuento.toLocaleString('es-AR')}`;
-                } else {
-                    discountRow.style.display = 'none';
-                }
-                this.updateShippingTotal(overlay);
-
-                if (e.target.value === 'mercadopago') {
-                    submitBtn.innerHTML = `
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
-                        Pagar con MercadoPago
-                    `;
-                    secureText.innerHTML = `
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                        Pago 100% seguro a través de MercadoPago.
-                    `;
-                } else {
-                    submitBtn.textContent = 'Confirmar Pedido';
-                    secureText.textContent = e.target.value === 'transferencia'
-                        ? 'Al confirmar el pedido vas a ver los datos bancarios para transferir.'
-                        : 'Abonás en efectivo al retirar o recibir el pedido.';
-                }
-            });
-        });
+        const detectedMethod = this.getPaymentMethod();
+        if (detectedMethod === 'transferencia') {
+            submitBtn.textContent = 'Confirmar Pedido';
+            if (secureText) secureText.textContent = 'Al confirmar el pedido vas a ver los datos bancarios para transferir.';
+        }
 
         // Inline Validation for Email
         const emailInput = document.getElementById('checkoutEmail');
@@ -696,7 +656,7 @@ const Cart = {
             btn.disabled = true;
 
             try {
-                const paymentMethod = document.querySelector('input[name="checkoutPayment"]:checked').value;
+                const paymentMethod = this.getPaymentMethod();
 
                 const streetVal = (document.getElementById('checkoutStreet')?.value || '').trim();
                 const cityVal = (document.getElementById('checkoutCity')?.value || '').trim();
@@ -757,7 +717,7 @@ const Cart = {
                     throw new Error(data.error || 'Error creating order');
                 }
             } catch (err) {
-                const checkedPayment = document.querySelector('input[name="checkoutPayment"]:checked').value;
+                const checkedPayment = this.getPaymentMethod();
                 if (checkedPayment === 'mercadopago') {
                     btn.innerHTML = `
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -826,8 +786,7 @@ const Cart = {
 
         const shippingPrice = isPickup ? 0 : (selected ? Number(selected.dataset.price || 0) : 0);
         const subtotal = this.getTotal();
-        const paymentMethod = overlay.querySelector('input[name="checkoutPayment"]:checked')?.value || 'mercadopago';
-        const discount = ['transferencia', 'efectivo'].includes(paymentMethod) ? this.getTransferDiscountAmount() : 0;
+        const discount = 0;
         const total = Math.round((subtotal - discount + shippingPrice) * 100) / 100;
 
         if (display) {

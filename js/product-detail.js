@@ -377,7 +377,8 @@
 
     const addBtn = document.getElementById('detailAddToCart');
     const stickyBtn = document.getElementById('detailAddToCartSticky');
-    const priceRef = { value: price }; // mutable — se actualiza al elegir cuotas
+    const priceRef = { value: price };
+    const paymentMethodRef = { value: 'mercadopago' };
     const handleAddToCart = () => {
       Cart.addItem({
         id: product.id,
@@ -388,7 +389,8 @@
         name: product.name,
         price: priceRef.value,
         image_url: primaryImage || product.image_url,
-        transfer_discount: priceRef.value === price ? Number(product.transfer_discount || 0) : 0
+        transfer_discount: priceRef.value === price ? Number(product.transfer_discount || 0) : 0,
+        payment_method: paymentMethodRef.value
       });
     };
 
@@ -403,10 +405,10 @@
     }
 
     setupGallery(root, imageUrls);
-    if (product.installments_enabled) loadInstallmentBadge(price, product.installment_prices || {}, priceRef, root, Number(product.transfer_discount || 0));
+    if (product.installments_enabled) loadInstallmentBadge(price, product.installment_prices || {}, priceRef, paymentMethodRef, root, Number(product.transfer_discount || 0));
   }
 
-  async function loadInstallmentBadge(basePrice, installmentPrices, priceRef, root, transferDiscount) {
+  async function loadInstallmentBadge(basePrice, installmentPrices, priceRef, paymentMethodRef, root, transferDiscount) {
     if (!basePrice || basePrice <= 0) return;
     const badge = document.getElementById('installmentBadge');
     if (!badge) return;
@@ -417,11 +419,11 @@
       .filter(([n, p]) => n > 0 && p > 0)
       .sort(([a], [b]) => a - b);
 
-    const updatePriceDisplay = (newPrice) => {
+    const updatePriceDisplay = (newPrice, method = 'mercadopago') => {
       priceRef.value = newPrice;
+      paymentMethodRef.value = method;
       const mainEl = root.querySelector('#productDetailMainPrice');
       if (mainEl) mainEl.textContent = Products.formatPrice(newPrice);
-      // En modo seleccionable el badge de transferencia separado no aplica
       const transferEl = root.querySelector('#productDetailTransferPrice');
       if (transferEl) transferEl.style.display = 'none';
     };
@@ -435,17 +437,17 @@
 
       const allOptions = [];
       if (transferPrice) {
-        allOptions.push({ label: `Transferencia / Efectivo (${transferDiscount}% OFF)`, price: transferPrice, perMonth: null });
+        allOptions.push({ label: `Transferencia / Efectivo (${transferDiscount}% OFF)`, price: transferPrice, perMonth: null, method: 'transferencia' });
       }
-      allOptions.push({ label: '1 pago MercadoPago', price: basePrice, perMonth: null });
-      entries.forEach(([n, p]) => allOptions.push({ label: `${n} cuotas sin interés`, price: p, perMonth: p / n }));
+      allOptions.push({ label: '1 pago MercadoPago', price: basePrice, perMonth: null, method: 'mercadopago' });
+      entries.forEach(([n, p]) => allOptions.push({ label: `${n} cuotas sin interés`, price: p, perMonth: p / n, method: 'mercadopago' }));
 
       badge.innerHTML = `
         <div style="margin:6px 0 2px;font-size:0.8rem;font-weight:600;color:var(--text-muted);letter-spacing:0.03em">OPCIONES DE PAGO</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
           ${allOptions.map(opt => `
             <label data-price="${opt.price}" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;border-radius:8px;border:1px solid var(--border-light);transition:border-color .15s,background .15s">
-              <input type="radio" name="installmentOption" value="${opt.price}" style="accent-color:var(--accent);flex-shrink:0">
+              <input type="radio" name="installmentOption" value="${opt.price}" data-method="${opt.method}" style="accent-color:var(--accent);flex-shrink:0">
               <span style="flex:1;font-size:0.9rem;font-weight:500">${opt.label}</span>
               ${opt.perMonth ? `<strong style="color:var(--accent)">${fmt(opt.perMonth)}<span style="font-weight:400;font-size:0.8em">/mes</span></strong>` : ''}
               <span style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap">Total ${fmt(opt.price)}</span>
@@ -456,7 +458,8 @@
 
       badge.querySelectorAll('input[name="installmentOption"]').forEach(r => {
         r.addEventListener('change', () => {
-          updatePriceDisplay(Number(r.value));
+          const method = r.dataset.method || 'mercadopago';
+          updatePriceDisplay(Number(r.value), method);
           badge.querySelectorAll('label[data-price]').forEach(l => {
             const sel = l.dataset.price === r.value;
             l.style.borderColor = sel ? 'var(--accent)' : 'var(--border-light)';
