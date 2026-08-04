@@ -332,7 +332,7 @@
         <span class="product-detail-category">${esc(Products.categoryLabel(product.category))}</span>
         <h1 class="product-detail-title">${esc(product.name)}</h1>
         <div class="product-detail-price">${Products.formatPrice(price)}</div>
-        <div id="installmentBadge" class="installment-badge" style="display:none"></div>
+        <div id="installmentPanel" class="installment-panel" style="display:none"></div>
         ${Number(product.transfer_discount || 0) > 0 ? `
           <div class="product-detail-price-discounted">${Products.formatPrice(price * (1 - Number(product.transfer_discount) / 100))} <span style="font-weight:400;font-size:0.85em;">con transferencia/efectivo</span></div>
           <span class="product-badge transfer-discount" style="position:static;display:inline-block;margin-top:0;margin-bottom:var(--space-md);">${Number(product.transfer_discount)}% OFF transferencia/efectivo</span>
@@ -407,18 +407,39 @@
 
   async function loadInstallmentBadge(price) {
     if (!price || price <= 0) return;
+    const panel = document.getElementById('installmentPanel');
+    if (!panel) return;
     try {
       const res = await fetch(`api/installments.php?amount=${Math.round(price)}`);
       if (!res.ok) return;
       const data = await res.json();
-      if (data.error || !data.installments) return;
-      const badge = document.getElementById('installmentBadge');
-      if (!badge) return;
-      const perCuota = data.installment_amount.toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
-      badge.textContent = data.free
-        ? `${data.installments} cuotas de ${perCuota} sin interés`
-        : `Hasta ${data.installments} cuotas de ${perCuota}`;
-      badge.style.display = '';
+      if (data.error || !Array.isArray(data.options) || data.options.length === 0) return;
+
+      const fmt = n => Number(n).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
+      const rows = data.options
+        .filter(o => o.installments >= 1)
+        .sort((a, b) => a.installments - b.installments)
+        .map(o => {
+          const label = o.installments === 1 ? '1 pago' : `${o.installments} cuotas`;
+          const perCuota = fmt(o.installment_amount);
+          const total = fmt(o.total_amount);
+          const tag = o.free
+            ? '<span class="inst-tag free">Sin interés</span>'
+            : '<span class="inst-tag">Con interés</span>';
+          const totalCol = o.installments === 1 ? '' : `<span class="inst-total">Total ${total}</span>`;
+          return `<div class="inst-row">
+            <span class="inst-label">${label}</span>
+            <span class="inst-amount">${perCuota}</span>
+            ${totalCol}
+            ${tag}
+          </div>`;
+        }).join('');
+
+      panel.innerHTML = `
+        <div class="inst-header">Cuotas con tarjeta de crédito</div>
+        ${rows}
+      `;
+      panel.style.display = '';
     } catch (_) {}
   }
 

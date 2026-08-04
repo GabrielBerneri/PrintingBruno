@@ -3,10 +3,10 @@
  * PrintingBruno - Cuotas disponibles para un monto
  * GET /api/installments.php?amount=5000
  *
- * Intenta obtener cuotas reales de la API de MercadoPago.
- * Si falla (modo test, sin conectividad), calcula con INSTALLMENTS_COUNT.
+ * Devuelve todas las opciones de cuotas (cantidad, monto por cuota, total, si tiene interés).
+ * Si la API de MP falla usa INSTALLMENTS_COUNT para calcular cuotas sin interés.
  *
- * Response: { "installments": 3, "installment_amount": 1666.67, "free": true }
+ * Response: { "options": [{ "installments": 3, "installment_amount": 1667, "total_amount": 5000, "free": true }, ...] }
  */
 
 header('Content-Type: application/json; charset=utf-8');
@@ -29,27 +29,20 @@ if (!$amount || $amount < 1) {
 
 $amountRounded = max(100, round($amount / 100) * 100);
 
-// Cache en disco 1 hora
-$cacheFile = sys_get_temp_dir() . '/pb_inst_' . (int)$amountRounded . '.json';
+$cacheFile = sys_get_temp_dir() . '/pb_inst2_' . (int)$amountRounded . '.json';
 if (file_exists($cacheFile) && time() - filemtime($cacheFile) < 3600) {
     echo file_get_contents($cacheFile);
     exit;
 }
 
-// --- Intenta API de MercadoPago ---
-$result = tryMercadoPagoInstallments($amountRounded);
+$options = tryMercadoPagoInstallments($amountRounded);
 
-// --- Fallback: cálculo local con INSTALLMENTS_COUNT ---
-if (!$result) {
-    $n = max(2, INSTALLMENTS_COUNT);
-    $result = [
-        'installments'       => $n,
-        'installment_amount' => round($amountRounded / $n, 2),
-        'free'               => true,
-    ];
+if (!$options) {
+    // Fallback: cuotas sin interés según INSTALLMENTS_COUNT
+    $options = buildLocalOptions($amountRounded);
 }
 
-$json = json_encode($result);
+$json = json_encode(['options' => $options]);
 @file_put_contents($cacheFile, $json);
 echo $json;
 
@@ -58,7 +51,7 @@ echo $json;
 function tryMercadoPagoInstallments(float $amount): ?array
 {
     if (!defined('MP_ACCESS_TOKEN') || str_starts_with(MP_ACCESS_TOKEN, 'TEST-0000')) {
-        return null; // credenciales de placeholder, saltar
+        return null;
     }
 
     $url = 'https://api.mercadopago.com/v1/payment_methods/installments?' . http_build_query([
@@ -78,34 +71,39 @@ function tryMercadoPagoInstallments(float $amount): ?array
     $httpCode  = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-    if ($httpCode !== 200 || !$response) {
-        return null;
-    }
+    if ($httpCode !== 200 || !$response) return null;
 
     $data = json_decode($response, true);
-    if (!isset($data[0]['payer_costs']) || !is_array($data[0]['payer_costs'])) {
-        return null;
-    }
+    if (!isset($data[0]['payer_costs']) || !is_array($data[0]['payer_costs'])) return null;
 
-    $bestFree = null;
-    $bestAny  = null;
-
+    $options = [];
     foreach ($data[0]['payer_costs'] as $cost) {
-        $n    = (int)$cost['installments'];
-        if ($n < 2) continue;
-        $rate = (float)($cost['installment_rate'] ?? 0);
-        $out  = [
+        $n = (int)$cost['installments'];
+        if ($n < 1) continue;
+        $options[] = [
             'installments'       => $n,
             'installment_amount' => round((float)$cost['installment_amount'], 2),
-            'free'               => ($rate === 0.0),
+            'total_amount'       => round((float)$cost['total_amount'], 2),
+            'free'               => ((float)($cost['installment_rate'] ?? 0)) === 0.0,
         ];
-        if ($rate === 0.0 && (!$bestFree || $n > $bestFree['installments'])) {
-            $bestFree = $out;
-        }
-        if (!$bestAny || $n > $bestAny['installments']) {
-            $bestAny = $out;
-        }
     }
 
-    return $bestFree ?? $bestAny;
+    return count($options) > 0 ? $options : null;
+}
+
+function buildLocalOptions(float $amount): array
+{
+    $n = max(2, INSTALLMENTS_COUNT);
+    $options = [
+        ['installments' => 1, 'installment_amount' => $amount, 'total_amount' => $amount, 'free' => true],
+    ];
+    for ($i = 2; $i <= $n; $i++) {
+        $options[] = [
+            'installments'       => $i,
+            'installment_amount' => round($amount / $i, 2),
+            'total_amount'       => $amount,
+            'free'               => true,
+        ];
+    }
+    return $options;
 }
