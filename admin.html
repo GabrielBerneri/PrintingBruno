@@ -928,21 +928,29 @@
                             </div>
                             <!-- Análisis de márgenes — ancho completo, fuera del flex de columnas -->
                             <div id="priceAnalysis" style="display:none;border:1px solid var(--border-light);border-radius:var(--border-radius-md);overflow:hidden;margin-top:var(--space-md)">
-                                <div style="background:var(--bg-elevated);padding:9px 16px;font-size:0.82rem;font-weight:700;color:var(--text-secondary)">Análisis de márgenes por forma de pago</div>
+                                <div style="background:var(--bg-elevated);padding:9px 16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+                                    <span style="font-size:0.82rem;font-weight:700;color:var(--text-secondary)">Calculador de precio sugerido</span>
+                                    <label style="display:flex;align-items:center;gap:6px;font-size:0.82rem;color:var(--text-muted)">
+                                        Ganancia objetivo $
+                                        <input type="number" id="pGananciaObj" min="0" step="1000" placeholder="ej: 50000"
+                                            style="width:110px;padding:4px 8px;border-radius:6px;border:1px solid var(--border-light);background:var(--bg-card);color:var(--text-primary);font-size:0.85rem">
+                                    </label>
+                                </div>
                                 <div style="overflow-x:auto">
-                                    <table style="width:100%;border-collapse:collapse;font-size:0.88rem;min-width:480px">
+                                    <table style="width:100%;border-collapse:collapse;font-size:0.88rem;min-width:520px">
                                         <thead>
                                             <tr style="background:var(--bg-card)">
                                                 <th style="text-align:left;padding:7px 16px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Forma de pago</th>
                                                 <th style="text-align:right;padding:7px 16px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Precio a cobrar</th>
-                                                <th style="text-align:right;padding:7px 16px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Ganancia</th>
+                                                <th style="text-align:right;padding:7px 16px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Ganancia neta</th>
                                                 <th style="text-align:right;padding:7px 16px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Margen</th>
+                                                <th style="padding:7px 12px"></th>
                                             </tr>
                                         </thead>
                                         <tbody id="priceAnalysisBody"></tbody>
                                     </table>
                                 </div>
-                                <div style="padding:6px 16px;font-size:0.73rem;color:var(--text-muted);border-top:1px solid var(--border-subtle)">Cuotas MP: precio / (1 − comisión%). Valores orientativos, pueden variar por provincia.</div>
+                                <div style="padding:6px 16px;font-size:0.73rem;color:var(--text-muted);border-top:1px solid var(--border-subtle)">Comisiones MP: 1 pago ~7%, 2c 7.79%, 3c 10.49%, 6c 18.69%. Valores orientativos.</div>
                             </div>
                             <div class="form-group" style="margin-top:var(--space-md)"><label class="form-label">Descripción</label><textarea class="form-textarea" id="pDescription" rows="4"></textarea></div>
                             <div class="form-group" style="margin-top:var(--space-xl)">
@@ -1800,6 +1808,7 @@
             if (e.target === e.currentTarget) closeProductModal();
         });
 
+        const MP_SINGLE_RATE = 7; // comisión MP 1 pago crédito
         const MP_COMMISSIONS = [
             { label: '2 cuotas', rate: 7.79 },
             { label: '3 cuotas', rate: 10.49 },
@@ -1811,43 +1820,77 @@
         }
 
         function updateInstallmentsCalc() {
-            const analysis = document.getElementById('priceAnalysis');
-            const body = document.getElementById('priceAnalysisBody');
-            const price    = parseFloat(document.getElementById('pPrice').value) || 0;
-            const cost     = parseFloat(document.getElementById('pCostPrice').value) || 0;
-            const discount = parseInt(document.getElementById('pTransferDiscount').value) || 0;
+            const analysis  = document.getElementById('priceAnalysis');
+            const body      = document.getElementById('priceAnalysisBody');
+            const price     = parseFloat(document.getElementById('pPrice').value) || 0;
+            const cost      = parseFloat(document.getElementById('pCostPrice').value) || 0;
+            const discount  = parseInt(document.getElementById('pTransferDiscount').value) || 0;
             const hasCuotas = document.getElementById('pInstallments').checked;
+            const ganObj    = parseFloat(document.getElementById('pGananciaObj').value) || 0;
 
-            if (price <= 0) { analysis.style.display = 'none'; return; }
+            const suggestMode = cost > 0 && ganObj > 0;
+            const analysisMode = price > 0;
+
+            if (!suggestMode && !analysisMode) { analysis.style.display = 'none'; return; }
             analysis.style.display = '';
 
             let rows = [], i = 0;
-            // net = lo que realmente recibís después de comisiones (puede diferir de cobrar)
-            const addRow = (label, cobrar, net = cobrar) => {
+            const addRow = (label, cobrar, net, showUsar) => {
                 const g = cost > 0 ? net - cost : null;
                 const m = g !== null && net > 0 ? (g / net * 100) : null;
                 const clr = g !== null ? (g >= 0 ? '#4ade80' : '#f87171') : 'var(--text-muted)';
                 const bg = i++ % 2 === 0 ? 'background:var(--bg-card)' : '';
+                const cobrarColor = showUsar ? 'var(--accent,#ff6b2b)' : 'var(--text-primary)';
+                const efectivoTarget = suggestMode ? Math.round(cost + ganObj) : 0;
+                const usarTd = showUsar
+                    ? `<td style="padding:4px 12px;text-align:right"><button type="button"
+                        style="font-size:0.73rem;padding:3px 10px;border-radius:4px;border:1px solid var(--accent,#ff6b2b);color:var(--accent,#ff6b2b);background:transparent;cursor:pointer;white-space:nowrap"
+                        onclick="applyPrice(${Math.round(cobrar)},${efectivoTarget})">Usar ←</button></td>`
+                    : '<td></td>';
                 rows.push(`<tr style="${bg}">
                     <td style="padding:7px 16px;color:var(--text-primary)">${label}</td>
-                    <td style="text-align:right;padding:7px 16px;font-weight:600;color:var(--text-primary)">${fmtARS(cobrar)}</td>
+                    <td style="text-align:right;padding:7px 16px;font-weight:600;color:${cobrarColor}">${fmtARS(cobrar)}</td>
                     <td style="text-align:right;padding:7px 16px;color:${clr}">${g !== null ? fmtARS(g) : '—'}</td>
                     <td style="text-align:right;padding:7px 16px;color:${clr}">${m !== null ? m.toFixed(1) + '%' : '—'}</td>
+                    ${usarTd}
                 </tr>`);
             };
 
-            addRow('Contado (tarjeta / MP sin cuotas)', price);
-            if (discount > 0) addRow(`Transferencia / Efectivo (−${discount}%)`, price * (1 - discount / 100));
-            // Para cuotas: cobrar es el precio al cliente; lo que recibís vos es price (MP se lleva la diferencia)
-            if (hasCuotas) MP_COMMISSIONS.forEach(({ label, rate }) => addRow(`${label} MP`, price / (1 - rate / 100), price));
+            if (suggestMode) {
+                // Modo sugerencia: partimos de costo + ganancia objetivo → mostramos qué cobrar
+                const net = cost + ganObj;
+                addRow('Efectivo / Transferencia', net, net, true);
+                addRow(`MP 1 pago crédito (${MP_SINGLE_RATE}%)`, net / (1 - MP_SINGLE_RATE / 100), net, true);
+                if (hasCuotas) MP_COMMISSIONS.forEach(({ label, rate }) =>
+                    addRow(`${label} MP`, net / (1 - rate / 100), net, true));
+            } else {
+                // Modo análisis: partimos de pPrice → mostramos ganancia real
+                addRow('MP 1 pago crédito (precio base)', price, price * (1 - MP_SINGLE_RATE / 100));
+                if (discount > 0) addRow(`Efectivo / Transferencia (−${discount}%)`, price * (1 - discount / 100), price * (1 - discount / 100));
+                if (hasCuotas) MP_COMMISSIONS.forEach(({ label, rate }) =>
+                    addRow(`${label} MP`, price / (1 - rate / 100), price));
+            }
 
             body.innerHTML = rows.join('');
+        }
+
+        function applyPrice(suggestedPrice, efectivoNet) {
+            document.getElementById('pPrice').value = suggestedPrice;
+            if (efectivoNet > 0 && suggestedPrice > efectivoNet) {
+                const pct = Math.round((suggestedPrice - efectivoNet) / suggestedPrice * 100);
+                document.getElementById('pTransferDiscount').value = pct;
+            } else {
+                document.getElementById('pTransferDiscount').value = 0;
+            }
+            updateTransferDiscountPreview();
+            updateInstallmentsCalc();
         }
 
         document.getElementById('pInstallments').addEventListener('change', updateInstallmentsCalc);
         document.getElementById('pPrice').addEventListener('input', updateInstallmentsCalc);
         document.getElementById('pCostPrice').addEventListener('input', updateInstallmentsCalc);
         document.getElementById('pTransferDiscount').addEventListener('input', updateInstallmentsCalc);
+        document.getElementById('pGananciaObj').addEventListener('input', updateInstallmentsCalc);
 
         function updateTransferDiscountPreview() {
             const previewEl = document.getElementById('pTransferDiscountPreview');
@@ -1869,6 +1912,7 @@
             document.getElementById('pActive').checked = true;
             document.getElementById('pInstallments').checked = false;
             document.getElementById('pStock').value = 0;
+            document.getElementById('pGananciaObj').value = '';
             document.getElementById('productFormTitle').textContent = 'Nuevo Producto';
             resetImageUploader();
             resetVariantBlocks();
@@ -1902,6 +1946,7 @@
             document.getElementById('pFeatured').checked = p.featured == 1;
             document.getElementById('pInstallments').checked = p.installments_enabled == 1;
             document.getElementById('pTransferDiscount').value = parseInt(p.transfer_discount || 0, 10);
+            document.getElementById('pGananciaObj').value = '';
             updateTransferDiscountPreview();
             updateInstallmentsCalc();
             document.getElementById('productFormTitle').textContent = 'Editar Producto';
