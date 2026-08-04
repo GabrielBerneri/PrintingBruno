@@ -405,7 +405,10 @@
     }
 
     setupGallery(root, imageUrls);
-    if (product.installments_enabled) loadInstallmentBadge(price, product.installment_prices || {}, priceRef, paymentMethodRef, root, Number(product.transfer_discount || 0));
+    const transferDiscount = Number(product.transfer_discount || 0);
+    if (product.installments_enabled || transferDiscount > 0) {
+      loadInstallmentBadge(price, product.installment_prices || {}, priceRef, paymentMethodRef, root, transferDiscount);
+    }
   }
 
   async function loadInstallmentBadge(basePrice, installmentPrices, priceRef, paymentMethodRef, root, transferDiscount) {
@@ -428,12 +431,12 @@
       if (transferEl) transferEl.style.display = 'none';
     };
 
-    if (entries.length > 0) {
+    const transferPrice = transferDiscount > 0 ? Math.round(basePrice * (1 - transferDiscount / 100)) : null;
+
+    if (entries.length > 0 || transferPrice) {
       // Ocultar el precio de transferencia separado (ya va integrado como opción)
       const transferEl = root.querySelector('#productDetailTransferPrice');
       if (transferEl) transferEl.style.display = 'none';
-
-      const transferPrice = transferDiscount > 0 ? Math.round(basePrice * (1 - transferDiscount / 100)) : null;
 
       const allOptions = [];
       if (transferPrice) {
