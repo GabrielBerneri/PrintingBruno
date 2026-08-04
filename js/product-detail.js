@@ -417,32 +417,38 @@
       .filter(([n, p]) => n > 0 && p > 0)
       .sort(([a], [b]) => a - b);
 
-    const updatePriceDisplay = (newPrice, isInstallment) => {
+    const updatePriceDisplay = (newPrice) => {
       priceRef.value = newPrice;
       const mainEl = root.querySelector('#productDetailMainPrice');
       if (mainEl) mainEl.textContent = Products.formatPrice(newPrice);
+      // En modo seleccionable el badge de transferencia separado no aplica
       const transferEl = root.querySelector('#productDetailTransferPrice');
-      if (transferEl) {
-        if (!isInstallment && transferDiscount > 0) {
-          const dp = newPrice * (1 - transferDiscount / 100);
-          transferEl.innerHTML = `${Products.formatPrice(dp)} <span style="font-weight:400;font-size:0.85em;">con transferencia/efectivo</span>`;
-          transferEl.style.display = '';
-        } else {
-          transferEl.style.display = 'none';
-        }
-      }
+      if (transferEl) transferEl.style.display = 'none';
     };
 
     if (entries.length > 0) {
+      // Ocultar el precio de transferencia separado (ya va integrado como opción)
+      const transferEl = root.querySelector('#productDetailTransferPrice');
+      if (transferEl) transferEl.style.display = 'none';
+
+      const transferPrice = transferDiscount > 0 ? Math.round(basePrice * (1 - transferDiscount / 100)) : null;
+
+      const allOptions = [];
+      if (transferPrice) {
+        allOptions.push({ label: `Transferencia / Efectivo (${transferDiscount}% OFF)`, price: transferPrice, perMonth: null });
+      }
+      allOptions.push({ label: '1 pago MercadoPago', price: basePrice, perMonth: null });
+      entries.forEach(([n, p]) => allOptions.push({ label: `${n} cuotas sin interés`, price: p, perMonth: p / n }));
+
       badge.innerHTML = `
-        <div style="margin:6px 0 2px;font-size:0.8rem;font-weight:600;color:var(--text-muted);letter-spacing:0.03em">OPCIONES DE CUOTAS (MercadoPago)</div>
+        <div style="margin:6px 0 2px;font-size:0.8rem;font-weight:600;color:var(--text-muted);letter-spacing:0.03em">OPCIONES DE PAGO</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
-          ${entries.map(([n, p]) => `
-            <label data-price="${p}" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;border-radius:8px;border:1px solid var(--border-light);transition:border-color .15s,background .15s">
-              <input type="radio" name="installmentOption" value="${p}" style="accent-color:var(--accent);flex-shrink:0">
-              <span style="flex:1;font-size:0.9rem;font-weight:500">${n} cuotas sin interés</span>
-              <strong style="color:var(--accent)">${fmt(p / n)}<span style="font-weight:400;font-size:0.8em">/mes</span></strong>
-              <span style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap">Total ${fmt(p)}</span>
+          ${allOptions.map(opt => `
+            <label data-price="${opt.price}" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;border-radius:8px;border:1px solid var(--border-light);transition:border-color .15s,background .15s">
+              <input type="radio" name="installmentOption" value="${opt.price}" style="accent-color:var(--accent);flex-shrink:0">
+              <span style="flex:1;font-size:0.9rem;font-weight:500">${opt.label}</span>
+              ${opt.perMonth ? `<strong style="color:var(--accent)">${fmt(opt.perMonth)}<span style="font-weight:400;font-size:0.8em">/mes</span></strong>` : ''}
+              <span style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap">Total ${fmt(opt.price)}</span>
             </label>
           `).join('')}
         </div>`;
@@ -450,7 +456,7 @@
 
       badge.querySelectorAll('input[name="installmentOption"]').forEach(r => {
         r.addEventListener('change', () => {
-          updatePriceDisplay(Number(r.value), true);
+          updatePriceDisplay(Number(r.value));
           badge.querySelectorAll('label[data-price]').forEach(l => {
             const sel = l.dataset.price === r.value;
             l.style.borderColor = sel ? 'var(--accent)' : 'var(--border-light)';
