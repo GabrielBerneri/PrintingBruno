@@ -202,6 +202,7 @@ const Cart = {
     },
 
     buildCheckoutShippingPayload() {
+        if (document.querySelector('input[name="deliveryType"]:checked')?.value === 'pickup') return null;
         const savedAddressSelect = document.getElementById('checkoutSavedAddress');
         const savedAddressGroup = document.getElementById('checkoutSavedAddressGroup');
         const recipient = document.getElementById('checkoutRecipient');
@@ -505,6 +506,18 @@ const Cart = {
             <label class="form-floating-label" for="checkoutPhone">Teléfono (WhatsApp activo) *</label>
           </div>
           <div class="form-group" style="margin-bottom: var(--space-lg);">
+            <label style="display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;font-weight:500;">Tipo de entrega *</label>
+            <div style="display:flex;flex-direction:column;gap:0.65rem;">
+              <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.95rem;">
+                <input type="radio" name="deliveryType" value="shipping" checked> Envío a domicilio
+              </label>
+              <label style="display:flex;align-items:center;gap:0.5rem;cursor:pointer;font-size:0.95rem;">
+                <input type="radio" name="deliveryType" value="pickup"> Retiro en persona <span style="font-size:0.8rem;color:var(--text-muted);margin-left:4px;">(sin costo de envío, coordinamos por WhatsApp)</span>
+              </label>
+            </div>
+          </div>
+          <div id="checkoutAddressBlock">
+          <div class="form-group" style="margin-bottom: var(--space-lg);">
             <label style="display:block;font-size:0.85rem;color:var(--text-secondary);margin-bottom:0.5rem;font-weight:500;">Dirección de entrega <span style="color:var(--accent)">*</span></label>
 <div id="checkoutSavedAddressGroup" hidden style="margin-bottom:0.75rem;">
               <label for="checkoutSavedAddress" style="display:block;font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.35rem;">Direcciones guardadas</label>
@@ -536,6 +549,7 @@ const Cart = {
             </div>
             <div id="shippingOptionsWrap" style="margin-top:0.75rem;"></div>
           </div>
+          </div><!-- /checkoutAddressBlock -->
           <div class="form-floating-group" style="margin-bottom: var(--space-xl);">
             <textarea class="form-input" id="checkoutNotes" placeholder=" " rows="2" style="resize: vertical; min-height: 50px;"></textarea>
             <label class="form-floating-label" for="checkoutNotes">Notas adicionales (opcional)</label>
@@ -590,6 +604,21 @@ const Cart = {
         document.body.appendChild(overlay);
         requestAnimationFrame(() => overlay.classList.add('active'));
         await this.prefillCheckoutCustomerContext(overlay);
+
+        // Handle delivery type toggle
+        overlay.querySelectorAll('input[name="deliveryType"]').forEach(r => {
+            r.addEventListener('change', () => {
+                const isPickup = overlay.querySelector('input[name="deliveryType"]:checked')?.value === 'pickup';
+                const addressBlock = overlay.querySelector('#checkoutAddressBlock');
+                const addressFields = ['checkoutStreet', 'checkoutCity', 'checkoutProvince', 'checkoutPostalCode'];
+                if (addressBlock) addressBlock.style.display = isPickup ? 'none' : '';
+                addressFields.forEach(id => {
+                    const el = overlay.querySelector(`#${id}`);
+                    if (el) isPickup ? el.removeAttribute('required') : el.setAttribute('required', '');
+                });
+                this.updateShippingTotal(overlay);
+            });
+        });
 
         // Handle payment method change
         const paymentRadios = document.querySelectorAll('input[name="checkoutPayment"]');
@@ -694,6 +723,8 @@ const Cart = {
                         },
                         shipping_address: this.buildCheckoutShippingPayload(),
                         shipping_option: (() => {
+                            if (document.querySelector('input[name="deliveryType"]:checked')?.value === 'pickup')
+                                return { code: 'pickup', name: 'Retiro en persona', price: 0 };
                             const sel = document.querySelector('input[name="shippingOption"]:checked');
                             return sel ? { code: sel.value, name: sel.dataset.name, price: Number(sel.dataset.price || 0) } : null;
                         })(),
@@ -788,20 +819,21 @@ const Cart = {
     },
 
     updateShippingTotal(overlay) {
+        const isPickup = overlay.querySelector('input[name="deliveryType"]:checked')?.value === 'pickup';
         const selected = overlay.querySelector('input[name="shippingOption"]:checked');
         const display = overlay.querySelector('#checkoutShippingDisplay');
         const totalEl = overlay.querySelector('#checkoutTotal');
 
-        const shippingPrice = selected ? Number(selected.dataset.price || 0) : 0;
+        const shippingPrice = isPickup ? 0 : (selected ? Number(selected.dataset.price || 0) : 0);
         const subtotal = this.getTotal();
         const paymentMethod = overlay.querySelector('input[name="checkoutPayment"]:checked')?.value || 'mercadopago';
         const discount = ['transferencia', 'efectivo'].includes(paymentMethod) ? this.getTransferDiscountAmount() : 0;
         const total = Math.round((subtotal - discount + shippingPrice) * 100) / 100;
 
         if (display) {
-            display.textContent = shippingPrice > 0
-                ? `$${shippingPrice.toLocaleString('es-AR')}`
-                : 'A coordinar';
+            display.textContent = isPickup
+                ? 'Sin costo'
+                : (shippingPrice > 0 ? `$${shippingPrice.toLocaleString('es-AR')}` : 'A coordinar');
         }
         if (totalEl) totalEl.textContent = `$${total.toLocaleString('es-AR')}`;
     },
