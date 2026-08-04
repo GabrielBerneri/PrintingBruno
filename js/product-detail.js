@@ -331,10 +331,10 @@
       <div class="product-detail-content reveal visible">
         <span class="product-detail-category">${esc(Products.categoryLabel(product.category))}</span>
         <h1 class="product-detail-title">${esc(product.name)}</h1>
-        <div class="product-detail-price">${Products.formatPrice(price)}</div>
+        <div id="productDetailMainPrice" class="product-detail-price">${Products.formatPrice(price)}</div>
         <div id="installmentBadge" class="installment-badge" style="display:none"></div>
         ${Number(product.transfer_discount || 0) > 0 ? `
-          <div class="product-detail-price-discounted">${Products.formatPrice(price * (1 - Number(product.transfer_discount) / 100))} <span style="font-weight:400;font-size:0.85em;">con transferencia/efectivo</span></div>
+          <div id="productDetailTransferPrice" class="product-detail-price-discounted">${Products.formatPrice(price * (1 - Number(product.transfer_discount) / 100))} <span style="font-weight:400;font-size:0.85em;">con transferencia/efectivo</span></div>
           <span class="product-badge transfer-discount" style="position:static;display:inline-block;margin-top:0;margin-bottom:var(--space-md);">${Number(product.transfer_discount)}% OFF transferencia/efectivo</span>
         ` : ''}
         ${priceNote}
@@ -377,6 +377,7 @@
 
     const addBtn = document.getElementById('detailAddToCart');
     const stickyBtn = document.getElementById('detailAddToCartSticky');
+    const priceRef = { value: price }; // mutable — se actualiza al elegir cuotas
     const handleAddToCart = () => {
       Cart.addItem({
         id: product.id,
@@ -385,9 +386,9 @@
         variant_label: shouldShowVariantMeta ? selectedVariantLabel : '',
         cart_key: selectedVariant?.id ? `v:${selectedVariant.id}` : `p:${product.id}`,
         name: product.name,
-        price,
+        price: priceRef.value,
         image_url: primaryImage || product.image_url,
-        transfer_discount: Number(product.transfer_discount || 0)
+        transfer_discount: priceRef.value === price ? Number(product.transfer_discount || 0) : 0
       });
     };
 
@@ -402,11 +403,11 @@
     }
 
     setupGallery(root, imageUrls);
-    if (product.installments_enabled) loadInstallmentBadge(price, product.installment_prices || {});
+    if (product.installments_enabled) loadInstallmentBadge(price, product.installment_prices || {}, priceRef, root, Number(product.transfer_discount || 0));
   }
 
-  async function loadInstallmentBadge(price, installmentPrices) {
-    if (!price || price <= 0) return;
+  async function loadInstallmentBadge(basePrice, installmentPrices, priceRef, root, transferDiscount) {
+    if (!basePrice || basePrice <= 0) return;
     const badge = document.getElementById('installmentBadge');
     if (!badge) return;
 
@@ -416,17 +417,53 @@
       .filter(([n, p]) => n > 0 && p > 0)
       .sort(([a], [b]) => a - b);
 
+    const updatePriceDisplay = (newPrice, isInstallment) => {
+      priceRef.value = newPrice;
+      const mainEl = root.querySelector('#productDetailMainPrice');
+      if (mainEl) mainEl.textContent = Products.formatPrice(newPrice);
+      const transferEl = root.querySelector('#productDetailTransferPrice');
+      if (transferEl) {
+        if (!isInstallment && transferDiscount > 0) {
+          const dp = newPrice * (1 - transferDiscount / 100);
+          transferEl.innerHTML = `${Products.formatPrice(dp)} <span style="font-weight:400;font-size:0.85em;">con transferencia/efectivo</span>`;
+          transferEl.style.display = '';
+        } else {
+          transferEl.style.display = 'none';
+        }
+      }
+    };
+
     if (entries.length > 0) {
-      badge.innerHTML = entries
-        .map(([n, p]) => `${n} cuotas de ${fmt(p / n)} <span style="color:var(--text-muted);font-size:0.85em;">(total ${fmt(p)}) — MercadoPago</span>`)
-        .join('<br>');
+      badge.innerHTML = `
+        <div style="margin:6px 0 2px;font-size:0.8rem;font-weight:600;color:var(--text-muted);letter-spacing:0.03em">OPCIONES DE CUOTAS (MercadoPago)</div>
+        <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+          ${entries.map(([n, p]) => `
+            <label data-price="${p}" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;border-radius:8px;border:1px solid var(--border-light);transition:border-color .15s,background .15s">
+              <input type="radio" name="installmentOption" value="${p}" style="accent-color:var(--accent);flex-shrink:0">
+              <span style="flex:1;font-size:0.9rem;font-weight:500">${n} cuotas sin interés</span>
+              <strong style="color:var(--accent)">${fmt(p / n)}<span style="font-weight:400;font-size:0.8em">/mes</span></strong>
+              <span style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap">Total ${fmt(p)}</span>
+            </label>
+          `).join('')}
+        </div>`;
       badge.style.display = '';
+
+      badge.querySelectorAll('input[name="installmentOption"]').forEach(r => {
+        r.addEventListener('change', () => {
+          updatePriceDisplay(Number(r.value), true);
+          badge.querySelectorAll('label[data-price]').forEach(l => {
+            const sel = l.dataset.price === r.value;
+            l.style.borderColor = sel ? 'var(--accent)' : 'var(--border-light)';
+            l.style.background = sel ? 'color-mix(in srgb, var(--accent) 8%, transparent)' : '';
+          });
+        });
+      });
       return;
     }
 
-    // Fallback: calcular desde la API
+    // Fallback: badge calculado por API
     try {
-      const res = await fetch(`api/installments.php?amount=${Math.round(price)}`);
+      const res = await fetch(`api/installments.php?amount=${Math.round(basePrice)}`);
       if (!res.ok) return;
       const data = await res.json();
       if (data.error || !data.installments || !data.installment_amount) return;
