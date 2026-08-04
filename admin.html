@@ -1946,6 +1946,7 @@
             document.getElementById('pFeatured').checked = p.featured == 1;
             document.getElementById('pInstallments').checked = p.installments_enabled == 1;
             document.getElementById('pTransferDiscount').value = parseInt(p.transfer_discount || 0, 10);
+            document.getElementById('pCostPrice').value = '';
             document.getElementById('pGananciaObj').value = '';
             updateTransferDiscountPreview();
             updateInstallmentsCalc();
