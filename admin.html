@@ -1822,9 +1822,10 @@
             analysis.style.display = '';
 
             let rows = [], i = 0;
-            const addRow = (label, cobrar) => {
-                const g = cost > 0 ? cobrar - cost : null;
-                const m = g !== null && cobrar > 0 ? (g / cobrar * 100) : null;
+            // net = lo que realmente recibís después de comisiones (puede diferir de cobrar)
+            const addRow = (label, cobrar, net = cobrar) => {
+                const g = cost > 0 ? net - cost : null;
+                const m = g !== null && net > 0 ? (g / net * 100) : null;
                 const clr = g !== null ? (g >= 0 ? '#4ade80' : '#f87171') : 'var(--text-muted)';
                 const bg = i++ % 2 === 0 ? 'background:var(--bg-card)' : '';
                 rows.push(`<tr style="${bg}">
@@ -1837,7 +1838,8 @@
 
             addRow('Contado (tarjeta / MP sin cuotas)', price);
             if (discount > 0) addRow(`Transferencia / Efectivo (−${discount}%)`, price * (1 - discount / 100));
-            if (hasCuotas) MP_COMMISSIONS.forEach(({ label, rate }) => addRow(`${label} MP`, price / (1 - rate / 100)));
+            // Para cuotas: cobrar es el precio al cliente; lo que recibís vos es price (MP se lleva la diferencia)
+            if (hasCuotas) MP_COMMISSIONS.forEach(({ label, rate }) => addRow(`${label} MP`, price / (1 - rate / 100), price));
 
             body.innerHTML = rows.join('');
         }
