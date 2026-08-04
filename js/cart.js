@@ -41,6 +41,8 @@ const Cart = {
             image_url: String(item?.image_url || ''),
             quantity: Math.max(1, Number(item?.quantity || 1) || 1),
             transfer_discount: Math.max(0, Math.min(100, Number(item?.transfer_discount || 0))),
+            payment_method: String(item?.payment_method || 'mercadopago'),
+            installments: item?.installments != null ? Number(item.installments) : null,
         };
     },
 
@@ -690,6 +692,7 @@ const Cart = {
                         })(),
                         notes: document.getElementById('checkoutNotes')?.value || '',
                         payment_method: paymentMethod,
+                        installments: this.getItems().map(i => i.installments).find(v => v != null) ?? null,
                         idempotency_key: this.getCheckoutToken()
                     })
                 });

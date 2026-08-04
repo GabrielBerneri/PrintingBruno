@@ -158,6 +158,8 @@ try {
         $paymentMethod = 'mercadopago';
     }
     $applyTransferDiscount = in_array($paymentMethod, ['transferencia', 'efectivo']);
+    $requestedInstallments = isset($body['installments']) && is_numeric($body['installments']) ? (int)$body['installments'] : null;
+    $hasInstallmentPricesColumn = pbHasColumn($db, 'products', 'installment_prices');
 
     foreach ($body['items'] as $item) {
         $pid = (int)($item['product_id'] ?? $item['id'] ?? 0);
@@ -204,8 +206,19 @@ try {
         $price = $variant && $variant['price'] !== null
             ? (float)$variant['price']
             : (float)$product['price'];
+
+        // Aplicar precio de cuotas si fue seleccionado y está configurado
+        $installmentApplied = false;
+        if ($requestedInstallments && $requestedInstallments > 1 && $hasInstallmentPricesColumn && !empty($product['installment_prices'])) {
+            $installmentPrices = json_decode($product['installment_prices'], true) ?? [];
+            if (isset($installmentPrices[$requestedInstallments]) && (float)$installmentPrices[$requestedInstallments] > 0) {
+                $price = (float)$installmentPrices[$requestedInstallments];
+                $installmentApplied = true;
+            }
+        }
+
         $discountPercent = max(0, min(100, (int)($product['transfer_discount'] ?? 0)));
-        if ($applyTransferDiscount && $discountPercent > 0) {
+        if (!$installmentApplied && $applyTransferDiscount && $discountPercent > 0) {
             $price = round($price * (1 - $discountPercent / 100), 2);
         }
         $total += $price * $qty;
@@ -403,7 +416,7 @@ try {
 
     // Create preference
     $client = new PreferenceClient();
-    $preference = $client->create([
+    $preferenceData = [
         'items' => $mpItems,
         'payer' => [
             'name' => $body['customer']['name'],
@@ -421,7 +434,14 @@ try {
         'notification_url' => MP_WEBHOOK_URL,
         'external_reference' => (string)$orderId,
         'statement_descriptor' => SITE_NAME,
-    ]);
+    ];
+    if ($requestedInstallments !== null && $requestedInstallments > 0) {
+        $preferenceData['payment_methods'] = [
+            'installments' => $requestedInstallments,
+            'default_installments' => $requestedInstallments,
+        ];
+    }
+    $preference = $client->create($preferenceData);
 
     // Update order with preference ID
     $stmt = $db->prepare("

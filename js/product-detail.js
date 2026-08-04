@@ -379,6 +379,7 @@
     const stickyBtn = document.getElementById('detailAddToCartSticky');
     const priceRef = { value: price };
     const paymentMethodRef = { value: 'mercadopago' };
+    const installmentsRef = { value: null };
     const handleAddToCart = () => {
       Cart.addItem({
         id: product.id,
@@ -390,7 +391,8 @@
         price: priceRef.value,
         image_url: primaryImage || product.image_url,
         transfer_discount: priceRef.value === price ? Number(product.transfer_discount || 0) : 0,
-        payment_method: paymentMethodRef.value
+        payment_method: paymentMethodRef.value,
+        installments: installmentsRef.value
       });
     };
 
@@ -407,11 +409,11 @@
     setupGallery(root, imageUrls);
     const transferDiscount = Number(product.transfer_discount || 0);
     if (product.installments_enabled || transferDiscount > 0) {
-      loadInstallmentBadge(price, product.installment_prices || {}, priceRef, paymentMethodRef, root, transferDiscount);
+      loadInstallmentBadge(price, product.installment_prices || {}, priceRef, paymentMethodRef, installmentsRef, root, transferDiscount);
     }
   }
 
-  async function loadInstallmentBadge(basePrice, installmentPrices, priceRef, paymentMethodRef, root, transferDiscount) {
+  async function loadInstallmentBadge(basePrice, installmentPrices, priceRef, paymentMethodRef, installmentsRef, root, transferDiscount) {
     if (!basePrice || basePrice <= 0) return;
     const badge = document.getElementById('installmentBadge');
     if (!badge) return;
@@ -422,9 +424,10 @@
       .filter(([n, p]) => n > 0 && p > 0)
       .sort(([a], [b]) => a - b);
 
-    const updatePriceDisplay = (newPrice, method = 'mercadopago') => {
+    const updatePriceDisplay = (newPrice, method = 'mercadopago', cuotas = null) => {
       priceRef.value = newPrice;
       paymentMethodRef.value = method;
+      installmentsRef.value = cuotas;
       const mainEl = root.querySelector('#productDetailMainPrice');
       if (mainEl) mainEl.textContent = Products.formatPrice(newPrice);
       const transferEl = root.querySelector('#productDetailTransferPrice');
@@ -440,17 +443,17 @@
 
       const allOptions = [];
       if (transferPrice) {
-        allOptions.push({ label: `Transferencia / Efectivo (${transferDiscount}% OFF)`, price: transferPrice, perMonth: null, method: 'transferencia' });
+        allOptions.push({ label: `Transferencia / Efectivo (${transferDiscount}% OFF)`, price: transferPrice, perMonth: null, method: 'transferencia', cuotas: null });
       }
-      allOptions.push({ label: '1 pago MercadoPago', price: basePrice, perMonth: null, method: 'mercadopago' });
-      entries.forEach(([n, p]) => allOptions.push({ label: `${n} cuotas sin interés`, price: p, perMonth: p / n, method: 'mercadopago' }));
+      allOptions.push({ label: '1 pago MercadoPago', price: basePrice, perMonth: null, method: 'mercadopago', cuotas: 1 });
+      entries.forEach(([n, p]) => allOptions.push({ label: `${n} cuotas sin interés`, price: p, perMonth: p / n, method: 'mercadopago', cuotas: n }));
 
       badge.innerHTML = `
         <div style="margin:6px 0 2px;font-size:0.8rem;font-weight:600;color:var(--text-muted);letter-spacing:0.03em">OPCIONES DE PAGO</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
           ${allOptions.map(opt => `
             <label data-price="${opt.price}" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;border-radius:8px;border:1px solid var(--border-light);transition:border-color .15s,background .15s">
-              <input type="radio" name="installmentOption" value="${opt.price}" data-method="${opt.method}" style="accent-color:var(--accent);flex-shrink:0">
+              <input type="radio" name="installmentOption" value="${opt.price}" data-method="${opt.method}" data-cuotas="${opt.cuotas ?? ''}" style="accent-color:var(--accent);flex-shrink:0">
               <span style="flex:1;font-size:0.9rem;font-weight:500">${opt.label}</span>
               ${opt.perMonth ? `<strong style="color:var(--accent)">${fmt(opt.perMonth)}<span style="font-weight:400;font-size:0.8em">/mes</span></strong>` : ''}
               <span style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap">Total ${fmt(opt.price)}</span>
@@ -462,7 +465,8 @@
       badge.querySelectorAll('input[name="installmentOption"]').forEach(r => {
         r.addEventListener('change', () => {
           const method = r.dataset.method || 'mercadopago';
-          updatePriceDisplay(Number(r.value), method);
+          const cuotas = r.dataset.cuotas ? Number(r.dataset.cuotas) : null;
+          updatePriceDisplay(Number(r.value), method, cuotas);
           badge.querySelectorAll('label[data-price]').forEach(l => {
             const sel = l.dataset.price === r.value;
             l.style.borderColor = sel ? 'var(--accent)' : 'var(--border-light)';
