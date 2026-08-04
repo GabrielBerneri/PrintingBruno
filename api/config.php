@@ -104,6 +104,10 @@ define('MP_PUBLIC_KEY', pbEnv('MP_PUBLIC_KEY', 'TEST-00000000-0000-0000-0000-000
 // Webhook secret: Configuraciones > Webhooks > Clave secreta en el panel de MP
 define('MP_WEBHOOK_SECRET', pbEnv('MP_WEBHOOK_SECRET', 'your_webhook_secret_here')); // Replace with your webhook secret
 
+// Cuotas a mostrar en la página del producto (badge informativo)
+// Si la API de MP responde, se usan los datos reales; de lo contrario se divide el precio por este número.
+define('INSTALLMENTS_COUNT', (int)pbEnv('INSTALLMENTS_COUNT', '3'));
+
 // ===== Site Configuration =====
 // ⚠️  PRODUCCIÓN: cambiar al dominio real (con https://)
 define('SITE_URL', pbEnv('SITE_URL', 'https://localhost/printingbruno')); // LOCAL — en producción usar dominio real
