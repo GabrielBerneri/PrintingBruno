@@ -894,7 +894,10 @@
                                 <!-- Right Column: Data -->
                                 <div style="flex:1;min-width:300px;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
                                     <div class="form-group" style="grid-column:1/-1"><label class="form-label">Nombre *</label><input type="text" class="form-input" id="pName" required></div>
-                                    <div class="form-group"><label class="form-label">Precio *</label><input type="number" class="form-input" id="pPrice" step="0.01" required></div>
+                                    <div class="form-group" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
+                                        <div><label class="form-label">Precio de venta *</label><input type="number" class="form-input" id="pPrice" step="0.01" required></div>
+                                        <div><label class="form-label">Costo proveedor <span style="font-weight:400;font-size:0.8rem;color:var(--text-muted)">(opcional, para ver margen)</span></label><input type="number" class="form-input" id="pCostPrice" step="1" min="0" placeholder="Ej: 800000"></div>
+                                    </div>
                                     <div class="form-group"><label class="form-label">Categoría *</label>
                                         <select class="form-select" id="pCategory" required>
                                             <option value="figuras">Figuras</option>
@@ -921,31 +924,25 @@
                                         </div>
                                         <div class="field-help">0 = sin descuento para este producto.</div>
                                     </div>
-                                    <!-- Calculador de cuotas MP -->
-                                    <div id="installmentsCalc" style="display:none;grid-column:1/-1;border:1px solid var(--border-light);border-radius:var(--border-radius-md);overflow:hidden">
-                                        <div style="background:var(--bg-elevated);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
-                                            <span style="font-size:0.82rem;font-weight:700;color:var(--text-secondary)">Calculador de cuotas MP</span>
-                                            <label style="display:flex;align-items:center;gap:8px;font-size:0.85rem;color:var(--text-secondary)">
-                                                Costo proveedor:
-                                                <input type="number" id="pCostPrice" min="0" step="1" placeholder="$0"
-                                                    style="width:110px;padding:4px 8px;border-radius:6px;border:1px solid var(--border-light);background:var(--bg-card);color:var(--text-primary);font-size:0.88rem">
-                                            </label>
-                                        </div>
-                                        <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
-                                            <thead>
-                                                <tr style="background:var(--bg-card)">
-                                                    <th style="text-align:left;padding:7px 14px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Cuotas</th>
-                                                    <th style="text-align:right;padding:7px 14px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Comisión MP</th>
-                                                    <th style="text-align:right;padding:7px 14px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Precio a cobrar</th>
-                                                    <th style="text-align:right;padding:7px 14px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Ganancia</th>
-                                                    <th style="text-align:right;padding:7px 14px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Margen</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="installmentsCalcBody"></tbody>
-                                        </table>
-                                        <div style="padding:6px 14px;font-size:0.73rem;color:var(--text-muted);border-top:1px solid var(--border-subtle)">precio / (1 − comisión%). Valores orientativos, pueden variar por provincia.</div>
-                                    </div>
                                 </div>
+                            </div>
+                            <!-- Análisis de márgenes — ancho completo, fuera del flex de columnas -->
+                            <div id="priceAnalysis" style="display:none;border:1px solid var(--border-light);border-radius:var(--border-radius-md);overflow:hidden;margin-top:var(--space-md)">
+                                <div style="background:var(--bg-elevated);padding:9px 16px;font-size:0.82rem;font-weight:700;color:var(--text-secondary)">Análisis de márgenes por forma de pago</div>
+                                <div style="overflow-x:auto">
+                                    <table style="width:100%;border-collapse:collapse;font-size:0.88rem;min-width:480px">
+                                        <thead>
+                                            <tr style="background:var(--bg-card)">
+                                                <th style="text-align:left;padding:7px 16px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Forma de pago</th>
+                                                <th style="text-align:right;padding:7px 16px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Precio a cobrar</th>
+                                                <th style="text-align:right;padding:7px 16px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Ganancia</th>
+                                                <th style="text-align:right;padding:7px 16px;color:var(--text-muted);font-weight:600;font-size:0.78rem">Margen</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="priceAnalysisBody"></tbody>
+                                    </table>
+                                </div>
+                                <div style="padding:6px 16px;font-size:0.73rem;color:var(--text-muted);border-top:1px solid var(--border-subtle)">Cuotas MP: precio / (1 − comisión%). Valores orientativos, pueden variar por provincia.</div>
                             </div>
                             <div class="form-group" style="margin-top:var(--space-md)"><label class="form-label">Descripción</label><textarea class="form-textarea" id="pDescription" rows="4"></textarea></div>
                             <div class="form-group" style="margin-top:var(--space-xl)">
@@ -1814,32 +1811,41 @@
         }
 
         function updateInstallmentsCalc() {
-            const calc = document.getElementById('installmentsCalc');
-            const body = document.getElementById('installmentsCalcBody');
-            const enabled = document.getElementById('pInstallments').checked;
-            calc.style.display = enabled ? '' : 'none';
-            if (!enabled) return;
-            const price = parseFloat(document.getElementById('pPrice').value) || 0;
-            const cost  = parseFloat(document.getElementById('pCostPrice').value) || 0;
-            body.innerHTML = MP_COMMISSIONS.map(({ label, rate }) => {
-                const cobrar   = price > 0 ? price / (1 - rate / 100) : 0;
-                const ganancia = cost > 0 && cobrar > 0 ? cobrar - cost : null;
-                const margen   = ganancia !== null && cobrar > 0 ? (ganancia / cobrar * 100) : null;
-                const ganStr   = ganancia !== null ? `<span style="color:${ganancia >= 0 ? '#4ade80' : '#f87171'}">${ganancia >= 0 ? '+' : ''}${fmtARS(ganancia)}</span>` : '<span style="color:var(--text-muted)">—</span>';
-                const marStr   = margen   !== null ? `<span style="color:${margen   >= 0 ? '#4ade80' : '#f87171'}">${margen.toFixed(1)}%</span>` : '<span style="color:var(--text-muted)">—</span>';
-                return `<tr style="border-top:1px solid var(--border-subtle)">
-                    <td style="padding:7px 14px;font-weight:600">${label}</td>
-                    <td style="padding:7px 14px;text-align:right;color:var(--text-muted)">${rate}%</td>
-                    <td style="padding:7px 14px;text-align:right;font-weight:700;color:var(--accent)">${price > 0 ? fmtARS(cobrar) : '—'}</td>
-                    <td style="padding:7px 14px;text-align:right">${ganStr}</td>
-                    <td style="padding:7px 14px;text-align:right">${marStr}</td>
-                </tr>`;
-            }).join('');
+            const analysis = document.getElementById('priceAnalysis');
+            const body = document.getElementById('priceAnalysisBody');
+            const price    = parseFloat(document.getElementById('pPrice').value) || 0;
+            const cost     = parseFloat(document.getElementById('pCostPrice').value) || 0;
+            const discount = parseInt(document.getElementById('pTransferDiscount').value) || 0;
+            const hasCuotas = document.getElementById('pInstallments').checked;
+
+            if (price <= 0) { analysis.style.display = 'none'; return; }
+            analysis.style.display = '';
+
+            let rows = [], i = 0;
+            const addRow = (label, cobrar) => {
+                const g = cost > 0 ? cobrar - cost : null;
+                const m = g !== null && cobrar > 0 ? (g / cobrar * 100) : null;
+                const clr = g !== null ? (g >= 0 ? '#4ade80' : '#f87171') : 'var(--text-muted)';
+                const bg = i++ % 2 === 0 ? 'background:var(--bg-card)' : '';
+                rows.push(`<tr style="${bg}">
+                    <td style="padding:7px 16px;color:var(--text-primary)">${label}</td>
+                    <td style="text-align:right;padding:7px 16px;font-weight:600;color:var(--text-primary)">${fmtARS(cobrar)}</td>
+                    <td style="text-align:right;padding:7px 16px;color:${clr}">${g !== null ? fmtARS(g) : '—'}</td>
+                    <td style="text-align:right;padding:7px 16px;color:${clr}">${m !== null ? m.toFixed(1) + '%' : '—'}</td>
+                </tr>`);
+            };
+
+            addRow('Contado (tarjeta / MP sin cuotas)', price);
+            if (discount > 0) addRow(`Transferencia / Efectivo (−${discount}%)`, price * (1 - discount / 100));
+            if (hasCuotas) MP_COMMISSIONS.forEach(({ label, rate }) => addRow(`${label} MP`, price / (1 - rate / 100)));
+
+            body.innerHTML = rows.join('');
         }
 
         document.getElementById('pInstallments').addEventListener('change', updateInstallmentsCalc);
         document.getElementById('pPrice').addEventListener('input', updateInstallmentsCalc);
         document.getElementById('pCostPrice').addEventListener('input', updateInstallmentsCalc);
+        document.getElementById('pTransferDiscount').addEventListener('input', updateInstallmentsCalc);
 
         function updateTransferDiscountPreview() {
             const previewEl = document.getElementById('pTransferDiscountPreview');
