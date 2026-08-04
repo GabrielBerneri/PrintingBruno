@@ -18,6 +18,7 @@ try {
     pbExpireReservations($db);
     $hasImageUrlsColumn = hasImageUrlsColumn($db);
     $hasTransferDiscountColumn = pbHasColumn($db, 'products', 'transfer_discount');
+    $hasInstallmentsColumn     = pbHasColumn($db, 'products', 'installments_enabled');
 
     // Campos públicos — no exponer active, created_at, updated_at (campos internos)
     $publicFields = 'id, name, slug, description, price, category, image_url, badge, material, stock, featured';
@@ -26,6 +27,9 @@ try {
     }
     if ($hasTransferDiscountColumn) {
         $publicFields .= ', transfer_discount';
+    }
+    if ($hasInstallmentsColumn) {
+        $publicFields .= ', installments_enabled';
     }
 
     // Single product
@@ -45,6 +49,7 @@ try {
 
         $product['price'] = (float)$product['price'];
         $product['transfer_discount'] = (int)($product['transfer_discount'] ?? 0);
+        $product['installments_enabled'] = (int)($product['installments_enabled'] ?? 0);
         enrichAvailableStock($db, $product);
         enrichProductImages($product, $hasImageUrlsColumn);
         $singleProductList = [$product];
@@ -91,6 +96,7 @@ try {
     foreach ($products as &$p) {
         $p['price'] = (float)$p['price'];
         $p['transfer_discount'] = (int)($p['transfer_discount'] ?? 0);
+        $p['installments_enabled'] = (int)($p['installments_enabled'] ?? 0);
         enrichAvailableStock($db, $p);
         enrichProductImages($p, $hasImageUrlsColumn);
     }

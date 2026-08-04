@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Admin | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260803-7">
+    <link rel="stylesheet" href="css/styles.css?v=20260803-8">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <style>
         /* ===== Admin Dashboard Styles ===== */
@@ -887,6 +887,23 @@
                                     <div style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:var(--border-radius);padding:var(--space-md);display:flex;flex-direction:column;gap:var(--space-md)">
                                         <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pActive" checked> Activo</label>
                                         <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pFeatured"> Destacado ⭐</label>
+                                        <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pInstallments"> Ofrece cuotas (MP)</label>
+                                    </div>
+                                    <!-- Calculador de comisiones MP -->
+                                    <div id="installmentsCalc" style="display:none;background:var(--bg-elevated);border:1px solid var(--border-light);border-radius:var(--border-radius-md);padding:var(--space-md);margin-top:var(--space-sm)">
+                                        <div style="font-size:0.8rem;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-muted);margin-bottom:var(--space-sm)">Comisiones MercadoPago — precio a cobrar para no perder</div>
+                                        <table style="width:100%;border-collapse:collapse;font-size:0.88rem">
+                                            <thead>
+                                                <tr style="color:var(--text-muted);font-size:0.78rem">
+                                                    <th style="text-align:left;padding:4px 6px">Cuotas</th>
+                                                    <th style="text-align:right;padding:4px 6px">Comisión MP</th>
+                                                    <th style="text-align:right;padding:4px 6px">Precio a cobrar</th>
+                                                    <th style="text-align:right;padding:4px 6px">Diferencia</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="installmentsCalcBody"></tbody>
+                                        </table>
+                                        <div style="font-size:0.75rem;color:var(--text-muted);margin-top:var(--space-sm)">Fórmula: precio / (1 − comisión%). Las comisiones son orientativas y pueden variar por provincia.</div>
                                     </div>
                                 </div>
 
@@ -1778,6 +1795,38 @@
             if (e.target === e.currentTarget) closeProductModal();
         });
 
+        const MP_COMMISSIONS = [
+            { label: '2 cuotas', rate: 7.79 },
+            { label: '3 cuotas', rate: 10.49 },
+            { label: '6 cuotas', rate: 18.69 },
+        ];
+
+        function fmtARS(n) {
+            return '$' + Math.round(n).toLocaleString('es-AR');
+        }
+
+        function updateInstallmentsCalc() {
+            const calc = document.getElementById('installmentsCalc');
+            const body = document.getElementById('installmentsCalcBody');
+            const enabled = document.getElementById('pInstallments').checked;
+            calc.style.display = enabled ? '' : 'none';
+            if (!enabled) return;
+            const price = parseFloat(document.getElementById('pPrice').value) || 0;
+            body.innerHTML = MP_COMMISSIONS.map(({ label, rate }) => {
+                const adjusted = price > 0 ? price / (1 - rate / 100) : 0;
+                const diff = adjusted - price;
+                return `<tr style="border-top:1px solid var(--border-subtle)">
+                    <td style="padding:5px 6px;font-weight:600">${label}</td>
+                    <td style="padding:5px 6px;text-align:right;color:var(--text-muted)">${rate}%</td>
+                    <td style="padding:5px 6px;text-align:right;font-weight:700;color:var(--accent)">${price > 0 ? fmtARS(adjusted) : '—'}</td>
+                    <td style="padding:5px 6px;text-align:right;color:#f87171">${price > 0 ? '+' + fmtARS(diff) : '—'}</td>
+                </tr>`;
+            }).join('');
+        }
+
+        document.getElementById('pInstallments').addEventListener('change', updateInstallmentsCalc);
+        document.getElementById('pPrice').addEventListener('input', updateInstallmentsCalc);
+
         function updateTransferDiscountPreview() {
             const previewEl = document.getElementById('pTransferDiscountPreview');
             const price = parseFloat(document.getElementById('pPrice').value) || 0;
@@ -1796,11 +1845,13 @@
             document.getElementById('productId').value = '';
             document.getElementById('productForm').reset();
             document.getElementById('pActive').checked = true;
+            document.getElementById('pInstallments').checked = false;
             document.getElementById('pStock').value = 0;
             document.getElementById('productFormTitle').textContent = 'Nuevo Producto';
             resetImageUploader();
             resetVariantBlocks();
             updateTransferDiscountPreview();
+            updateInstallmentsCalc();
             formOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
         });
@@ -1827,8 +1878,10 @@
             }]);
             document.getElementById('pActive').checked = p.active == 1;
             document.getElementById('pFeatured').checked = p.featured == 1;
+            document.getElementById('pInstallments').checked = p.installments_enabled == 1;
             document.getElementById('pTransferDiscount').value = parseInt(p.transfer_discount || 0, 10);
             updateTransferDiscountPreview();
+            updateInstallmentsCalc();
             document.getElementById('productFormTitle').textContent = 'Editar Producto';
             formOverlay.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -1851,6 +1904,7 @@
                 description: document.getElementById('pDescription').value,
                 active: document.getElementById('pActive').checked ? 1 : 0,
                 featured: document.getElementById('pFeatured').checked ? 1 : 0,
+                installments_enabled: document.getElementById('pInstallments').checked ? 1 : 0,
                 transfer_discount: Math.max(0, Math.min(100, parseInt(document.getElementById('pTransferDiscount').value, 10) || 0)),
                 variants,
             };

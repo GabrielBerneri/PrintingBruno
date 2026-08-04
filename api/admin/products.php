@@ -23,6 +23,13 @@ adminRequireCsrf();
 $db = getDB();
 $hasImageUrlsColumn = hasImageUrlsColumn($db);
 $hasTransferDiscountColumn = pbHasColumn($db, 'products', 'transfer_discount');
+$hasInstallmentsColumn = pbHasColumn($db, 'products', 'installments_enabled');
+if (!$hasInstallmentsColumn) {
+    try {
+        $db->exec("ALTER TABLE products ADD COLUMN installments_enabled TINYINT(1) NOT NULL DEFAULT 0");
+        $hasInstallmentsColumn = true;
+    } catch (Exception $e) {}
+}
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
@@ -36,6 +43,7 @@ try {
                 $p['reserved_stock'] = (int)($reservedByProduct[(int)$p['id']] ?? 0);
                 $p['available_stock'] = max(0, (int)$p['stock'] - $p['reserved_stock']);
                 $p['transfer_discount'] = $hasTransferDiscountColumn ? (int)($p['transfer_discount'] ?? 0) : 0;
+                $p['installments_enabled'] = $hasInstallmentsColumn ? (int)($p['installments_enabled'] ?? 0) : 0;
                 enrichProductImages($p, $hasImageUrlsColumn);
             }
             unset($p);
@@ -96,6 +104,10 @@ try {
                 $columns .= ', transfer_discount';
                 $params[] = max(0, min(100, (int)($body['transfer_discount'] ?? 0)));
             }
+            if ($hasInstallmentsColumn) {
+                $columns .= ', installments_enabled';
+                $params[] = (int)($body['installments_enabled'] ?? 0);
+            }
             $placeholders = implode(', ', array_fill(0, count($params), '?'));
             $stmt = $db->prepare("INSERT INTO products ($columns) VALUES ($placeholders)");
             $stmt->execute($params);
@@ -131,6 +143,9 @@ try {
             if ($hasTransferDiscountColumn) {
                 $fields[] = 'transfer_discount';
             }
+            if ($hasInstallmentsColumn) {
+                $fields[] = 'installments_enabled';
+            }
             $updates = [];
             $params = [];
             
@@ -139,7 +154,7 @@ try {
                     $updates[] = "$field = ?";
                     $params[] = $field === 'transfer_discount'
                         ? max(0, min(100, (int)$body[$field]))
-                        : $body[$field];
+                        : ($field === 'installments_enabled' ? (int)$body[$field] : $body[$field]);
                 }
             }
 

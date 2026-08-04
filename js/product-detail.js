@@ -402,7 +402,7 @@
     }
 
     setupGallery(root, imageUrls);
-    loadInstallmentBadge(price);
+    if (product.installments_enabled) loadInstallmentBadge(price);
   }
 
   async function loadInstallmentBadge(price) {
