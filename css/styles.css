@@ -1586,6 +1586,20 @@ select {
   font-size: 2rem;
   font-weight: 800;
   color: var(--accent);
+  margin-bottom: var(--space-sm);
+}
+
+.installment-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 180, 100, 0.12);
+  border: 1px solid rgba(0, 180, 100, 0.3);
+  color: #00b464;
+  border-radius: 8px;
+  padding: 5px 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
   margin-bottom: var(--space-lg);
 }
 
