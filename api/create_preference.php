@@ -79,11 +79,14 @@ try {
     }
 
     $shippingBody = isset($body['shipping_address']) && is_array($body['shipping_address']) ? $body['shipping_address'] : null;
-    if (!$shippingBody
+    $isPickup = isset($body['shipping_option']['code']) && $body['shipping_option']['code'] === 'pickup';
+    if (!$isPickup && (
+        !$shippingBody
         || empty(trim((string)($shippingBody['street'] ?? '')))
         || empty(trim((string)($shippingBody['city'] ?? '')))
         || empty(trim((string)($shippingBody['province'] ?? '')))
-        || empty(trim((string)($shippingBody['postal_code'] ?? '')))) {
+        || empty(trim((string)($shippingBody['postal_code'] ?? '')))
+    )) {
         jsonResponse(['error' => 'Por favor completá la dirección de entrega (calle, ciudad, provincia y código postal).'], 400);
     }
 

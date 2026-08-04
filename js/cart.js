@@ -660,12 +660,15 @@ const Cart = {
             try {
                 const paymentMethod = this.getPaymentMethod();
 
-                const streetVal = (document.getElementById('checkoutStreet')?.value || '').trim();
-                const cityVal = (document.getElementById('checkoutCity')?.value || '').trim();
-                const provinceVal = (document.getElementById('checkoutProvince')?.value || '').trim();
-                const postalVal = (document.getElementById('checkoutPostalCode')?.value || '').trim();
-                if (!streetVal || !cityVal || !provinceVal || !postalVal) {
-                    throw new Error('Completá la dirección de entrega (calle, ciudad, provincia y código postal).');
+                const isPickup = document.querySelector('input[name="deliveryType"]:checked')?.value === 'pickup';
+                if (!isPickup) {
+                    const streetVal = (document.getElementById('checkoutStreet')?.value || '').trim();
+                    const cityVal = (document.getElementById('checkoutCity')?.value || '').trim();
+                    const provinceVal = (document.getElementById('checkoutProvince')?.value || '').trim();
+                    const postalVal = (document.getElementById('checkoutPostalCode')?.value || '').trim();
+                    if (!streetVal || !cityVal || !provinceVal || !postalVal) {
+                        throw new Error('Completá la dirección de entrega (calle, ciudad, provincia y código postal).');
+                    }
                 }
 
                 const response = await fetch(`${this.getApiBase()}/create_preference.php`, {
