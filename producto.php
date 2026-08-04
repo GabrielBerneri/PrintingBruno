@@ -78,7 +78,7 @@
     <?php pb_render_footer(); ?>
     <?php pb_render_cart_drawer(); ?>
 
-    <script src="js/cart.js?v=20260804-3"></script>
+    <script src="js/cart.js?v=20260804-4"></script>
     <script src="js/products.js?v=20260331-1"></script>
     <script src="js/main.js?v=20260803-2"></script>
     <script src="js/product-detail.js?v=20260804-5"></script>

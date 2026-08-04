@@ -70,7 +70,17 @@ const Cart = {
         const existing = items.find(i => this.itemKey(i) === incomingKey);
 
         if (existing) {
-            existing.quantity += quantity;
+            const paymentChanged = existing.price !== incoming.price
+                || existing.payment_method !== incoming.payment_method
+                || existing.installments !== incoming.installments;
+            if (paymentChanged) {
+                existing.price = incoming.price;
+                existing.payment_method = incoming.payment_method;
+                existing.installments = incoming.installments;
+                existing.transfer_discount = incoming.transfer_discount;
+            } else {
+                existing.quantity += quantity;
+            }
         } else {
             items.push(incoming);
         }
