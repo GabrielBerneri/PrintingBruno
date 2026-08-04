@@ -17,8 +17,9 @@ try {
     $db = getDB();
     pbExpireReservations($db);
     $hasImageUrlsColumn = hasImageUrlsColumn($db);
-    $hasTransferDiscountColumn = pbHasColumn($db, 'products', 'transfer_discount');
-    $hasInstallmentsColumn     = pbHasColumn($db, 'products', 'installments_enabled');
+    $hasTransferDiscountColumn      = pbHasColumn($db, 'products', 'transfer_discount');
+    $hasInstallmentsColumn          = pbHasColumn($db, 'products', 'installments_enabled');
+    $hasInstallmentPricesColumn     = pbHasColumn($db, 'products', 'installment_prices');
 
     // Campos públicos — no exponer active, created_at, updated_at (campos internos)
     $publicFields = 'id, name, slug, description, price, category, image_url, badge, material, stock, featured';
@@ -30,6 +31,9 @@ try {
     }
     if ($hasInstallmentsColumn) {
         $publicFields .= ', installments_enabled';
+    }
+    if ($hasInstallmentPricesColumn) {
+        $publicFields .= ', installment_prices';
     }
 
     // Single product
@@ -50,6 +54,8 @@ try {
         $product['price'] = (float)$product['price'];
         $product['transfer_discount'] = (int)($product['transfer_discount'] ?? 0);
         $product['installments_enabled'] = (int)($product['installments_enabled'] ?? 0);
+        $product['installment_prices'] = $hasInstallmentPricesColumn && !empty($product['installment_prices'])
+            ? (json_decode($product['installment_prices'], true) ?? []) : [];
         enrichAvailableStock($db, $product);
         enrichProductImages($product, $hasImageUrlsColumn);
         $singleProductList = [$product];
@@ -97,6 +103,8 @@ try {
         $p['price'] = (float)$p['price'];
         $p['transfer_discount'] = (int)($p['transfer_discount'] ?? 0);
         $p['installments_enabled'] = (int)($p['installments_enabled'] ?? 0);
+        $p['installment_prices'] = $hasInstallmentPricesColumn && !empty($p['installment_prices'])
+            ? (json_decode($p['installment_prices'], true) ?? []) : [];
         enrichAvailableStock($db, $p);
         enrichProductImages($p, $hasImageUrlsColumn);
     }

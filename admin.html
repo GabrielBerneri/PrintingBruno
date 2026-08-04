@@ -888,6 +888,17 @@
                                         <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pActive" checked> Activo</label>
                                         <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pFeatured"> Destacado ⭐</label>
                                         <label style="display:flex;align-items:center;gap:var(--space-sm);cursor:pointer;font-size:0.95rem"><input type="checkbox" id="pInstallments"> Ofrece cuotas (MP)</label>
+                                        <div id="installmentPricesBlock" style="display:none;margin-top:0.5rem;border:1px solid var(--border-light);border-radius:6px;padding:10px 12px;grid-column:1/-1">
+                                            <div style="font-size:0.78rem;font-weight:600;color:var(--text-muted);margin-bottom:8px">Precio por cantidad de cuotas <span style="font-weight:400">(dejar vacío para no ofrecer esa opción)</span></div>
+                                            <div style="display:grid;grid-template-columns:80px 1fr;gap:6px 10px;align-items:center">
+                                                <label style="font-size:0.88rem;color:var(--text-secondary)">2 cuotas</label>
+                                                <input type="number" id="pInstallmentPrice2" class="form-input" style="padding:5px 10px;font-size:0.88rem" step="1" min="0" placeholder="—">
+                                                <label style="font-size:0.88rem;color:var(--text-secondary)">3 cuotas</label>
+                                                <input type="number" id="pInstallmentPrice3" class="form-input" style="padding:5px 10px;font-size:0.88rem" step="1" min="0" placeholder="—">
+                                                <label style="font-size:0.88rem;color:var(--text-secondary)">6 cuotas</label>
+                                                <input type="number" id="pInstallmentPrice6" class="form-input" style="padding:5px 10px;font-size:0.88rem" step="1" min="0" placeholder="—">
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -1810,9 +1821,9 @@
 
         const MP_SINGLE_RATE = 7; // comisión MP 1 pago crédito
         const MP_COMMISSIONS = [
-            { label: '2 cuotas', rate: 7.79 },
-            { label: '3 cuotas', rate: 10.49 },
-            { label: '6 cuotas', rate: 18.69 },
+            { label: '2 cuotas', cuotas: 2, rate: 7.79 },
+            { label: '3 cuotas', cuotas: 3, rate: 10.49 },
+            { label: '6 cuotas', cuotas: 6, rate: 18.69 },
         ];
 
         function fmtARS(n) {
@@ -1835,17 +1846,21 @@
             analysis.style.display = '';
 
             let rows = [], i = 0;
-            const addRow = (label, cobrar, net, showUsar) => {
+            const efectivoTarget = suggestMode ? Math.round(cost + ganObj) : 0;
+            // cuotasN: si es fila de cuotas, llena el campo de precio correspondiente; si no, llena pPrice
+            const addRow = (label, cobrar, net, showUsar, cuotasN = 0) => {
                 const g = cost > 0 ? net - cost : null;
                 const m = g !== null && net > 0 ? (g / net * 100) : null;
                 const clr = g !== null ? (g >= 0 ? '#4ade80' : '#f87171') : 'var(--text-muted)';
                 const bg = i++ % 2 === 0 ? 'background:var(--bg-card)' : '';
                 const cobrarColor = showUsar ? 'var(--accent,#ff6b2b)' : 'var(--text-primary)';
-                const efectivoTarget = suggestMode ? Math.round(cost + ganObj) : 0;
+                const onclk = cuotasN
+                    ? `applyInstallmentPrice(${cuotasN},${Math.round(cobrar)})`
+                    : `applyPrice(${Math.round(cobrar)},${efectivoTarget})`;
                 const usarTd = showUsar
                     ? `<td style="padding:4px 12px;text-align:right"><button type="button"
                         style="font-size:0.73rem;padding:3px 10px;border-radius:4px;border:1px solid var(--accent,#ff6b2b);color:var(--accent,#ff6b2b);background:transparent;cursor:pointer;white-space:nowrap"
-                        onclick="applyPrice(${Math.round(cobrar)},${efectivoTarget})">Usar ←</button></td>`
+                        onclick="${onclk}">Usar ←</button></td>`
                     : '<td></td>';
                 rows.push(`<tr style="${bg}">
                     <td style="padding:7px 16px;color:var(--text-primary)">${label}</td>
@@ -1857,17 +1872,15 @@
             };
 
             if (suggestMode) {
-                // Modo sugerencia: partimos de costo + ganancia objetivo → mostramos qué cobrar
                 const net = cost + ganObj;
                 addRow('Efectivo / Transferencia', net, net, true);
                 addRow(`MP 1 pago crédito (${MP_SINGLE_RATE}%)`, net / (1 - MP_SINGLE_RATE / 100), net, true);
-                if (hasCuotas) MP_COMMISSIONS.forEach(({ label, rate }) =>
-                    addRow(`${label} MP`, net / (1 - rate / 100), net, true));
+                if (hasCuotas) MP_COMMISSIONS.forEach(({ label, cuotas, rate }) =>
+                    addRow(`${label} MP`, net / (1 - rate / 100), net, true, cuotas));
             } else {
-                // Modo análisis: partimos de pPrice → mostramos ganancia real
                 addRow('MP 1 pago crédito (precio base)', price, price * (1 - MP_SINGLE_RATE / 100));
                 if (discount > 0) addRow(`Efectivo / Transferencia (−${discount}%)`, price * (1 - discount / 100), price * (1 - discount / 100));
-                if (hasCuotas) MP_COMMISSIONS.forEach(({ label, rate }) =>
+                if (hasCuotas) MP_COMMISSIONS.forEach(({ label, cuotas, rate }) =>
                     addRow(`${label} MP`, price / (1 - rate / 100), price));
             }
 
@@ -1886,7 +1899,21 @@
             updateInstallmentsCalc();
         }
 
-        document.getElementById('pInstallments').addEventListener('change', updateInstallmentsCalc);
+        function applyInstallmentPrice(cuotas, suggestedPrice) {
+            const el = document.getElementById(`pInstallmentPrice${cuotas}`);
+            if (el) { el.value = suggestedPrice; }
+            updateInstallmentsCalc();
+        }
+
+        function toggleInstallmentPricesBlock() {
+            const enabled = document.getElementById('pInstallments').checked;
+            document.getElementById('installmentPricesBlock').style.display = enabled ? '' : 'none';
+        }
+
+        document.getElementById('pInstallments').addEventListener('change', () => {
+            toggleInstallmentPricesBlock();
+            updateInstallmentsCalc();
+        });
         document.getElementById('pPrice').addEventListener('input', updateInstallmentsCalc);
         document.getElementById('pCostPrice').addEventListener('input', updateInstallmentsCalc);
         document.getElementById('pTransferDiscount').addEventListener('input', updateInstallmentsCalc);
@@ -1913,6 +1940,8 @@
             document.getElementById('pInstallments').checked = false;
             document.getElementById('pStock').value = 0;
             document.getElementById('pGananciaObj').value = '';
+            [2, 3, 6].forEach(n => { const el = document.getElementById(`pInstallmentPrice${n}`); if (el) el.value = ''; });
+            toggleInstallmentPricesBlock();
             document.getElementById('productFormTitle').textContent = 'Nuevo Producto';
             resetImageUploader();
             resetVariantBlocks();
@@ -1948,6 +1977,12 @@
             document.getElementById('pTransferDiscount').value = parseInt(p.transfer_discount || 0, 10);
             document.getElementById('pCostPrice').value = '';
             document.getElementById('pGananciaObj').value = '';
+            const ip = p.installment_prices || {};
+            [2, 3, 6].forEach(n => {
+                const el = document.getElementById(`pInstallmentPrice${n}`);
+                if (el) el.value = ip[n] ? ip[n] : '';
+            });
+            toggleInstallmentPricesBlock();
             updateTransferDiscountPreview();
             updateInstallmentsCalc();
             document.getElementById('productFormTitle').textContent = 'Editar Producto';
@@ -1973,6 +2008,14 @@
                 active: document.getElementById('pActive').checked ? 1 : 0,
                 featured: document.getElementById('pFeatured').checked ? 1 : 0,
                 installments_enabled: document.getElementById('pInstallments').checked ? 1 : 0,
+                installment_prices: (() => {
+                    const ip = {};
+                    [2, 3, 6].forEach(n => {
+                        const v = parseFloat(document.getElementById(`pInstallmentPrice${n}`)?.value) || 0;
+                        if (v > 0) ip[n] = v;
+                    });
+                    return ip;
+                })(),
                 transfer_discount: Math.max(0, Math.min(100, parseInt(document.getElementById('pTransferDiscount').value, 10) || 0)),
                 variants,
             };

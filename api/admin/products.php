@@ -30,6 +30,13 @@ if (!$hasInstallmentsColumn) {
         $hasInstallmentsColumn = true;
     } catch (Exception $e) {}
 }
+$hasInstallmentPricesColumn = pbHasColumn($db, 'products', 'installment_prices');
+if (!$hasInstallmentPricesColumn) {
+    try {
+        $db->exec("ALTER TABLE products ADD COLUMN installment_prices TEXT NULL");
+        $hasInstallmentPricesColumn = true;
+    } catch (Exception $e) {}
+}
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
@@ -44,6 +51,8 @@ try {
                 $p['available_stock'] = max(0, (int)$p['stock'] - $p['reserved_stock']);
                 $p['transfer_discount'] = $hasTransferDiscountColumn ? (int)($p['transfer_discount'] ?? 0) : 0;
                 $p['installments_enabled'] = $hasInstallmentsColumn ? (int)($p['installments_enabled'] ?? 0) : 0;
+                $p['installment_prices'] = $hasInstallmentPricesColumn && !empty($p['installment_prices'])
+                    ? (json_decode($p['installment_prices'], true) ?? []) : [];
                 enrichProductImages($p, $hasImageUrlsColumn);
             }
             unset($p);
@@ -108,6 +117,12 @@ try {
                 $columns .= ', installments_enabled';
                 $params[] = (int)($body['installments_enabled'] ?? 0);
             }
+            if ($hasInstallmentPricesColumn) {
+                $columns .= ', installment_prices';
+                $ip = $body['installment_prices'] ?? [];
+                if (is_array($ip)) { foreach ($ip as $k => $v) { if ((float)$v <= 0) unset($ip[$k]); } }
+                $params[] = !empty($ip) ? json_encode($ip, JSON_UNESCAPED_SLASHES) : null;
+            }
             $placeholders = implode(', ', array_fill(0, count($params), '?'));
             $stmt = $db->prepare("INSERT INTO products ($columns) VALUES ($placeholders)");
             $stmt->execute($params);
@@ -148,6 +163,7 @@ try {
             }
             $updates = [];
             $params = [];
+            $installmentPricesFromBody = null;
             
             foreach ($fields as $field) {
                 if (isset($body[$field])) {
@@ -178,6 +194,13 @@ try {
                 }
             }
             
+            if ($hasInstallmentPricesColumn && array_key_exists('installment_prices', $body)) {
+                $ip = $body['installment_prices'] ?? [];
+                if (is_array($ip)) { foreach ($ip as $k => $v) { if ((float)$v <= 0) unset($ip[$k]); } }
+                $updates[] = 'installment_prices = ?';
+                $params[] = !empty($ip) ? json_encode($ip, JSON_UNESCAPED_SLASHES) : null;
+            }
+
             if (empty($updates)) {
                 jsonResponse(['error' => 'No fields to update'], 400);
             }

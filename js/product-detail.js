@@ -402,19 +402,34 @@
     }
 
     setupGallery(root, imageUrls);
-    if (product.installments_enabled) loadInstallmentBadge(price);
+    if (product.installments_enabled) loadInstallmentBadge(price, product.installment_prices || {});
   }
 
-  async function loadInstallmentBadge(price) {
+  async function loadInstallmentBadge(price, installmentPrices) {
     if (!price || price <= 0) return;
     const badge = document.getElementById('installmentBadge');
     if (!badge) return;
+
+    const fmt = n => Number(n).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
+    const entries = Object.entries(installmentPrices)
+      .map(([n, p]) => [parseInt(n), parseFloat(p)])
+      .filter(([n, p]) => n > 0 && p > 0)
+      .sort(([a], [b]) => a - b);
+
+    if (entries.length > 0) {
+      badge.innerHTML = entries
+        .map(([n, p]) => `${n} cuotas de ${fmt(p / n)} <span style="color:var(--text-muted);font-size:0.85em;">(total ${fmt(p)}) — MercadoPago</span>`)
+        .join('<br>');
+      badge.style.display = '';
+      return;
+    }
+
+    // Fallback: calcular desde la API
     try {
       const res = await fetch(`api/installments.php?amount=${Math.round(price)}`);
       if (!res.ok) return;
       const data = await res.json();
       if (data.error || !data.installments || !data.installment_amount) return;
-      const fmt = n => Number(n).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
       badge.textContent = `${data.installments} cuotas de ${fmt(data.installment_amount)} (MercadoPago)`;
       badge.style.display = '';
     } catch (_) {}
