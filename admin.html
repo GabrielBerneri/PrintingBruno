@@ -1828,8 +1828,8 @@
             const hasCuotas = document.getElementById('pInstallments').checked;
             const ganObj    = parseFloat(document.getElementById('pGananciaObj').value) || 0;
 
-            const suggestMode = cost > 0 && ganObj > 0;
-            const analysisMode = price > 0;
+            const suggestMode = cost >= 100 && ganObj >= 100;
+            const analysisMode = price >= 100;
 
             if (!suggestMode && !analysisMode) { analysis.style.display = 'none'; return; }
             analysis.style.display = '';
