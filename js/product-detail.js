@@ -415,7 +415,7 @@
       const data = await res.json();
       if (data.error || !data.installments || !data.installment_amount) return;
       const fmt = n => Number(n).toLocaleString('es-AR', { style: 'currency', currency: 'ARS', maximumFractionDigits: 0 });
-      badge.textContent = `${data.installments} cuotas de ${fmt(data.installment_amount)}`;
+      badge.textContent = `${data.installments} cuotas de ${fmt(data.installment_amount)} (MercadoPago)`;
       badge.style.display = '';
     } catch (_) {}
   }
