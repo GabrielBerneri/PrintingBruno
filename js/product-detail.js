@@ -466,7 +466,7 @@
           ${allOptions.map(opt => `
             <label data-price="${opt.price}" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;border-radius:8px;border:1px solid var(--border-light);transition:border-color .15s,background .15s">
               <input type="radio" name="installmentOption" value="${opt.price}" data-method="${opt.method}" data-cuotas="${opt.cuotas ?? ''}" style="accent-color:var(--accent);flex-shrink:0">
-              <span style="flex:1;font-size:0.9rem;font-weight:500">${opt.label}${opt.price === minPrice ? ' <span style="font-size:0.72rem;font-weight:600;color:#22c55e;background:rgba(34,197,94,0.1);padding:1px 7px;border-radius:10px;border:1px solid rgba(34,197,94,0.25);vertical-align:middle">Mejor precio</span>' : ''}</span>
+              <span style="flex:1;font-size:0.9rem;font-weight:500;display:flex;align-items:center;gap:6px;flex-wrap:wrap">${opt.label}${opt.price === minPrice ? '<span style="font-size:0.72rem;font-weight:600;color:#22c55e;background:rgba(34,197,94,0.1);padding:1px 7px;border-radius:10px;border:1px solid rgba(34,197,94,0.25);white-space:nowrap;flex-shrink:0">Mejor precio</span>' : ''}</span>
               ${opt.perMonth ? `<strong style="color:var(--accent)">${fmt(opt.perMonth)}<span style="font-weight:400;font-size:0.8em">/mes</span></strong>` : ''}
               <span style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap">Total ${fmt(opt.price)}</span>
             </label>
