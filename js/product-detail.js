@@ -516,6 +516,7 @@
   async function loadRelatedProducts(currentProduct) {
     const section = document.getElementById('relatedProductsSection');
     const grid = document.getElementById('relatedProductsGrid');
+    console.log('[related] guard:', { section: !!section, grid: !!grid, Products: !!window.Products });
     if (!section || !grid || !window.Products) return;
 
     try {
