@@ -107,6 +107,22 @@
   color: #111111;
 }
 
+/* Logo e íconos de nav blancos cuando el header está sobre el hero en modo claro */
+[data-theme="light"] .header:not(.scrolled) .logo {
+  color: #ffffff;
+}
+[data-theme="light"] .header:not(.scrolled) .nav-social a,
+[data-theme="light"] .header:not(.scrolled) .cart-toggle {
+  color: rgba(255, 255, 255, 0.9);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+[data-theme="light"] .header:not(.scrolled) .nav-social a:hover,
+[data-theme="light"] .header:not(.scrolled) .cart-toggle:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.15);
+}
+
 /* ---------- Reset & Base ---------- */
 *,
 *::before,
