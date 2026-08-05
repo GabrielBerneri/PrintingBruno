@@ -1984,7 +1984,7 @@
             document.getElementById('pFeatured').checked = p.featured == 1;
             document.getElementById('pInstallments').checked = p.installments_enabled == 1;
             document.getElementById('pTransferDiscount').value = parseInt(p.transfer_discount || 0, 10);
-            document.getElementById('pCostPrice').value = '';
+            document.getElementById('pCostPrice').value = p.cost_price ? p.cost_price : '';
             document.getElementById('pGananciaObj').value = '';
             const ip = p.installment_prices || {};
             [2, 3, 6].forEach(n => {
@@ -2026,6 +2026,7 @@
                     return ip;
                 })(),
                 transfer_discount: Math.max(0, Math.min(100, parseInt(document.getElementById('pTransferDiscount').value, 10) || 0)),
+                cost_price: parseFloat(document.getElementById('pCostPrice').value) || null,
                 variants,
             };
             const url = id ? `${API}/products.php?id=${id}` : `${API}/products.php`;

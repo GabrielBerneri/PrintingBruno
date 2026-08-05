@@ -37,6 +37,13 @@ if (!$hasInstallmentPricesColumn) {
         $hasInstallmentPricesColumn = true;
     } catch (Exception $e) {}
 }
+$hasCostPriceColumn = pbHasColumn($db, 'products', 'cost_price');
+if (!$hasCostPriceColumn) {
+    try {
+        $db->exec("ALTER TABLE products ADD COLUMN cost_price DECIMAL(12,2) NULL");
+        $hasCostPriceColumn = true;
+    } catch (Exception $e) {}
+}
 $method = $_SERVER['REQUEST_METHOD'];
 
 try {
@@ -53,6 +60,7 @@ try {
                 $p['installments_enabled'] = $hasInstallmentsColumn ? (int)($p['installments_enabled'] ?? 0) : 0;
                 $p['installment_prices'] = $hasInstallmentPricesColumn && !empty($p['installment_prices'])
                     ? (json_decode($p['installment_prices'], true) ?? []) : [];
+                $p['cost_price'] = $hasCostPriceColumn && $p['cost_price'] !== null ? (float)$p['cost_price'] : null;
                 enrichProductImages($p, $hasImageUrlsColumn);
             }
             unset($p);
@@ -122,6 +130,10 @@ try {
                 $ip = $body['installment_prices'] ?? [];
                 if (is_array($ip)) { foreach ($ip as $k => $v) { if ((float)$v <= 0) unset($ip[$k]); } }
                 $params[] = !empty($ip) ? json_encode($ip, JSON_UNESCAPED_SLASHES) : null;
+            }
+            if ($hasCostPriceColumn) {
+                $columns .= ', cost_price';
+                $params[] = isset($body['cost_price']) && $body['cost_price'] !== null && $body['cost_price'] !== '' ? (float)$body['cost_price'] : null;
             }
             $placeholders = implode(', ', array_fill(0, count($params), '?'));
             $stmt = $db->prepare("INSERT INTO products ($columns) VALUES ($placeholders)");
@@ -199,6 +211,10 @@ try {
                 if (is_array($ip)) { foreach ($ip as $k => $v) { if ((float)$v <= 0) unset($ip[$k]); } }
                 $updates[] = 'installment_prices = ?';
                 $params[] = !empty($ip) ? json_encode($ip, JSON_UNESCAPED_SLASHES) : null;
+            }
+            if ($hasCostPriceColumn && array_key_exists('cost_price', $body)) {
+                $updates[] = 'cost_price = ?';
+                $params[] = $body['cost_price'] !== null && $body['cost_price'] !== '' ? (float)$body['cost_price'] : null;
             }
 
             if (empty($updates)) {
