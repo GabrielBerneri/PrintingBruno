@@ -104,7 +104,7 @@
 /* Hero text stays light (dark photo background) */
 [data-theme="light"] .hero-title,
 [data-theme="light"] .hero-description {
-  color: #f0f0f5;
+  color: #111111;
 }
 
 /* ---------- Reset & Base ---------- */
