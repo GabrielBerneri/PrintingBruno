@@ -458,13 +458,14 @@
       allOptions.push({ label: '1 pago MercadoPago', price: basePrice, perMonth: null, method: 'mercadopago', cuotas: 1 });
       entries.forEach(([n, p]) => allOptions.push({ label: `${n} cuotas sin interés`, price: p, perMonth: p / n, method: 'mercadopago', cuotas: n }));
 
+      const minPrice = Math.min(...allOptions.map(o => o.price));
       badge.innerHTML = `
         <div style="margin:6px 0 2px;font-size:0.8rem;font-weight:600;color:var(--text-muted);letter-spacing:0.03em">OPCIONES DE PAGO</div>
         <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
           ${allOptions.map(opt => `
             <label data-price="${opt.price}" style="display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;border-radius:8px;border:1px solid var(--border-light);transition:border-color .15s,background .15s">
               <input type="radio" name="installmentOption" value="${opt.price}" data-method="${opt.method}" data-cuotas="${opt.cuotas ?? ''}" style="accent-color:var(--accent);flex-shrink:0">
-              <span style="flex:1;font-size:0.9rem;font-weight:500">${opt.label}</span>
+              <span style="flex:1;font-size:0.9rem;font-weight:500">${opt.label}${opt.price === minPrice ? ' <span style="font-size:0.72rem;font-weight:600;color:#22c55e;background:rgba(34,197,94,0.1);padding:1px 7px;border-radius:10px;border:1px solid rgba(34,197,94,0.25);vertical-align:middle">Mejor precio</span>' : ''}</span>
               ${opt.perMonth ? `<strong style="color:var(--accent)">${fmt(opt.perMonth)}<span style="font-weight:400;font-size:0.8em">/mes</span></strong>` : ''}
               <span style="font-size:0.8rem;color:var(--text-muted);white-space:nowrap">Total ${fmt(opt.price)}</span>
             </label>
