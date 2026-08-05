@@ -304,7 +304,14 @@
     const hasMultipleImages = imageUrls.length > 1;
     const primaryImage = imageUrls[0] || '';
     const selectedVariantLabel = getVariantLabel(selectedVariant);
-    const shouldShowVariantMeta = selectedVariant && !isDefaultVariantLabel(selectedVariantLabel);
+    const UNDEFINED_COLOR = new Set(['', 'sin definir', 'base', 'única', 'unica']);
+    const variantHasRealColor = v => {
+      if (!v) return false;
+      const p = String(v.primary_color_name || v.primary_color || '').trim().toLowerCase();
+      const s = String(v.secondary_color_name || v.secondary_color || '').trim().toLowerCase();
+      return !UNDEFINED_COLOR.has(p) || !UNDEFINED_COLOR.has(s);
+    };
+    const shouldShowVariantMeta = selectedVariant && !isDefaultVariantLabel(selectedVariantLabel) && variantHasRealColor(selectedVariant);
     const priceNote = selectedVariant && selectedVariant.price != null
       ? '<div class="product-detail-price-note">Esta variante tiene precio propio.</div>'
       : '';
