@@ -16,7 +16,7 @@
 
 <body>
     <?php
-    pb_render_header('nosotros');
+    pb_render_header('nosotros', ['show_cart' => true]);
     ?>
 
     <section class="page-header">
@@ -150,6 +150,8 @@
     <?php pb_render_footer(); ?>
 
 
+    <script src="js/cart.js?v=20260804-4"></script>
+    <?php pb_render_cart_drawer(); ?>
     <script src="js/main.js?v=20260803-2"></script>
 </body>
 
