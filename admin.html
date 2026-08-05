@@ -961,7 +961,7 @@
                                         <tbody id="priceAnalysisBody"></tbody>
                                     </table>
                                 </div>
-                                <div style="padding:6px 16px;font-size:0.73rem;color:var(--text-muted);border-top:1px solid var(--border-subtle)">Comisiones MP: 1 pago ~7%, 2c 7.79%, 3c 10.49%, 6c 18.69%. Valores orientativos.</div>
+                                <div style="padding:6px 16px;font-size:0.73rem;color:var(--text-muted);border-top:1px solid var(--border-subtle)">Comisiones MP totales: 1 pago ~7%, 2c ~14.79% (7+7.79), 3c ~17.49% (7+10.49), 6c ~25.69% (7+18.69). Valores orientativos.</div>
                             </div>
                             <div class="form-group" style="margin-top:var(--space-md)"><label class="form-label">Descripción</label><textarea class="form-textarea" id="pDescription" rows="4"></textarea></div>
                             <div class="form-group" style="margin-top:var(--space-xl)">
@@ -1876,17 +1876,19 @@
                 addRow('Efectivo / Transferencia', net, net, true);
                 addRow(`MP 1 pago crédito (${MP_SINGLE_RATE}%)`, net / (1 - MP_SINGLE_RATE / 100), net, true);
                 if (hasCuotas) MP_COMMISSIONS.forEach(({ label, cuotas, rate }) =>
-                    addRow(`${label} MP`, net / (1 - rate / 100), net, true, cuotas));
+                    addRow(`${label} MP (${MP_SINGLE_RATE + rate}%)`, net / (1 - (MP_SINGLE_RATE + rate) / 100), net, true, cuotas));
             } else {
                 addRow('MP 1 pago crédito (precio base)', price, price * (1 - MP_SINGLE_RATE / 100));
                 if (discount > 0) addRow(`Efectivo / Transferencia (−${discount}%)`, price * (1 - discount / 100), price * (1 - discount / 100));
                 if (hasCuotas) MP_COMMISSIONS.forEach(({ label, cuotas, rate }) => {
+                    const totalRate = MP_SINGLE_RATE + rate;
                     const ipVal = parseFloat(document.getElementById(`pInstallmentPrice${cuotas}`)?.value) || 0;
                     if (ipVal >= 100) {
-                        // Precio manual: MP descuenta su comisión del precio cobrado
-                        addRow(`${label} MP`, ipVal, ipVal * (1 - rate / 100));
+                        // Precio manual: MP descuenta comisión base + cuotas del precio cobrado
+                        addRow(`${label} MP`, ipVal, ipVal * (1 - totalRate / 100));
                     } else {
-                        addRow(`${label} MP`, price / (1 - rate / 100), price);
+                        const base1pago = price * (1 - MP_SINGLE_RATE / 100);
+                        addRow(`${label} MP`, base1pago / (1 - totalRate / 100), base1pago);
                     }
                 });
             }
