@@ -461,7 +461,8 @@
 
       const allOptions = [];
       if (transferPrice) {
-        allOptions.push({ label: `Transferencia / Efectivo (${transferDiscount}% OFF)`, price: transferPrice, perMonth: null, method: 'transferencia', cuotas: null });
+        allOptions.push({ label: `Transferencia (${transferDiscount}% OFF)`, price: transferPrice, perMonth: null, method: 'transferencia', cuotas: null });
+        allOptions.push({ label: `Efectivo (${transferDiscount}% OFF)`, price: transferPrice, perMonth: null, method: 'efectivo', cuotas: null });
       }
       allOptions.push({ label: '1 pago MercadoPago', price: basePrice, perMonth: null, method: 'mercadopago', cuotas: 1 });
       entries.forEach(([n, p]) => allOptions.push({ label: `${n} cuotas`, price: p, perMonth: p / n, method: 'mercadopago', cuotas: n }));

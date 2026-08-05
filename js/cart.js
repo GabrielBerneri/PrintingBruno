@@ -143,8 +143,9 @@ const Cart = {
     getPaymentMethod() {
         const items = this.getItems();
         if (items.length === 0) return 'mercadopago';
-        const allTransfer = items.every(i => i.payment_method === 'transferencia');
-        return allTransfer ? 'transferencia' : 'mercadopago';
+        if (items.every(i => i.payment_method === 'efectivo')) return 'efectivo';
+        if (items.every(i => i.payment_method === 'transferencia')) return 'transferencia';
+        return 'mercadopago';
     },
 
     getCount() {
@@ -633,6 +634,9 @@ const Cart = {
         if (detectedMethod === 'transferencia') {
             submitBtn.textContent = 'Confirmar Pedido';
             if (secureText) secureText.textContent = 'Al confirmar el pedido vas a ver los datos bancarios para transferir.';
+        } else if (detectedMethod === 'efectivo') {
+            submitBtn.textContent = 'Confirmar Pedido';
+            if (secureText) secureText.textContent = 'Al confirmar el pedido te contactamos por WhatsApp para coordinar el pago en efectivo.';
         }
 
         // Inline Validation for Email
