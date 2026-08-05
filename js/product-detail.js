@@ -169,9 +169,18 @@
     if (allVariants.length === 0) return '';
 
     // Solo mostrar variantes con color definido (no "Base", no "Sin definir")
-    const variants = allVariants.filter(v => !isDefaultVariantLabel(getVariantLabel(v)));
-    // Si hay 0 o 1 variante visible no hay elección que mostrar
-    if (variants.length <= 1) return '';
+    const UNDEFINED_COLOR = new Set(['', 'sin definir', 'base', 'única', 'unica']);
+    const hasDefinedColor = v => {
+      const p = String(v.primary_color_name || v.primary_color || '').trim().toLowerCase();
+      const s = String(v.secondary_color_name || v.secondary_color || '').trim().toLowerCase();
+      return !UNDEFINED_COLOR.has(p) || !UNDEFINED_COLOR.has(s);
+    };
+    const variants = allVariants.filter(v => hasDefinedColor(v) && !isDefaultVariantLabel(getVariantLabel(v)));
+    if (variants.length === 0) return '';
+
+    // Mostrar aunque sea 1 variante si tiene color real (informativo)
+    const showSingle = variants.length === 1 && !isDefaultVariantLabel(getVariantLabel(variants[0]));
+    if (variants.length === 1 && !showSingle) return '';
 
     return `
       <div class="product-variant-picker">
