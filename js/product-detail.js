@@ -521,9 +521,10 @@
     try {
       const apiUrl = new URL('api/products.php', window.location.href);
       const res = await fetch(apiUrl);
-      if (!res.ok) return;
+      if (!res.ok) { console.error('[related] fetch error', res.status); return; }
       const all = await res.json();
       const products = Array.isArray(all) ? all : (all.products || []);
+      console.log('[related] productos totales:', products.length, '| categoria actual:', currentProduct.category, '| id actual:', currentProduct.id);
 
       const cat = (currentProduct.category || '').toLowerCase();
       const relatedCats = RELATED_CATEGORIES[cat] || [];
@@ -548,6 +549,7 @@
       }
       related = related.slice(0, 4);
 
+      console.log('[related] relacionados encontrados:', related.length);
       if (related.length === 0) return;
 
       grid.innerHTML = '';
