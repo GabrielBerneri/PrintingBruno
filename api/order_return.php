@@ -57,6 +57,7 @@ try {
         'fulfillment_status' => $lifecycle['fulfillment_status'],
         'status' => $lifecycle['status'],
         'transfer_details' => $transferDetails,
+        'total' => (float)($order['total'] ?? 0),
     ]);
 } catch (Throwable $e) {
     error_log('order_return error: ' . $e->getMessage());
