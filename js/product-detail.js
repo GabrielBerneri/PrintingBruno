@@ -355,10 +355,11 @@
             <span class="product-detail-meta-label">Categoría</span>
             <span class="product-detail-meta-value">${esc(Products.categoryLabel(product.category))}</span>
           </div>
+          ${product.material && product.material.trim() && product.material.trim().toLowerCase() !== 'a definir' ? `
           <div class="product-detail-meta-item">
             <span class="product-detail-meta-label">Material</span>
-            <span class="product-detail-meta-value">${esc(product.material || 'A definir')}</span>
-          </div>
+            <span class="product-detail-meta-value">${esc(product.material)}</span>
+          </div>` : ''}
           ${shouldShowVariantMeta ? `
             <div class="product-detail-meta-item">
               <span class="product-detail-meta-label">Variante</span>
