@@ -60,6 +60,13 @@
         </div>
     </section>
 
+    <section class="section" id="relatedProductsSection" style="display:none;padding-top:0">
+        <div class="container">
+            <h2 style="font-family:var(--font-heading);font-size:1.5rem;margin-bottom:var(--space-xl)">Productos <span class="accent-text">relacionados</span></h2>
+            <div class="products-grid" id="relatedProductsGrid"></div>
+        </div>
+    </section>
+
     <section class="cta-section">
         <div class="cta-bg"></div>
         <div class="container">
@@ -81,7 +88,7 @@
     <script src="js/cart.js?v=20260804-4"></script>
     <script src="js/products.js?v=20260331-1"></script>
     <script src="js/main.js?v=20260803-2"></script>
-    <script src="js/product-detail.js?v=20260805-6"></script>
+    <script src="js/product-detail.js?v=20260805-7"></script>
 </body>
 
 </html>

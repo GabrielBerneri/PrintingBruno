@@ -500,6 +500,58 @@
     } catch (_) {}
   }
 
+  const RELATED_CATEGORIES = {
+    impresoras:   ['insumos', 'filamentos'],
+    insumos:      ['impresoras', 'filamentos'],
+    filamentos:   ['impresoras', 'insumos'],
+    figuras:      ['decoracion', 'personalizado', 'llaveros'],
+    decoracion:   ['figuras', 'personalizado', 'llaveros'],
+    personalizado:['figuras', 'decoracion', 'llaveros'],
+    mates:        ['jarras', 'personalizado', 'funcional'],
+    jarras:       ['mates', 'personalizado', 'funcional'],
+    llaveros:     ['figuras', 'decoracion', 'personalizado'],
+    funcional:    ['personalizado', 'decoracion', 'figuras'],
+  };
+
+  async function loadRelatedProducts(currentProduct) {
+    const section = document.getElementById('relatedProductsSection');
+    const grid = document.getElementById('relatedProductsGrid');
+    if (!section || !grid || !window.Products) return;
+
+    try {
+      const res = await fetch('api/products.php');
+      if (!res.ok) return;
+      const all = await res.json();
+      const products = Array.isArray(all) ? all : (all.products || []);
+
+      const cat = currentProduct.category || '';
+      const relatedCats = RELATED_CATEGORIES[cat] || [];
+      const currentId = Number(currentProduct.id);
+
+      // Prioridad: categorías relacionadas primero, luego misma categoría
+      let related = products.filter(p =>
+        Number(p.id) !== currentId && p.active != 0 && relatedCats.includes(p.category)
+      );
+      if (related.length < 4) {
+        const sameCat = products.filter(p =>
+          Number(p.id) !== currentId && p.active != 0 && p.category === cat && !related.find(r => r.id === p.id)
+        );
+        related = [...related, ...sameCat];
+      }
+      related = related.slice(0, 4);
+
+      if (related.length === 0) return;
+
+      grid.innerHTML = '';
+      related.forEach((p, i) => {
+        const delays = ['reveal-delay-1', 'reveal-delay-2', 'reveal-delay-3', 'reveal-delay-4'];
+        const card = Products.renderCard(p, { delay: delays[i], enableGallery: false });
+        grid.appendChild(card);
+      });
+      section.style.display = '';
+    } catch (e) { /* silencioso */ }
+  }
+
   async function loadProduct() {
     if (!slug && !id) {
       root.innerHTML = `
@@ -519,6 +571,7 @@
       if (!response.ok) throw new Error('Producto no encontrado');
       const product = await response.json();
       renderProduct(product);
+      loadRelatedProducts(product);
     } catch (error) {
       root.className = 'product-detail-empty';
       root.innerHTML = `
