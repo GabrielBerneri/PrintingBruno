@@ -923,7 +923,7 @@
                                             <option value="llaveros">Llaveros</option>
                                         </select>
                                     </div>
-                                    <div class="form-group"><label class="form-label">Material</label><input type="text" class="form-input" id="pMaterial" value="PLA"></div>
+                                    <div class="form-group"><label class="form-label">Material</label><input type="text" class="form-input" id="pMaterial" value=""></div>
                                     <div class="form-group"><label class="form-label">Stock total</label><input type="number" class="form-input" id="pStock" value="0" readonly></div>
                                     <div class="form-group" style="grid-column:1/-1"><label class="form-label">Badge</label><input type="text" class="form-input" id="pBadge" placeholder="Ej: Nuevo, Edición Limitada"></div>
                                     <div class="form-group" style="grid-column:1/-1">
@@ -1967,7 +1967,7 @@
             document.getElementById('pName').value = p.name;
             document.getElementById('pPrice').value = p.price;
             document.getElementById('pCategory').value = p.category;
-            document.getElementById('pMaterial').value = p.material || 'PLA';
+            document.getElementById('pMaterial').value = p.material ?? '';
             document.getElementById('pBadge').value = p.badge || '';
             document.getElementById('pDescription').value = p.description || '';
             if (Array.isArray(p.image_urls) && p.image_urls.length > 0) {
