@@ -170,10 +170,8 @@
 
     // Solo mostrar variantes con color definido (no "Base", no "Sin definir")
     const variants = allVariants.filter(v => !isDefaultVariantLabel(getVariantLabel(v)));
-    if (variants.length === 0) return '';
-
-    const showSingle = variants.length === 1 && !isDefaultVariantLabel(getVariantLabel(variants[0]));
-    if (variants.length === 1 && !showSingle) return '';
+    // Si hay 0 o 1 variante visible no hay elección que mostrar
+    if (variants.length <= 1) return '';
 
     return `
       <div class="product-variant-picker">
