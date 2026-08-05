@@ -554,7 +554,7 @@
       related.forEach((p, i) => {
         const delays = ['reveal-delay-1', 'reveal-delay-2', 'reveal-delay-3', 'reveal-delay-4'];
         const card = Products.renderCard(p, { delay: delays[i], enableGallery: false });
-        card.classList.add('revealed');
+        card.classList.add('visible');
         grid.appendChild(card);
       });
       section.style.display = '';
