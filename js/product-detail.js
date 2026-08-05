@@ -519,22 +519,23 @@
     if (!section || !grid || !window.Products) return;
 
     try {
-      const res = await fetch('api/products.php');
+      const apiUrl = new URL('api/products.php', window.location.href);
+      const res = await fetch(apiUrl);
       if (!res.ok) return;
       const all = await res.json();
       const products = Array.isArray(all) ? all : (all.products || []);
 
-      const cat = currentProduct.category || '';
+      const cat = (currentProduct.category || '').toLowerCase();
       const relatedCats = RELATED_CATEGORIES[cat] || [];
       const currentId = Number(currentProduct.id);
 
       // Prioridad: categorías relacionadas primero, luego misma categoría
       let related = products.filter(p =>
-        Number(p.id) !== currentId && p.active != 0 && relatedCats.includes(p.category)
+        Number(p.id) !== currentId && p.active != 0 && relatedCats.includes((p.category || '').toLowerCase())
       );
       if (related.length < 4) {
         const sameCat = products.filter(p =>
-          Number(p.id) !== currentId && p.active != 0 && p.category === cat && !related.find(r => r.id === p.id)
+          Number(p.id) !== currentId && p.active != 0 && (p.category || '').toLowerCase() === cat && !related.find(r => r.id === p.id)
         );
         related = [...related, ...sameCat];
       }
@@ -546,6 +547,7 @@
       related.forEach((p, i) => {
         const delays = ['reveal-delay-1', 'reveal-delay-2', 'reveal-delay-3', 'reveal-delay-4'];
         const card = Products.renderCard(p, { delay: delays[i], enableGallery: false });
+        card.classList.add('revealed');
         grid.appendChild(card);
       });
       section.style.display = '';
