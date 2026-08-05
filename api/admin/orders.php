@@ -43,6 +43,24 @@ try {
             jsonResponse(updateAdminOrder($db, $orderId, $body));
             break;
 
+        case 'DELETE':
+            if (empty($_GET['id'])) {
+                jsonResponse(['error' => 'Order ID required'], 400);
+            }
+            $orderId = (int)$_GET['id'];
+            $check = $db->prepare("SELECT id FROM orders WHERE id = ? LIMIT 1");
+            $check->execute([$orderId]);
+            if (!$check->fetch()) {
+                jsonResponse(['error' => 'Order not found'], 404);
+            }
+            $db->beginTransaction();
+            $db->prepare("DELETE FROM order_items WHERE order_id = ?")->execute([$orderId]);
+            $db->prepare("DELETE FROM orders WHERE id = ?")->execute([$orderId]);
+            $db->commit();
+            adminAuditLog('delete', 'order', $orderId, []);
+            jsonResponse(['success' => true]);
+            break;
+
         default:
             jsonResponse(['error' => 'Method not allowed'], 405);
     }

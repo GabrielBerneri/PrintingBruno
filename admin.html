@@ -3249,10 +3249,13 @@
                         </div>
                     </div>
 
-                    <div style="display:flex;justify-content:flex-end;align-items:center;gap:var(--space-sm);margin-top:var(--space-lg);flex-wrap:wrap">
-                        <span id="orderStatusFeedback" style="font-size:0.8rem;display:none"></span>
-                        ${quickAction ? `<button class="btn btn-secondary btn-sm" onclick="applyOrderQuickAction(${parseInt(o.id)}, '${esc(quickAction.code)}', event)">${esc(quickAction.label)}</button>` : ''}
-                        <button class="btn btn-primary btn-sm" onclick="updateOrderLifecycle(${parseInt(o.id)})">Guardar pedido</button>
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:var(--space-sm);margin-top:var(--space-lg);flex-wrap:wrap">
+                        <button class="btn btn-sm" style="background:transparent;border:1px solid #e74c3c;color:#e74c3c;opacity:0.8" onclick="deleteOrder(${parseInt(o.id)}, '${escAttr(o.order_number || '#' + o.id)}')">🗑 Eliminar pedido</button>
+                        <div style="display:flex;align-items:center;gap:var(--space-sm);flex-wrap:wrap">
+                            <span id="orderStatusFeedback" style="font-size:0.8rem;display:none"></span>
+                            ${quickAction ? `<button class="btn btn-secondary btn-sm" onclick="applyOrderQuickAction(${parseInt(o.id)}, '${esc(quickAction.code)}', event)">${esc(quickAction.label)}</button>` : ''}
+                            <button class="btn btn-primary btn-sm" onclick="updateOrderLifecycle(${parseInt(o.id)})">Guardar pedido</button>
+                        </div>
                     </div>
                     ${itemsHtml}
                 `;
@@ -3315,6 +3318,27 @@
             const overlay = document.getElementById('orderModalOverlay');
             overlay.classList.remove('active');
             delete overlay.dataset.orderId;
+        };
+
+        window.deleteOrder = async function (orderId, orderLabel) {
+            if (!confirm(`¿Eliminar el pedido ${orderLabel}? Esta acción no se puede deshacer.`)) return;
+            try {
+                const res = await fetch(`${API}/orders.php?id=${orderId}`, {
+                    method: 'DELETE',
+                    headers: authHeaders(),
+                    credentials: 'same-origin',
+                });
+                if (!res.ok) {
+                    const data = await res.json().catch(() => ({}));
+                    alert('Error al eliminar: ' + (data.error || res.status));
+                    return;
+                }
+                closeOrderModal();
+                loadOrders(currentOrdersPage);
+                loadDashboard();
+            } catch (e) {
+                alert('Error al eliminar el pedido');
+            }
         };
 
         document.getElementById('orderModalOverlay').addEventListener('click', (e) => {
