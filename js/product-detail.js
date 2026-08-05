@@ -528,16 +528,23 @@
       const cat = (currentProduct.category || '').toLowerCase();
       const relatedCats = RELATED_CATEGORIES[cat] || [];
       const currentId = Number(currentProduct.id);
+      const isActive = p => p.active === undefined || p.active == 1 || p.active === true;
 
-      // Prioridad: categorías relacionadas primero, luego misma categoría
+      // Prioridad: categorías relacionadas primero, luego misma categoría, luego cualquier producto
       let related = products.filter(p =>
-        Number(p.id) !== currentId && p.active != 0 && relatedCats.includes((p.category || '').toLowerCase())
+        Number(p.id) !== currentId && isActive(p) && relatedCats.includes((p.category || '').toLowerCase())
       );
       if (related.length < 4) {
         const sameCat = products.filter(p =>
-          Number(p.id) !== currentId && p.active != 0 && (p.category || '').toLowerCase() === cat && !related.find(r => r.id === p.id)
+          Number(p.id) !== currentId && isActive(p) && (p.category || '').toLowerCase() === cat && !related.find(r => r.id === p.id)
         );
         related = [...related, ...sameCat];
+      }
+      if (related.length < 4) {
+        const others = products.filter(p =>
+          Number(p.id) !== currentId && isActive(p) && !related.find(r => r.id === p.id)
+        );
+        related = [...related, ...others];
       }
       related = related.slice(0, 4);
 
@@ -551,7 +558,7 @@
         grid.appendChild(card);
       });
       section.style.display = '';
-    } catch (e) { /* silencioso */ }
+    } catch (e) { console.error('[related]', e); }
   }
 
   async function loadProduct() {
