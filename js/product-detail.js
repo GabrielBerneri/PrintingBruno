@@ -516,8 +516,7 @@
   async function loadRelatedProducts(currentProduct) {
     const section = document.getElementById('relatedProductsSection');
     const grid = document.getElementById('relatedProductsGrid');
-    console.log('[related] guard:', { section: !!section, grid: !!grid, Products: !!window.Products });
-    if (!section || !grid || !window.Products) return;
+    if (!section || !grid || typeof Products === 'undefined') return;
 
     try {
       const apiUrl = new URL('api/products.php', window.location.href);
@@ -525,7 +524,6 @@
       if (!res.ok) { console.error('[related] fetch error', res.status); return; }
       const all = await res.json();
       const products = Array.isArray(all) ? all : (all.products || []);
-      console.log('[related] productos totales:', products.length, '| categoria actual:', currentProduct.category, '| id actual:', currentProduct.id);
 
       const cat = (currentProduct.category || '').toLowerCase();
       const relatedCats = RELATED_CATEGORIES[cat] || [];
@@ -550,7 +548,6 @@
       }
       related = related.slice(0, 4);
 
-      console.log('[related] relacionados encontrados:', related.length);
       if (related.length === 0) return;
 
       grid.innerHTML = '';
@@ -561,7 +558,7 @@
         grid.appendChild(card);
       });
       section.style.display = '';
-    } catch (e) { console.error('[related]', e); }
+    } catch (e) { /* silencioso */ }
   }
 
   async function loadProduct() {
