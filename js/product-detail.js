@@ -35,7 +35,7 @@
   }
 
   function isDefaultVariantLabel(label) {
-    return ['base', 'única', 'unica', ''].includes(String(label || '').trim().toLowerCase());
+    return ['base', 'única', 'unica', 'sin definir', ''].includes(String(label || '').trim().toLowerCase());
   }
 
   function resolveSelectedVariant(product, selectedVariantId) {
@@ -165,7 +165,11 @@
   }
 
   function renderVariantSelector(product, selectedVariant) {
-    const variants = getActiveVariants(product);
+    const allVariants = getActiveVariants(product);
+    if (allVariants.length === 0) return '';
+
+    // Solo mostrar variantes con color definido (no "Base", no "Sin definir")
+    const variants = allVariants.filter(v => !isDefaultVariantLabel(getVariantLabel(v)));
     if (variants.length === 0) return '';
 
     const showSingle = variants.length === 1 && !isDefaultVariantLabel(getVariantLabel(variants[0]));
