@@ -299,7 +299,7 @@
     const isAvailable = stock > 0 && isPublishedProduct(product);
     const price = getDisplayPrice(product, selectedVariant);
     const badgeHTML = product.badge
-      ? `<span class="product-badge product-detail-badge ${esc(String(product.badge).toLowerCase())}">${esc(product.badge)}</span>`
+      ? `<span class="product-badge product-detail-badge ${Products.badgeClass(product.badge)}">${esc(product.badge)}</span>`
       : '';
     const hasMultipleImages = imageUrls.length > 1;
     const primaryImage = imageUrls[0] || '';
