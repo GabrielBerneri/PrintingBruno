@@ -186,7 +186,6 @@
       <div class="product-variant-picker">
         <div class="product-variant-picker-head">
           <span class="product-variant-picker-label">Color</span>
-          <strong>${esc(getVariantLabel(selectedVariant))}</strong>
         </div>
         <div class="product-variant-options">
           ${variants.map(variant => `
