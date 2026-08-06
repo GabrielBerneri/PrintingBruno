@@ -10,6 +10,9 @@ SetEnvIf Host "^(localhost|127\.0\.0\.1)(:\d+)?$" IS_LOCALHOST=1
 # Keep public URLs as .html while rendering shared PHP templates underneath.
 RewriteRule ^(index|catalogo|producto|nosotros|contacto|mi-cuenta)\.html$ $1.php [L]
 
+# Sitemap dinámico
+RewriteRule ^sitemap\.xml$ sitemap.php [L]
+
 # Block direct access to dotfiles except ACME/PKI well-known paths.
 RewriteRule "(^|/)\.(?!well-known(?:/|$))" - [F,L]
 
@@ -68,7 +71,7 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
   # Content Security Policy
   # 'unsafe-inline' necesario por scripts/estilos inline actuales
   # frame-src permite el checkout de MercadoPago
-  Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com; frame-src https://www.mercadopago.com.ar https://mercadopago.com https://mercadopago.com.ar; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+  Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self' https://www.google-analytics.com https://region1.google-analytics.com https://analytics.google.com; frame-src https://www.mercadopago.com.ar https://mercadopago.com https://mercadopago.com.ar https://lookerstudio.google.com; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
 </IfModule>
 
 # Prevent directory listing
