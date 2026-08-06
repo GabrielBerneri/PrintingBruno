@@ -28,11 +28,45 @@
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
+      "@type": ["LocalBusiness", "Store"],
       "name": "PrintingBruno",
+      "description": "Servicio de impresión 3D a medida en General Pacheco, Tigre. Figuras, organizadores, piezas funcionales, filamentos e insumos.",
       "url": "https://www.printingbruno.com/",
       "logo": "https://www.printingbruno.com/assets/logo/logo.png",
       "image": "https://www.printingbruno.com/assets/logo/logo.png",
+      "telephone": "+5491137022937",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Buenos Aires 623",
+        "addressLocality": "General Pacheco",
+        "addressRegion": "Buenos Aires",
+        "addressCountry": "AR"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": -34.4606,
+        "longitude": -58.6264
+      },
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"],
+          "opens": "08:00",
+          "closes": "20:00"
+        }
+      ],
+      "priceRange": "$$",
+      "currenciesAccepted": "ARS",
+      "paymentAccepted": "Cash, Credit Card, Bank Transfer",
+      "areaServed": {
+        "@type": "GeoCircle",
+        "geoMidpoint": {
+          "@type": "GeoCoordinates",
+          "latitude": -34.4606,
+          "longitude": -58.6264
+        },
+        "geoRadius": "50000"
+      },
       "sameAs": [
         "https://www.instagram.com/printing.bruno/",
         "https://www.tiktok.com/@printing.bruno"
