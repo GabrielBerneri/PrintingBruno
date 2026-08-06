@@ -30,19 +30,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password_hash'])) {
-        // Si ya existía sesión, regenerar el ID para prevenir fixation.
-        // Si no existía, arrancarla recién ahora evita emitir dos Set-Cookie.
-        $hadActiveSession = session_status() === PHP_SESSION_ACTIVE;
         adminEnsureSessionStarted();
-        if ($hadActiveSession) {
-            session_regenerate_id(true);
-        }
-        $_SESSION['admin_id']   = $user['id'];
-        $_SESSION['admin_user'] = $user['username'];
-        $_SESSION['admin_csrf_token'] = bin2hex(random_bytes(32));
+        session_regenerate_id(true);
+        // Credenciales válidas — marcar sesión como pendiente de 2FA
+        $_SESSION['admin_pending_2fa']  = true;
+        $_SESSION['admin_pending_id']   = (int)$user['id'];
+        $_SESSION['admin_pending_user'] = $user['username'];
+        // Limpiar cualquier estado previo de admin autenticado
+        unset($_SESSION['admin_id'], $_SESSION['admin_user'], $_SESSION['admin_csrf_token']);
         clearRateLimit($rateLimitKey);
-        adminAuditLog('login', 'admin_session', (int)$user['id'], ['username' => $user['username']]);
-        jsonResponse(['success' => true, 'user' => $user['username'], 'csrf_token' => adminCsrfToken()]);
+        jsonResponse(['require_2fa' => true]);
     } else {
         recordFailedAttempt($rateLimitKey);
         // Mismo mensaje para usuario y contraseña → no revela cuál es incorrecto

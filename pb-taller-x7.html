@@ -750,6 +750,7 @@
                 <img class="logo-icon" src="assets/logo/logo.png" alt="PrintingBruno">Printing<span>Bruno</span>
             </div>
             <h1>Panel de Administración</h1>
+            <!-- Paso 1: usuario y contraseña -->
             <form id="loginForm">
                 <div class="form-group"><input type="text" class="form-input" id="loginUser" placeholder="Usuario" autocomplete="username" required></div>
                 <div class="form-group"><input type="password" class="form-input" id="loginPass" placeholder="Contraseña" autocomplete="current-password" required></div>
@@ -759,6 +760,23 @@
                     <a href="admin-reset.php" style="color:var(--text-secondary);font-size:0.85rem">Olvidé mi contraseña</a>
                 </p>
             </form>
+            <!-- Paso 2: código 2FA -->
+            <div id="twoFaStep" style="display:none">
+                <p style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:var(--space-xl);line-height:1.6">
+                    Enviamos un código de 6 dígitos a <strong id="twoFaEmailHint" style="color:var(--text-primary)"></strong>. Ingresalo para continuar.
+                </p>
+                <div class="form-group">
+                    <input type="text" class="form-input" id="twoFaCode" placeholder="000000"
+                        inputmode="numeric" pattern="\d{6}" maxlength="6" autocomplete="one-time-code"
+                        style="font-size:1.5rem;letter-spacing:0.3em;text-align:center;font-family:monospace">
+                </div>
+                <button class="btn btn-primary btn-lg" style="width:100%;margin-bottom:var(--space-md)" id="twoFaBtn">Verificar</button>
+                <button class="btn btn-secondary btn-lg" style="width:100%;font-size:0.88rem" id="twoFaResendBtn">Reenviar código</button>
+                <p id="twoFaError" style="color:#e74c3c;font-size:0.85rem;margin-top:var(--space-md);display:none"></p>
+                <p style="margin-top:var(--space-md);text-align:center">
+                    <a href="#" id="twoFaBackBtn" style="color:var(--text-secondary);font-size:0.85rem">← Volver al inicio de sesión</a>
+                </p>
+            </div>
         </div>
     </div>
 
@@ -1583,25 +1601,117 @@
             loadOrders();
         }
 
+        // ── 2FA helpers ─────────────────────────────────
+        function showLoginStep() {
+            document.getElementById('loginForm').style.display = '';
+            document.getElementById('twoFaStep').style.display = 'none';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        function showTwoFaStep(emailHint) {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('twoFaStep').style.display = '';
+            document.getElementById('twoFaEmailHint').textContent = emailHint;
+            document.getElementById('twoFaError').style.display = 'none';
+            document.getElementById('twoFaCode').value = '';
+            document.getElementById('twoFaCode').focus();
+        }
+
+        async function requestTwoFaCode() {
+            const res  = await fetch(`${API}/send_2fa.php`, { method: 'POST', credentials: 'same-origin' });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'No se pudo enviar el código');
+            return data.email_hint || '***';
+        }
+
+        // Paso 1: usuario + contraseña
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('loginBtn');
-            btn.textContent = 'Ingresando...'; btn.disabled = true;
+            const errEl = document.getElementById('loginError');
+            errEl.style.display = 'none';
+            btn.textContent = 'Verificando...'; btn.disabled = true;
             try {
                 const res = await fetch(`${API}/login.php`, {
-                    method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: document.getElementById('loginUser').value, password: document.getElementById('loginPass').value })
+                    method: 'POST', credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('loginUser').value,
+                        password: document.getElementById('loginPass').value
+                    })
+                });
+                const data = await res.json();
+                if (res.ok && data.require_2fa) {
+                    const hint = await requestTwoFaCode();
+                    showTwoFaStep(hint);
+                } else {
+                    errEl.textContent = data.error || 'Credenciales inválidas';
+                    errEl.style.display = 'block';
+                }
+            } catch (err) {
+                errEl.textContent = err.message || 'Error de conexión';
+                errEl.style.display = 'block';
+            }
+            btn.textContent = 'Ingresar'; btn.disabled = false;
+        });
+
+        // Paso 2: verificar código 2FA
+        document.getElementById('twoFaBtn').addEventListener('click', async () => {
+            const btn   = document.getElementById('twoFaBtn');
+            const errEl = document.getElementById('twoFaError');
+            const code  = document.getElementById('twoFaCode').value.trim();
+            errEl.style.display = 'none';
+            btn.textContent = 'Verificando...'; btn.disabled = true;
+            try {
+                const res = await fetch(`${API}/verify_2fa.php`, {
+                    method: 'POST', credentials: 'same-origin',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    const confirmed = await checkAuth();
-                    if (!confirmed) {
-                        throw new Error('No se pudo confirmar la sesión. Intentá nuevamente.');
-                    }
+                    csrfToken = data.csrf_token;
+                    await checkAuth();
+                } else {
+                    errEl.textContent = data.error || 'Código incorrecto';
+                    errEl.style.display = 'block';
+                    if (data.error && data.error.includes('expiró')) showLoginStep();
                 }
-                else { document.getElementById('loginError').textContent = data.error || 'Credenciales inválidas'; document.getElementById('loginError').style.display = 'block'; }
-            } catch (err) { document.getElementById('loginError').textContent = err.message || 'Error de conexión'; document.getElementById('loginError').style.display = 'block'; }
-            btn.textContent = 'Ingresar'; btn.disabled = false;
+            } catch (err) {
+                errEl.textContent = err.message || 'Error de conexión';
+                errEl.style.display = 'block';
+            }
+            btn.textContent = 'Verificar'; btn.disabled = false;
+        });
+
+        // Enter en el input del código
+        document.getElementById('twoFaCode').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') document.getElementById('twoFaBtn').click();
+        });
+
+        // Reenviar código
+        document.getElementById('twoFaResendBtn').addEventListener('click', async () => {
+            const btn = document.getElementById('twoFaResendBtn');
+            const errEl = document.getElementById('twoFaError');
+            btn.textContent = 'Enviando...'; btn.disabled = true;
+            try {
+                const hint = await requestTwoFaCode();
+                document.getElementById('twoFaEmailHint').textContent = hint;
+                errEl.textContent = 'Código reenviado.';
+                errEl.style.color = '#25D366';
+                errEl.style.display = 'block';
+                setTimeout(() => { errEl.style.display = 'none'; errEl.style.color = '#e74c3c'; }, 3000);
+            } catch (err) {
+                errEl.textContent = err.message;
+                errEl.style.display = 'block';
+            }
+            btn.textContent = 'Reenviar código'; btn.disabled = false;
+        });
+
+        // Volver al paso 1
+        document.getElementById('twoFaBackBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            showLoginStep();
         });
 
         document.getElementById('logoutBtn').addEventListener('click', async () => {

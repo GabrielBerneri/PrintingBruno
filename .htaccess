@@ -7,6 +7,9 @@ RewriteEngine On
 DirectoryIndex index.php index.html
 SetEnvIf Host "^(localhost|127\.0\.0\.1)(:\d+)?$" IS_LOCALHOST=1
 
+# Bloquear acceso a la URL antigua del admin
+RewriteRule ^admin\.html$ - [F,L]
+
 # Keep public URLs as .html while rendering shared PHP templates underneath.
 RewriteRule ^(index|catalogo|producto|nosotros|contacto|mi-cuenta)\.html$ $1.php [L]
 
