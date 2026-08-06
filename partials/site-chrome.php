@@ -266,7 +266,7 @@ function pb_render_footer(): void
                                 <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                 <circle cx="12" cy="10" r="3"></circle>
                             </svg>
-                            Argentina
+                            <a href="https://maps.google.com/maps?q=Buenos+Aires+623,+General+Pacheco,+Tigre" target="_blank" rel="noopener">Buenos Aires 623, General Pacheco, Tigre</a>
                         </li>
                         <li>
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -292,6 +292,15 @@ function pb_render_footer(): void
                             <div class="payment-icon">Efectivo</div>
                             <div class="payment-icon">3 - 6 cuotas</div>
                         </div>
+                    </div>
+
+                    <div class="footer-map" style="margin-top:var(--space-lg)">
+                        <iframe
+                            src="https://maps.google.com/maps?q=Buenos+Aires+623,+General+Pacheco,+Tigre&z=15&output=embed"
+                            width="100%" height="180" style="border:0;border-radius:12px;display:block"
+                            loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                            title="Ubicación PrintingBruno - Buenos Aires 623, General Pacheco, Tigre"
+                            allowfullscreen></iframe>
                     </div>
                 </div>
             </div>
