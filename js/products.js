@@ -133,6 +133,9 @@ const Products = {
     const transferDiscountBadge = transferDiscountPct > 0
       ? `<span class="product-badge transfer-discount">${transferDiscountPct}% OFF transferencia/efectivo</span>`
       : '';
+    const bestPrice = transferDiscountPct > 0
+      ? displayPrice * (1 - transferDiscountPct / 100)
+      : null;
 
     const div = document.createElement('div');
     div.className = `product-card reveal${secondaryImage ? ' has-secondary-image' : ''}${enableGallery ? ' has-gallery' : ''}${delay ? ' ' + delay : ''}`;
@@ -159,7 +162,10 @@ const Products = {
           ${transferDiscountBadge}
         </div>
         <div class="product-footer${hasMultipleVariants ? ' product-footer-variant' : ''}">
-          <span class="product-price">${priceText}</span>
+          ${bestPrice
+            ? `<span class="product-price">${hasMultipleVariants && Number(product?.price_from || 0) !== Number(product?.price_to || 0) ? 'Desde ' : ''}${this.formatPrice(bestPrice)}<span class="product-price-original">${priceText}</span></span>`
+            : `<span class="product-price">${priceText}</span>`
+          }
           <div class="product-action">
             <a class="btn btn-secondary btn-sm btn-detail" href="${this.escapeAttr(this.productUrl(product))}">Ver detalle</a>
             <button class="btn btn-primary btn-sm btn-add-cart" type="button" aria-label="${this.escapeAttr(hasMultipleVariants ? `Elegir variante de ${product.name}` : `Agregar ${product.name} al carrito`)}" title="${this.escapeAttr(hasMultipleVariants ? 'Elegir variante' : 'Agregar al carrito')}" ${isAvailable ? '' : 'disabled'}>${isAvailable ? '+' : '—'}</button>

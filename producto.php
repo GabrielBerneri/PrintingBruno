@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Detalle de producto de PrintingBruno.">
     <title>Producto | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260805-2">
+    <link rel="stylesheet" href="css/styles.css?v=20260805-5">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';
@@ -86,7 +86,7 @@
     <?php pb_render_cart_drawer(); ?>
 
     <script src="js/cart.js?v=20260805-1"></script>
-    <script src="js/products.js?v=20260331-1"></script>
+    <script src="js/products.js?v=20260805-2"></script>
     <script src="js/main.js?v=20260803-2"></script>
     <script src="js/product-detail.js?v=20260805-18"></script>
 </body>
