@@ -177,7 +177,7 @@ try {
 
     // Send to both email addresses
     $mail->addAddress('contacto@printingbruno.com', 'PrintingBruno');
-    $mail->addAddress('printingbruno.22@gmail.com', 'PrintingBruno Gmail');
+    $mail->addAddress('contacto@printingbruno.com', 'PrintingBruno Gmail');
 
     // Strip CRLFs from name/subject to prevent email header injection
     $safeSubjectName = str_replace(["\r", "\n", "\r\n"], '', $name);

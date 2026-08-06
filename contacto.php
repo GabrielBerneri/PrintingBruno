@@ -160,11 +160,11 @@
                                 <span>Conversacion rapida y seguimiento directo</span>
                             </div>
                         </a>
-                        <a class="contact-method-card" href="mailto:printingbruno.22@gmail.com">
+                        <a class="contact-method-card" href="mailto:contacto@printingbruno.com">
                             <div class="contact-method-icon">EM</div>
                             <div>
                                 <strong>Email</strong>
-                                <span>printingbruno.22@gmail.com</span>
+                                <span>contacto@printingbruno.com</span>
                             </div>
                         </a>
                         <a class="contact-method-card" href="https://www.instagram.com/printing.bruno/" target="_blank" rel="noopener">
