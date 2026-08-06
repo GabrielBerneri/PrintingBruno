@@ -91,6 +91,6 @@ try {
 
     jsonResponse(['success' => true, 'email_hint' => substr($recipientEmail, 0, 3) . '***@' . explode('@', $recipientEmail)[1]]);
 } catch (Exception $e) {
-    error_log('2FA send error: ' . $e->getMessage());
-    jsonResponse(['error' => 'No se pudo enviar el email. Intentá de nuevo.'], 500);
+    error_log('2FA send error: ' . $e->getMessage() . ' | Mailer: ' . ($mail->ErrorInfo ?? ''));
+    jsonResponse(['error' => 'No se pudo enviar el email. Intentá de nuevo. (' . $e->getMessage() . ')'], 500);
 }
