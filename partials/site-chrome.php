@@ -287,21 +287,13 @@ function pb_render_footer(): void
                     <div class="footer-payments">
                         <p class="footer-payments-title">Medios de pago</p>
                         <div class="footer-payments-icons">
-                            <div class="payment-icon">Mercado Pago</div>
-                            <div class="payment-icon">Transferencia</div>
-                            <div class="payment-icon">Efectivo</div>
-                            <div class="payment-icon">3 - 6 cuotas</div>
+                            <div class="payment-icon payment-icon--mp">💳 Mercado Pago</div>
+                            <div class="payment-icon payment-icon--transfer">🏦 Transferencia</div>
+                            <div class="payment-icon payment-icon--cash">💵 Efectivo</div>
+                            <div class="payment-icon payment-icon--cuotas">🗓️ 3 - 6 cuotas</div>
                         </div>
                     </div>
 
-                    <div class="footer-map" style="margin-top:var(--space-lg)">
-                        <iframe
-                            src="https://maps.google.com/maps?q=Buenos+Aires+623,+General+Pacheco,+Tigre&z=15&output=embed"
-                            width="100%" height="180" style="border:0;border-radius:12px;display:block"
-                            loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-                            title="Ubicación PrintingBruno - Buenos Aires 623, General Pacheco, Tigre"
-                            allowfullscreen></iframe>
-                    </div>
                 </div>
             </div>
 
