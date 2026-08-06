@@ -400,6 +400,10 @@ try {
         // Send order confirmation email as best effort.
         require_once __DIR__ . '/email/order_confirmation.php';
         sendOrderConfirmation($orderId);
+
+        // Notificación interna al negocio (best effort).
+        require_once __DIR__ . '/email/order_admin_notification.php';
+        sendOrderAdminNotification($orderId);
     }
 
     if ($paymentMethod !== 'mercadopago') {

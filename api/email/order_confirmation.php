@@ -160,8 +160,6 @@ HTML;
 
         $mail->setFrom(SMTP_USER, SMTP_FROM_NAME);
         $mail->addAddress($customerEmail, $customerName);
-        // Copia oculta al negocio para enterarse de cada pedido
-        $mail->addBCC('contacto@printingbruno.com', 'PrintingBruno');
 
         $mail->isHTML(true);
         $subject = "PrintingBruno - Confirmación de Pedido {$orderNumber}";
