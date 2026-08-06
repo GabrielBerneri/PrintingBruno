@@ -56,9 +56,15 @@ function sendOrderAdminNotification(int $orderId): bool {
         $paymentLabel = pbPaymentMethodLabel($order['payment_method'] ?? '');
         $createdAt    = $order['created_at'] ?? date('Y-m-d H:i:s');
 
-        // Envío o retiro
+        // Envío o retiro.
+        // El retiro se detecta por el método (se guarda como "Retiro en persona"),
+        // no por la presencia de dirección: en retiro puede quedar guardada igual
+        // la dirección de la cuenta del cliente.
         $shipping = pbGetOrderShippingAddress($db, $orderId);
-        $hasAddress = $shipping && trim((string)($shipping['street'] ?? '')) !== '';
+        $shippingMethodName = trim((string)($order['shipping_method'] ?? ''));
+        $isPickup = stripos($shippingMethodName, 'retir') !== false
+            || stripos($shippingMethodName, 'pickup') !== false;
+        $hasAddress = !$isPickup && $shipping && trim((string)($shipping['street'] ?? '')) !== '';
         if ($hasAddress) {
             $fulfillmentTitle = 'Envío a domicilio';
             $addressParts = array_filter([
