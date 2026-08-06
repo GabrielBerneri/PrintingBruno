@@ -162,10 +162,7 @@ const Products = {
           ${transferDiscountBadge}
         </div>
         <div class="product-footer${hasMultipleVariants ? ' product-footer-variant' : ''}">
-          ${bestPrice
-            ? `<span class="product-price">${hasMultipleVariants && Number(product?.price_from || 0) !== Number(product?.price_to || 0) ? 'Desde ' : ''}${this.formatPrice(bestPrice)}<span class="product-price-original">${priceText}</span></span>`
-            : `<span class="product-price">${priceText}</span>`
-          }
+          <span class="product-price">${bestPrice ? (hasMultipleVariants && Number(product?.price_from || 0) !== Number(product?.price_to || 0) ? 'Desde ' : '') + this.formatPrice(bestPrice) : priceText}</span>
           <div class="product-action">
             <a class="btn btn-secondary btn-sm btn-detail" href="${this.escapeAttr(this.productUrl(product))}">Ver detalle</a>
             <button class="btn btn-primary btn-sm btn-add-cart" type="button" aria-label="${this.escapeAttr(hasMultipleVariants ? `Elegir variante de ${product.name}` : `Agregar ${product.name} al carrito`)}" title="${this.escapeAttr(hasMultipleVariants ? 'Elegir variante' : 'Agregar al carrito')}" ${isAvailable ? '' : 'disabled'}>${isAvailable ? '+' : '—'}</button>
