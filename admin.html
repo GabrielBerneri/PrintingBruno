@@ -791,6 +791,7 @@
                 <button class="admin-tab" data-tab="emails">📧 Correos</button>
                 <button class="admin-tab" data-tab="shipping">🚚 Envíos</button>
                 <button class="admin-tab" data-tab="settings">⚙️ Configuración</button>
+                <button class="admin-tab" data-tab="analytics">📈 Analíticas</button>
             </div>
 
             <!-- Dashboard Tab -->
@@ -1265,6 +1266,76 @@
         </div>
     </div>
 
+    <!-- Analytics Tab -->
+    <div class="admin-panel" id="analyticsPanel" style="display:none">
+        <h2 style="font-family:var(--font-heading);font-size:1.2rem;margin-bottom:var(--space-xl)">📈 Analíticas</h2>
+
+        <!-- KPIs del mes -->
+        <div class="kpi-grid" id="analyticsKpiGrid" style="margin-bottom:var(--space-2xl)">
+            <div class="kpi-card accent"><div class="kpi-icon">💰</div><div class="kpi-value" id="aKpiRevMonth">—</div><div class="kpi-label">Ingresos del mes</div></div>
+            <div class="kpi-card success"><div class="kpi-icon">🛒</div><div class="kpi-value" id="aKpiOrdersMonth">—</div><div class="kpi-label">Pedidos del mes</div></div>
+            <div class="kpi-card"><div class="kpi-icon">📅</div><div class="kpi-value" id="aKpiOrdersToday">—</div><div class="kpi-label">Pedidos hoy</div></div>
+            <div class="kpi-card warning"><div class="kpi-icon">🎯</div><div class="kpi-value" id="aKpiAvgTicket">—</div><div class="kpi-label">Ticket promedio</div></div>
+        </div>
+
+        <!-- Gráficos -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-xl);margin-bottom:var(--space-2xl)">
+            <div class="dashboard-panel" style="padding:var(--space-xl)">
+                <h3 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:var(--space-lg)">Pedidos últimos 30 días</h3>
+                <canvas id="chartOrders" height="200"></canvas>
+            </div>
+            <div class="dashboard-panel" style="padding:var(--space-xl)">
+                <h3 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:var(--space-lg)">Ingresos últimos 30 días</h3>
+                <canvas id="chartRevenue" height="200"></canvas>
+            </div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-xl);margin-bottom:var(--space-2xl)">
+            <div class="dashboard-panel" style="padding:var(--space-xl)">
+                <h3 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:var(--space-lg)">Métodos de pago</h3>
+                <canvas id="chartPayments" height="200"></canvas>
+            </div>
+            <div class="dashboard-panel" style="padding:var(--space-xl)">
+                <h3 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:var(--space-lg)">Ingresos por categoría</h3>
+                <canvas id="chartCategories" height="200"></canvas>
+            </div>
+        </div>
+
+        <!-- Accesos rápidos a GA4 -->
+        <div class="dashboard-panel" style="padding:var(--space-xl);margin-bottom:var(--space-2xl)">
+            <h3 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:var(--space-lg)">Google Analytics 4</h3>
+            <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:var(--space-lg)">Accesos directos a las secciones más usadas de GA4.</p>
+            <div style="display:flex;flex-wrap:wrap;gap:var(--space-md)">
+                <a href="https://analytics.google.com/analytics/web/#/p/realtime" target="_blank" class="btn btn-secondary btn-sm">🟢 Tiempo real</a>
+                <a href="https://analytics.google.com/analytics/web/#/p/reports/reportinghub" target="_blank" class="btn btn-secondary btn-sm">📊 Resumen</a>
+                <a href="https://analytics.google.com/analytics/web/#/p/reports/acquisition" target="_blank" class="btn btn-secondary btn-sm">🔍 Adquisición</a>
+                <a href="https://analytics.google.com/analytics/web/#/p/reports/engagement" target="_blank" class="btn btn-secondary btn-sm">💬 Engagement</a>
+                <a href="https://analytics.google.com/" target="_blank" class="btn btn-primary btn-sm">Abrir GA4 →</a>
+            </div>
+        </div>
+
+        <!-- Looker Studio -->
+        <div class="dashboard-panel" style="padding:var(--space-xl)">
+            <h3 style="font-size:0.85rem;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:var(--space-lg)">Looker Studio (opcional)</h3>
+            <div id="lookerStudioContainer">
+                <p style="font-size:0.88rem;color:var(--text-secondary);margin-bottom:var(--space-lg)">
+                    Podés embeber un reporte de Looker Studio acá. Para configurarlo:<br>
+                    1. Creá un reporte en <a href="https://lookerstudio.google.com/" target="_blank" style="color:var(--accent)">Looker Studio</a> conectado a GA4.<br>
+                    2. En "Compartir" → "Publicar en la web" → copiá la URL del embed.<br>
+                    3. Pegá la URL abajo y guardá.
+                </p>
+                <div style="display:flex;gap:var(--space-md);align-items:center;flex-wrap:wrap">
+                    <input type="url" id="lookerUrlInput" class="form-input" placeholder="https://lookerstudio.google.com/embed/reporting/..." style="flex:1;min-width:280px">
+                    <button class="btn btn-primary btn-sm" onclick="saveLookerUrl()">Guardar</button>
+                    <button class="btn btn-secondary btn-sm" id="lookerClearBtn" style="display:none" onclick="clearLookerUrl()">Quitar</button>
+                </div>
+                <div id="lookerIframeWrap" style="margin-top:var(--space-xl);display:none">
+                    <iframe id="lookerIframe" style="width:100%;height:600px;border:1px solid var(--border-subtle);border-radius:var(--border-radius-sm)" allowfullscreen sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Order Detail Modal -->
     <div class="order-modal-overlay" id="orderModalOverlay">
         <div class="order-modal">
@@ -1555,9 +1626,11 @@
                 document.getElementById('emailsPanel').style.display = t === 'emails' ? '' : 'none';
                 document.getElementById('settingsPanel').style.display = t === 'settings' ? '' : 'none';
                 document.getElementById('shippingPanel').style.display = t === 'shipping' ? '' : 'none';
+                document.getElementById('analyticsPanel').style.display = t === 'analytics' ? '' : 'none';
                 if (t === 'colors') loadColors();
                 if (t === 'emails') loadEmails();
                 if (t === 'shipping') loadShippingZones();
+                if (t === 'analytics') loadAnalytics();
             });
         });
 
@@ -3512,6 +3585,151 @@
                 alertEl.textContent = '✗ Error al guardar: ' + e.message;
             }
         };
+
+        // ═══════════════════════════════════════════════
+        //  ANALYTICS
+        // ═══════════════════════════════════════════════
+        let analyticsLoaded = false;
+        let chartInstances = {};
+
+        function formatCurrency(n) {
+            return '$' + Math.round(n).toLocaleString('es-AR');
+        }
+
+        function destroyChart(id) {
+            if (chartInstances[id]) { chartInstances[id].destroy(); delete chartInstances[id]; }
+        }
+
+        async function loadAnalytics() {
+            if (analyticsLoaded) return;
+            analyticsLoaded = true;
+
+            // Load Chart.js dynamically
+            if (!window.Chart) {
+                await new Promise((resolve, reject) => {
+                    const s = document.createElement('script');
+                    s.src = 'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js';
+                    s.onload = resolve; s.onerror = reject;
+                    document.head.appendChild(s);
+                });
+            }
+
+            try {
+                const res = await fetch(`${API}/analytics.php`, { credentials: 'same-origin' });
+                const d = await res.json();
+                if (isUnauthorizedResponse(res, d)) { handleAdminUnauthorized(); return; }
+                if (!res.ok) throw new Error(d.error || 'Error');
+
+                // KPIs
+                document.getElementById('aKpiRevMonth').textContent = formatCurrency(d.revenue_month);
+                document.getElementById('aKpiOrdersMonth').textContent = d.orders_month;
+                document.getElementById('aKpiOrdersToday').textContent = d.orders_today;
+                document.getElementById('aKpiAvgTicket').textContent = d.avg_ticket > 0 ? formatCurrency(d.avg_ticket) : '—';
+
+                const accent = '#ff6b2b';
+                const accentBlue = '#3b82f6';
+                const gridColor = 'rgba(255,255,255,0.06)';
+                const textColor = '#9ca3af';
+
+                const defaultScales = {
+                    x: { ticks: { color: textColor, maxTicksLimit: 10, maxRotation: 0 }, grid: { color: gridColor } },
+                    y: { ticks: { color: textColor }, grid: { color: gridColor } }
+                };
+
+                // Fill missing days in range
+                const dayMap = {};
+                (d.by_day || []).forEach(r => { dayMap[r.day] = r; });
+                const labels = [], ordersData = [], revenueData = [];
+                for (let i = 29; i >= 0; i--) {
+                    const dt = new Date(); dt.setDate(dt.getDate() - i);
+                    const key = dt.toISOString().slice(0, 10);
+                    const label = dt.toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit' });
+                    labels.push(label);
+                    ordersData.push(dayMap[key] ? parseInt(dayMap[key].orders) : 0);
+                    revenueData.push(dayMap[key] ? parseFloat(dayMap[key].revenue) : 0);
+                }
+
+                // Orders chart
+                destroyChart('orders');
+                chartInstances['orders'] = new Chart(document.getElementById('chartOrders'), {
+                    type: 'bar',
+                    data: { labels, datasets: [{ label: 'Pedidos', data: ordersData, backgroundColor: accent + 'cc', borderRadius: 4 }] },
+                    options: { responsive: true, plugins: { legend: { display: false } }, scales: defaultScales }
+                });
+
+                // Revenue chart
+                destroyChart('revenue');
+                chartInstances['revenue'] = new Chart(document.getElementById('chartRevenue'), {
+                    type: 'line',
+                    data: { labels, datasets: [{ label: 'Ingresos', data: revenueData, borderColor: accentBlue, backgroundColor: accentBlue + '22', fill: true, tension: 0.4, pointRadius: 2 }] },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => formatCurrency(ctx.parsed.y) } } },
+                        scales: { ...defaultScales, y: { ...defaultScales.y, ticks: { ...defaultScales.y.ticks, callback: v => formatCurrency(v) } } }
+                    }
+                });
+
+                // Payment methods donut
+                const pmLabels = { mercadopago: 'Mercado Pago', transferencia: 'Transferencia', efectivo: 'Efectivo' };
+                const pmColors = ['#ff6b2b', '#3b82f6', '#22c55e', '#a78bfa'];
+                const pmData = (d.payment_methods || []);
+                destroyChart('payments');
+                chartInstances['payments'] = new Chart(document.getElementById('chartPayments'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: pmData.map(r => pmLabels[r.payment_method] || r.payment_method),
+                        datasets: [{ data: pmData.map(r => parseInt(r.cnt)), backgroundColor: pmColors, borderWidth: 0, hoverOffset: 6 }]
+                    },
+                    options: { responsive: true, plugins: { legend: { position: 'bottom', labels: { color: textColor, padding: 16 } } } }
+                });
+
+                // Categories bar
+                const catData = (d.by_category || []);
+                destroyChart('categories');
+                chartInstances['categories'] = new Chart(document.getElementById('chartCategories'), {
+                    type: 'bar',
+                    data: {
+                        labels: catData.map(r => r.category || 'Sin categoría'),
+                        datasets: [{ label: 'Ingresos', data: catData.map(r => parseFloat(r.revenue)), backgroundColor: accentBlue + 'cc', borderRadius: 4 }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => formatCurrency(ctx.parsed.x) } } },
+                        scales: { x: { ticks: { color: textColor, callback: v => formatCurrency(v) }, grid: { color: gridColor } }, y: { ticks: { color: textColor }, grid: { color: gridColor } } }
+                    }
+                });
+
+                // Looker Studio
+                const savedUrl = localStorage.getItem('pb_looker_url');
+                if (savedUrl) applyLookerUrl(savedUrl);
+
+            } catch (e) {
+                console.error('Analytics error', e);
+            }
+        }
+
+        function applyLookerUrl(url) {
+            document.getElementById('lookerUrlInput').value = url;
+            document.getElementById('lookerIframe').src = url;
+            document.getElementById('lookerIframeWrap').style.display = '';
+            document.getElementById('lookerClearBtn').style.display = '';
+        }
+
+        function saveLookerUrl() {
+            const url = document.getElementById('lookerUrlInput').value.trim();
+            if (!url) return;
+            localStorage.setItem('pb_looker_url', url);
+            applyLookerUrl(url);
+        }
+
+        function clearLookerUrl() {
+            localStorage.removeItem('pb_looker_url');
+            document.getElementById('lookerUrlInput').value = '';
+            document.getElementById('lookerIframe').src = '';
+            document.getElementById('lookerIframeWrap').style.display = 'none';
+            document.getElementById('lookerClearBtn').style.display = 'none';
+        }
 
         // Init
         checkAuth();
