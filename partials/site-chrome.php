@@ -290,6 +290,7 @@ function pb_render_footer(): void
                             <div class="payment-icon">Mercado Pago</div>
                             <div class="payment-icon">Transferencia</div>
                             <div class="payment-icon">Efectivo</div>
+                            <div class="payment-icon">3 - 6 cuotas</div>
                         </div>
                     </div>
                 </div>
