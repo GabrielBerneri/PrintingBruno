@@ -4098,6 +4098,32 @@ select {
   margin-bottom: var(--space-2xl);
 }
 
+/* Estados de resultado (checkout success/failure/pending): mismo verde/
+   amarillo en ambos temas se vuelve casi ilegible sobre fondo claro. */
+.status-heading-success,
+.transfer-amount-label,
+.transfer-amount-value {
+  color: #25D366;
+}
+
+.status-heading-error {
+  color: #e74c3c;
+}
+
+.status-heading-warning {
+  color: #fbbf24;
+}
+
+[data-theme="light"] .status-heading-success,
+[data-theme="light"] .transfer-amount-label,
+[data-theme="light"] .transfer-amount-value {
+  color: #15803d;
+}
+
+[data-theme="light"] .status-heading-warning {
+  color: #b45309;
+}
+
 .site-toast {
   position: fixed;
   right: 1rem;
@@ -4185,15 +4211,20 @@ select {
   padding: 2rem;
   border: 1px solid var(--border-subtle);
   border-radius: var(--border-radius-lg);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01));
+  background: var(--bg-card);
   color: var(--text-secondary);
   text-align: center;
 }
 
-.catalog-empty-state h3 {
+.catalog-empty-state h3,
+.catalog-empty-state h1 {
   color: var(--text-primary);
   font-family: var(--font-heading);
   font-size: 1.35rem;
+}
+
+.catalog-empty-state h1 {
+  font-size: 1.7rem;
 }
 
 .catalog-empty-state svg {
