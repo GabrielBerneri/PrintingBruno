@@ -101,10 +101,20 @@
   box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
 }
 
-/* Hero text stays light (dark photo background) */
+/* Hero text stays light (dark photo background) — independiente del tema */
 [data-theme="light"] .hero-title,
 [data-theme="light"] .hero-description {
-  color: #111111;
+  color: #ffffff;
+}
+
+[data-theme="light"] .hero-buttons .btn-secondary {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+[data-theme="light"] .hero-buttons .btn-secondary:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 /* Logo e íconos de nav blancos cuando el header está sobre el hero en modo claro */
@@ -112,12 +122,14 @@
   color: #ffffff;
 }
 [data-theme="light"] .header:not(.scrolled) .nav-social a,
-[data-theme="light"] .header:not(.scrolled) .cart-toggle {
+[data-theme="light"] .header:not(.scrolled) .cart-toggle,
+[data-theme="light"] .header:not(.scrolled) .theme-toggle {
   color: rgba(255, 255, 255, 0.9);
   border-color: rgba(255, 255, 255, 0.35);
 }
 [data-theme="light"] .header:not(.scrolled) .nav-social a:hover,
-[data-theme="light"] .header:not(.scrolled) .cart-toggle:hover {
+[data-theme="light"] .header:not(.scrolled) .cart-toggle:hover,
+[data-theme="light"] .header:not(.scrolled) .theme-toggle:hover {
   color: #ffffff;
   border-color: rgba(255, 255, 255, 0.7);
   background: rgba(255, 255, 255, 0.15);
@@ -3260,6 +3272,34 @@ select {
     margin-top: auto;
   }
 
+  /* El drawer mobile tiene fondo sólido propio (var(--bg-secondary)), no es
+     transparente sobre el hero como en desktop. El forzado a blanco pensado
+     para el header transparente rompía el contraste (texto blanco sobre
+     fondo blanco en tema claro). Acá siempre usamos colores del tema. */
+  .header:not(.scrolled) .nav-link,
+  [data-theme="light"] .header:not(.scrolled) .nav-link {
+    color: var(--text-secondary);
+  }
+  .header:not(.scrolled) .nav-link:hover,
+  .header:not(.scrolled) .nav-link.active,
+  [data-theme="light"] .header:not(.scrolled) .nav-link:hover,
+  [data-theme="light"] .header:not(.scrolled) .nav-link.active {
+    color: var(--accent-light);
+  }
+  .header:not(.scrolled) .nav-social a,
+  .header:not(.scrolled) .cart-toggle,
+  .header:not(.scrolled) .theme-toggle,
+  [data-theme="light"] .header:not(.scrolled) .nav-social a,
+  [data-theme="light"] .header:not(.scrolled) .cart-toggle,
+  [data-theme="light"] .header:not(.scrolled) .theme-toggle {
+    color: var(--text-secondary);
+    border-color: var(--border-light);
+  }
+  .header:not(.scrolled) .logo,
+  [data-theme="light"] .header:not(.scrolled) .logo {
+    color: var(--text-primary);
+  }
+
   .nav-overlay {
     display: none;
     position: fixed;
@@ -3308,6 +3348,41 @@ select {
 
   .hero-description {
     font-size: 1.02rem;
+  }
+
+  /* Tarjetas: el padding de 48px de desktop las hace demasiado altas en
+     mobile y desperdicia espacio útil de pantalla. */
+  .entry-card,
+  .feature-card,
+  .testimonial-card {
+    padding: var(--space-xl) var(--space-lg);
+  }
+
+  .category-card {
+    padding: var(--space-xl) var(--space-md);
+  }
+
+  .feature-icon {
+    width: 60px;
+    height: 60px;
+    font-size: 1.7rem;
+  }
+
+  .category-icon {
+    width: 56px;
+    height: 56px;
+    font-size: 1.6rem;
+  }
+
+  /* Botones de acción de producto: acercar el tamaño de toque a 44px */
+  .product-action .btn {
+    padding: 0.6rem 0.9rem;
+  }
+
+  .product-action .btn-add-cart {
+    width: 2.5rem;
+    min-width: 2.5rem;
+    height: 2.5rem;
   }
 
   .hero-carousel {
