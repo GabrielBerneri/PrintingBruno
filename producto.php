@@ -14,21 +14,14 @@
     ?>
     <style>
         .product-detail-image-wrap {
-            background: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: clamp(16px, 2vw, 24px);
         }
 
         .product-detail-image {
             display: block;
             object-position: center;
-            background: #ffffff;
-        }
-
-        .product-detail-thumb {
-            background: #ffffff;
         }
     </style>
 </head>
