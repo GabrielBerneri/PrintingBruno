@@ -781,6 +781,45 @@
                 padding: var(--space-sm) var(--space-md);
             }
 
+            /* Últimos Pedidos: fila -> tarjeta apilada (nº+monto arriba, cliente+estado abajo) */
+            #recentOrdersTable,
+            #recentOrdersTable tbody,
+            #recentOrdersTable tr,
+            #recentOrdersTable td {
+                display: block;
+                width: 100% !important;
+            }
+
+            #recentOrdersTable tr.clickable {
+                display: grid;
+                grid-template-columns: 1fr auto;
+                grid-template-areas:
+                    "id amount"
+                    "name status";
+                gap: 4px 10px;
+                align-items: center;
+                padding: 12px 0;
+            }
+
+            #recentOrdersTable td {
+                padding: 0 !important;
+                border: none !important;
+            }
+
+            #recentOrdersTable td:nth-child(1) { grid-area: id; }
+            #recentOrdersTable td:nth-child(2) { grid-area: name; }
+            #recentOrdersTable td:nth-child(3) {
+                grid-area: status;
+                text-align: right !important;
+            }
+            #recentOrdersTable td:nth-child(4) {
+                grid-area: amount;
+                text-align: right !important;
+            }
+            #recentOrdersTable td:nth-child(5) {
+                display: none !important;
+            }
+
         }
     </style>
 </head>
