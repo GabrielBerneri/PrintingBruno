@@ -902,6 +902,100 @@
                 grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important;
             }
 
+            /* ===== Tablas genéricas (Pedidos, Correos, Colores) -> tarjetas ===== */
+            .mobile-cards thead {
+                display: none;
+            }
+            .mobile-cards,
+            .mobile-cards tbody,
+            .mobile-cards tr,
+            .mobile-cards td {
+                display: block;
+                width: 100% !important;
+            }
+            .mobile-cards tbody tr {
+                border: 1px solid var(--border-subtle);
+                border-radius: var(--border-radius);
+                background: var(--bg-card);
+                padding: 6px 14px;
+                margin-bottom: 12px;
+            }
+            .mobile-cards tbody td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 12px;
+                flex-wrap: wrap;
+                text-align: right;
+                padding: 7px 0 !important;
+                border: none !important;
+                border-bottom: 1px solid var(--border-subtle) !important;
+            }
+            .mobile-cards tbody td:last-child {
+                border-bottom: none !important;
+            }
+            .mobile-cards tbody td::before {
+                content: attr(data-label);
+                font-size: 0.7rem;
+                font-weight: 700;
+                color: var(--text-muted);
+                text-transform: uppercase;
+                letter-spacing: 0.03em;
+                text-align: left;
+                flex-shrink: 0;
+            }
+            .mobile-cards tbody td[colspan] {
+                justify-content: center;
+                text-align: center;
+                border-bottom: none !important;
+            }
+            .mobile-cards tbody td[colspan]::before {
+                content: '';
+            }
+            /* Botones de acción a lo ancho dentro de la celda */
+            .mobile-cards tbody td .admin-actions,
+            .mobile-cards tbody td .order-quick-action {
+                display: flex;
+                gap: 8px;
+                flex: 1 1 100%;
+                margin-top: 4px;
+            }
+            .mobile-cards tbody td .admin-actions button {
+                flex: 1;
+            }
+
+            /* Contenedores con overflow-x ya no necesitan scroll horizontal */
+            #ordersPanel [style*="overflow-x"],
+            #emailsPanel [style*="overflow-x"],
+            #colorsPanel [style*="overflow-x"] {
+                overflow-x: visible !important;
+            }
+
+            /* Filtros de pedidos: apilados y a lo ancho */
+            .order-toolbar-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .order-toolbar-row input,
+            .order-toolbar-row select,
+            .order-search {
+                width: 100% !important;
+                min-width: 0 !important;
+                flex: 1 1 auto !important;
+            }
+
+            /* Analíticas: gráficos y bloques a una columna */
+            #analyticsPanel [style*="grid-template-columns:1fr 1fr"],
+            #analyticsPanel [style*="grid-template-columns: 1fr 1fr"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Formularios de configuración: sin ancho máximo forzado */
+            #settingsPanel > div,
+            #shippingZonesContainer {
+                max-width: 100% !important;
+            }
+
         }
     </style>
 </head>
@@ -1213,7 +1307,7 @@
                 <div class="colors-layout">
                     <div class="dashboard-panel">
                         <h3>Lista de colores</h3>
-                        <table class="mini-table" id="colorsTable">
+                        <table class="mini-table mobile-cards" id="colorsTable">
                             <thead>
                                 <tr>
                                     <th></th>
@@ -1347,7 +1441,7 @@
                     </div>
                 </div>
                 <div style="overflow-x:auto">
-                    <table class="admin-table">
+                    <table class="admin-table mobile-cards">
                         <thead>
                             <tr>
                                 <th>N° Orden</th>
@@ -1378,7 +1472,7 @@
                     </select>
                 </div>
                 <div style="overflow-x:auto">
-                    <table class="admin-table">
+                    <table class="admin-table mobile-cards">
                         <thead>
                             <tr>
                                 <th>N° Orden</th>
@@ -4045,6 +4139,33 @@
             document.getElementById('lookerIframeWrap').style.display = 'none';
             document.getElementById('lookerClearBtn').style.display = 'none';
         }
+
+        // ═══════════════════════════════════════════════
+        //  Tablas responsive: etiqueta cada celda con su columna
+        //  para que en mobile se muestren como tarjetas legibles.
+        // ═══════════════════════════════════════════════
+        function pbApplyTableLabels(table) {
+            const heads = [...table.querySelectorAll('thead th')]
+                .map(th => th.textContent.replace(/[↕].*$/, '').trim());
+            table.querySelectorAll('tbody tr').forEach(tr => {
+                const tds = tr.children;
+                if (tds.length === 1 && tds[0].hasAttribute('colspan')) return;
+                [...tds].forEach((td, i) => {
+                    if (heads[i]) td.setAttribute('data-label', heads[i]);
+                });
+            });
+        }
+        function pbInitResponsiveTables() {
+            document.querySelectorAll('table.mobile-cards').forEach(table => {
+                pbApplyTableLabels(table);
+                if (!table._pbObserved) {
+                    table._pbObserved = true;
+                    new MutationObserver(() => pbApplyTableLabels(table))
+                        .observe(table, { childList: true, subtree: true });
+                }
+            });
+        }
+        document.addEventListener('DOMContentLoaded', pbInitResponsiveTables);
 
         // Init
         checkAuth();
