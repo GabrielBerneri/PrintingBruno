@@ -820,6 +820,82 @@
                 display: none !important;
             }
 
+            /* Productos: tabla -> tarjetas en mobile */
+            #productsTable thead {
+                display: none;
+            }
+
+            #productsTable,
+            #productsTable tbody,
+            #productsTable tr,
+            #productsTable td {
+                display: block;
+                width: 100% !important;
+            }
+
+            #productsTableBody tr {
+                display: grid;
+                grid-template-columns: 52px 1fr auto;
+                grid-template-areas:
+                    "img name   status"
+                    "img cat    price"
+                    "img stock  stock"
+                    "img actions actions";
+                gap: 4px 10px;
+                align-items: center;
+                padding: 12px 0;
+                border-bottom: 1px solid var(--border-subtle);
+            }
+
+            #productsTableBody td {
+                padding: 0 !important;
+                border: none !important;
+            }
+
+            #productsTableBody td:nth-child(1) { grid-area: img; }
+            #productsTableBody td:nth-child(1) img {
+                width: 48px;
+                height: 48px;
+                border-radius: 8px;
+                object-fit: cover;
+            }
+            #productsTableBody td:nth-child(2) { grid-area: name; }
+            #productsTableBody td:nth-child(3) {
+                grid-area: cat;
+                color: var(--text-muted);
+                font-size: 0.8rem;
+            }
+            #productsTableBody td:nth-child(4) {
+                grid-area: price;
+                text-align: right;
+                font-weight: 700;
+                color: var(--accent);
+            }
+            #productsTableBody td:nth-child(5) {
+                grid-area: stock;
+                font-size: 0.8rem;
+            }
+            #productsTableBody td:nth-child(6) {
+                grid-area: status;
+                text-align: right;
+            }
+            #productsTableBody td:nth-child(7) { grid-area: actions; }
+
+            #productsTableBody .admin-actions {
+                display: flex;
+                gap: 8px;
+                margin-top: 4px;
+            }
+            #productsTableBody .admin-actions button {
+                flex: 1;
+            }
+
+            #productsTableBody td[colspan] {
+                grid-column: 1 / -1 !important;
+                text-align: center;
+                padding: var(--space-lg) !important;
+            }
+
         }
     </style>
 </head>
