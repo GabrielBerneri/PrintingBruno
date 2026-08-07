@@ -896,6 +896,12 @@
                 padding: var(--space-lg) !important;
             }
 
+            /* Editar producto: miniaturas más grandes para que "Portada" y "×" no se pisen */
+            #imageThumbs,
+            .variant-thumbs {
+                grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)) !important;
+            }
+
         }
     </style>
 </head>
