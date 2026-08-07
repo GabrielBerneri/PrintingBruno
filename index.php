@@ -18,7 +18,7 @@
   <meta property="og:site_name" content="PrintingBruno">
   <title>Tienda de Impresión 3D | PrintingBruno</title>
   <link rel="canonical" href="https://www.printingbruno.com/">
-  <link rel="stylesheet" href="css/styles.css?v=20260807-3">
+  <link rel="stylesheet" href="css/styles.css?v=20260807-4">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo/logo.png">
   <link rel="apple-touch-icon" href="https://www.printingbruno.com/assets/logo/logo.png">
   <?php
@@ -324,8 +324,8 @@
   <?php pb_render_cart_drawer(); ?>
 
   <script src="js/cart.js?v=20260805-1"></script>
-  <script src="js/products.js?v=20260805-2"></script>
-  <script src="js/main.js?v=20260803-2"></script>
+  <script src="js/products.js?v=20260807-1"></script>
+  <script src="js/main.js?v=20260807-1"></script>
   <script>Products.loadFeatured('featuredGrid');</script>
 
 

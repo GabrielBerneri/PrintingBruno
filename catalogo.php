@@ -7,7 +7,7 @@
     <meta name="description"
         content="Catálogo de productos de impresión 3D de PrintingBruno. Figuras, decoración, piezas funcionales y más.">
     <title>Catálogo | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260807-3">
+    <link rel="stylesheet" href="css/styles.css?v=20260807-4">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';
@@ -35,6 +35,22 @@
     <!-- CATALOG -->
     <section class="section">
         <div class="container">
+            <div class="catalog-worlds" id="catalogWorlds" role="tablist" aria-label="Tipo de catálogo">
+                <button type="button" class="catalog-world active" data-mundo="productos" role="tab" aria-selected="true">
+                    <span class="catalog-world-emoji">🎨</span>
+                    <span class="catalog-world-text">
+                        <strong>Productos 3D</strong>
+                        <small>Figuras, mates, deco, llaveros y más</small>
+                    </span>
+                </button>
+                <button type="button" class="catalog-world" data-mundo="equipo" role="tab" aria-selected="false">
+                    <span class="catalog-world-emoji">🖨️</span>
+                    <span class="catalog-world-text">
+                        <strong>Impresoras &amp; Insumos</strong>
+                        <small>Equipos, filamentos y consumibles</small>
+                    </span>
+                </button>
+            </div>
             <div class="catalog-layout">
                 <!-- Sidebar Filters -->
                 <aside class="catalog-sidebar">
@@ -132,8 +148,8 @@
     <?php pb_render_cart_drawer(); ?>
 
     <script src="js/cart.js?v=20260805-1"></script>
-    <script src="js/products.js?v=20260805-2"></script>
-    <script src="js/main.js?v=20260803-2"></script>
+    <script src="js/products.js?v=20260807-1"></script>
+    <script src="js/main.js?v=20260807-1"></script>
     <script>Products.loadCatalog('catalogGrid');</script>
 </body>
 

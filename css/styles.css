@@ -2488,6 +2488,71 @@ select {
 }
 
 /* ---------- Catalog Page ---------- */
+/* Toggle de "mundos": separa Productos 3D de Impresoras & Insumos */
+.catalog-worlds {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+  padding-top: var(--space-2xl);
+}
+
+.catalog-world {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--border-radius-lg);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+
+.catalog-world:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-2px);
+}
+
+.catalog-world.active {
+  border-color: var(--accent);
+  background: rgba(255, 107, 43, 0.08);
+  box-shadow: var(--shadow-accent);
+}
+
+.catalog-world-emoji {
+  font-size: 1.9rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.catalog-world-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.catalog-world-text strong {
+  font-family: var(--font-heading);
+  font-size: 1.05rem;
+  color: var(--text-primary);
+}
+
+.catalog-world.active .catalog-world-text strong {
+  color: var(--accent);
+}
+
+[data-theme="light"] .catalog-world.active .catalog-world-text strong {
+  color: #c2410c;
+}
+
+.catalog-world-text small {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
 .catalog-layout {
   display: grid;
   grid-template-columns: 260px 1fr;
@@ -3635,6 +3700,30 @@ select {
 
   .catalog-sidebar {
     position: static;
+  }
+
+  /* Toggle de mundos: más compacto en mobile */
+  .catalog-worlds {
+    gap: var(--space-sm);
+  }
+
+  .catalog-world {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs);
+    padding: var(--space-md);
+  }
+
+  .catalog-world-emoji {
+    font-size: 1.5rem;
+  }
+
+  .catalog-world-text strong {
+    font-size: 0.92rem;
+  }
+
+  .catalog-world-text small {
+    font-size: 0.72rem;
   }
 
   .testimonials-wrapper {

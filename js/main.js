@@ -128,6 +128,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const productCount = document.getElementById('productCount');
   let currentFilter = 'all';
   let currentSearch = '';
+  let currentMundo = 'productos';
+  const mundoOf = (cat) => (typeof Products !== 'undefined' ? Products.mundoOf(cat) : 'productos');
 
   if (catalogSidebar && catalogGrid) {
     let emptyState = null;
@@ -142,10 +144,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const name = (card.querySelector('.product-name')?.textContent || '').toLowerCase();
         const desc = (card.querySelector('.product-description')?.textContent || '').toLowerCase();
 
+        const matchesMundo = mundoOf(category) === currentMundo;
         const matchesCategory = currentFilter === 'all' || category === currentFilter;
         const matchesSearch = !query || name.includes(query) || desc.includes(query);
 
-        if (matchesCategory && matchesSearch) {
+        if (matchesMundo && matchesCategory && matchesSearch) {
           card.style.display = '';
           visibleCount++;
         } else {
@@ -199,6 +202,35 @@ document.addEventListener('DOMContentLoaded', () => {
       applyFilter(option.getAttribute('data-filter'));
     });
 
+    // ===== Mundos (Productos 3D / Impresoras & Insumos) =====
+    const worldsBar = document.getElementById('catalogWorlds');
+
+    function applyMundo(mundo, keepFilter = false) {
+      currentMundo = mundo;
+      if (worldsBar) {
+        worldsBar.querySelectorAll('[data-mundo]').forEach(btn => {
+          btn.classList.toggle('active', btn.getAttribute('data-mundo') === mundo);
+        });
+      }
+      // Regenerar los filtros de categoría para el mundo activo
+      if (typeof Products !== 'undefined') {
+        Products.renderCatalogFilters(null, mundo);
+      }
+      if (!keepFilter) {
+        applyFilter('all');
+      } else {
+        applyFilterAndSearch();
+      }
+    }
+
+    if (worldsBar) {
+      worldsBar.addEventListener('click', (event) => {
+        const btn = event.target.closest('[data-mundo]');
+        if (!btn) return;
+        applyMundo(btn.getAttribute('data-mundo'));
+      });
+    }
+
     // ===== Catalog Search =====
     const searchInput = document.getElementById('catalogSearch');
     const searchClear = document.getElementById('catalogSearchClear');
@@ -221,20 +253,25 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Activate filter from URL hash (e.g. catalogo.html#mates)
+    const validCategories = () =>
+      (typeof Products !== 'undefined') ? Object.values(Products.MUNDOS).flat() : [];
+
+    // Activate filter (and su mundo) desde el hash de la URL
+    // (ej: catalogo.html#mates -> mundo productos; #filamentos -> equipo).
     function applyHashFilter() {
       const hash = window.location.hash.replace('#', '');
-      if (!hash) return;
-      const target = document.querySelector(`.filter-option[data-filter="${hash}"]`);
-      if (target) applyFilter(hash);
+      if (!hash || !validCategories().includes(hash)) return;
+      applyMundo(mundoOf(hash), true);
+      applyFilter(hash);
     }
 
     document.addEventListener('catalogLoaded', () => {
       const hash = window.location.hash.replace('#', '');
-      if (hash && document.querySelector(`.filter-option[data-filter="${hash}"]`)) {
+      if (hash && validCategories().includes(hash)) {
+        applyMundo(mundoOf(hash), true);
         applyFilter(hash);
       } else {
-        applyFilter('all');
+        applyMundo('productos');
       }
     });
 

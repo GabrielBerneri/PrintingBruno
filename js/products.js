@@ -311,14 +311,34 @@ const Products = {
     return labels[category] || category;
   },
 
-  renderCatalogFilters(products = []) {
+  // "Mundos" del catálogo: separan lo que imprime PrintingBruno de la
+  // reventa de equipo/insumos, porque son públicos distintos.
+  MUNDOS: {
+    productos: ['figuras', 'decoracion', 'funcional', 'personalizado', 'mates', 'jarras', 'llaveros'],
+    equipo: ['impresoras', 'filamentos', 'insumos']
+  },
+
+  mundoOf(category) {
+    for (const [mundo, cats] of Object.entries(this.MUNDOS)) {
+      if (cats.includes(category)) return mundo;
+    }
+    return 'productos';
+  },
+
+  // Guardamos los productos cargados para poder re-renderizar los filtros
+  // cuando el usuario cambia de mundo.
+  _catalogProducts: [],
+
+  renderCatalogFilters(products = null, mundo = 'productos') {
+    if (products) this._catalogProducts = products;
     const group = document.querySelector('.catalog-sidebar .filter-group');
     if (!group) return;
 
     const categories = [...new Set(
-      products
+      this._catalogProducts
         .map(p => p.category)
         .filter(Boolean)
+        .filter(c => this.mundoOf(c) === mundo)
     )].sort((a, b) => this.categoryLabel(a).localeCompare(this.categoryLabel(b), 'es'));
 
     const optionsHTML = [
