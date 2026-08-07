@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Detalle de producto de PrintingBruno.">
     <title>Producto | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260806-2">
+    <link rel="stylesheet" href="css/styles.css?v=20260807-1">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';

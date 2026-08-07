@@ -127,6 +127,10 @@
   color: rgba(255, 255, 255, 0.9);
   border-color: rgba(255, 255, 255, 0.35);
 }
+[data-theme="light"] .header:not(.scrolled) .menu-toggle span {
+  background: #ffffff;
+}
+
 [data-theme="light"] .header:not(.scrolled) .nav-social a:hover,
 [data-theme="light"] .header:not(.scrolled) .cart-toggle:hover,
 [data-theme="light"] .header:not(.scrolled) .theme-toggle:hover {
@@ -614,6 +618,9 @@ select {
   flex-direction: column;
   align-items: center;
   text-align: center;
+  /* El hero centra el bloque en 100vh; corremos el contenido un poco
+     hacia arriba para que los botones no queden tan abajo/al medio. */
+  margin-bottom: clamp(40px, 12vh, 140px);
 }
 
 .hero-content {
