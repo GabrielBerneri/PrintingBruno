@@ -1672,6 +1672,102 @@ select {
   color: #22c55e;
 }
 
+/* ---------- Opciones de pago (ficha de producto) ---------- */
+.pay-options-title {
+  margin: 6px 0 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.pay-options {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+/* Grilla de 2 filas: el radio ocupa ambas, arriba nombre + total,
+   abajo (si aplica) el badge y el precio por mes. Evita que el texto
+   largo o "N cuotas" se parta en dos líneas como pasaba en mobile. */
+.pay-option {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 3px 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.pay-option:hover {
+  border-color: var(--border-accent);
+}
+
+.pay-option.selected {
+  border-color: var(--accent);
+  background: rgba(255, 107, 43, 0.08);
+}
+
+.pay-option input[type="radio"] {
+  grid-row: 1 / -1;
+  width: 17px;
+  height: 17px;
+  margin: 0;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
+.pay-option-name {
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.pay-option-total {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.pay-option-meta {
+  grid-column: 2 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pay-option-permonth {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.92rem;
+  white-space: nowrap;
+}
+
+.pay-option-permonth span {
+  font-weight: 400;
+  font-size: 0.8em;
+}
+
+.pay-badge-best {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.12);
+  padding: 2px 8px;
+  border-radius: 10px;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  white-space: nowrap;
+}
+
+[data-theme="light"] .pay-badge-best {
+  color: #15803d;
+}
+
 .product-variant-picker {
   display: grid;
   gap: var(--space-md);
@@ -3467,6 +3563,23 @@ select {
     width: 2.5rem;
     min-width: 2.5rem;
     height: 2.5rem;
+  }
+
+  /* Opciones de pago: en pantallas chicas el nombre no entra junto al
+     total en la misma línea ("Transferencia (7% OFF)" se partía en dos).
+     Le damos el ancho completo y bajamos el total a la segunda fila. */
+  .pay-option-name {
+    grid-column: 2 / -1;
+  }
+
+  .pay-option-meta {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .pay-option-total {
+    grid-column: 3;
+    grid-row: 2;
   }
 
   .hero-carousel {

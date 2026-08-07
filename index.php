@@ -18,7 +18,7 @@
   <meta property="og:site_name" content="PrintingBruno">
   <title>Tienda de Impresión 3D | PrintingBruno</title>
   <link rel="canonical" href="https://www.printingbruno.com/">
-  <link rel="stylesheet" href="css/styles.css?v=20260807-1">
+  <link rel="stylesheet" href="css/styles.css?v=20260807-2">
   <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo/logo.png">
   <link rel="apple-touch-icon" href="https://www.printingbruno.com/assets/logo/logo.png">
   <?php
