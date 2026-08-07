@@ -471,6 +471,13 @@ select {
   transform: translateX(0.5px);
 }
 
+/* Elementos exclusivos del drawer mobile: ocultos en desktop */
+.nav-link-icon,
+.nav-mobile-cta,
+.nav-social-label {
+  display: none;
+}
+
 /* Mobile menu toggle */
 .menu-toggle {
   display: none;
@@ -3243,16 +3250,18 @@ select {
     position: fixed;
     top: 0;
     right: -100%;
-    width: 80%;
-    max-width: 350px;
+    width: 85%;
+    max-width: 360px;
     height: 100vh;
     background: var(--bg-secondary);
     flex-direction: column;
-    padding: calc(var(--header-height) + var(--space-2xl)) var(--space-xl) var(--space-2xl);
-    gap: var(--space-xl);
+    align-items: stretch;
+    padding: calc(var(--header-height) + var(--space-xl)) var(--space-lg) var(--space-xl);
+    gap: 0;
     transition: right var(--transition-base);
     border-left: 1px solid var(--border-subtle);
     z-index: 1310;
+    overflow-y: auto;
   }
 
   .nav.open {
@@ -3262,22 +3271,78 @@ select {
   .nav-links {
     flex-direction: column;
     width: 100%;
-    gap: 0;
+    gap: 0.3rem;
   }
 
   .nav-link {
-    padding: var(--space-md) 0;
-    font-size: 1.1rem;
-    border-bottom: 1px solid var(--border-subtle);
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 0.9rem;
+    font-size: 1.02rem;
+    border-radius: var(--border-radius-md);
     width: 100%;
+    transition: background var(--transition-fast), color var(--transition-fast);
+  }
+
+  .nav-link-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    width: 1.5rem;
+    flex-shrink: 0;
   }
 
   .nav-link::after {
     display: none;
   }
 
+  .nav-link:hover,
+  .nav-link:active {
+    background: var(--bg-elevated);
+  }
+
+  .nav-link.active {
+    background: rgba(255, 107, 43, 0.1);
+    font-weight: 700;
+  }
+
+  .nav-mobile-cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    width: 100%;
+    margin-top: var(--space-lg);
+    padding: 0.9rem 1rem;
+    border-radius: var(--border-radius-full);
+    background: #25D366;
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.95rem;
+    box-shadow: 0 6px 18px rgba(37, 211, 102, 0.28);
+    transition: transform var(--transition-fast);
+  }
+
+  .nav-mobile-cta:hover,
+  .nav-mobile-cta:active {
+    transform: translateY(-1px);
+  }
+
+  .nav-social-label {
+    display: block;
+    margin-top: var(--space-xl);
+    margin-bottom: var(--space-sm);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
   .nav-social {
-    margin-top: auto;
+    margin-top: 0;
   }
 
   /* El drawer mobile tiene fondo sólido propio (var(--bg-secondary)), no es
@@ -3289,10 +3354,14 @@ select {
     color: var(--text-secondary);
   }
   .header:not(.scrolled) .nav-link:hover,
-  .header:not(.scrolled) .nav-link.active,
+  .header:not(.scrolled) .nav-link.active {
+    color: var(--accent-light);
+  }
+  /* var(--accent-light) da ~2.3:1 sobre fondo blanco (no cumple AA);
+     en tema claro usamos un naranja más oscuro con mejor contraste. */
   [data-theme="light"] .header:not(.scrolled) .nav-link:hover,
   [data-theme="light"] .header:not(.scrolled) .nav-link.active {
-    color: var(--accent-light);
+    color: #c2410c;
   }
   .header:not(.scrolled) .nav-social a,
   .header:not(.scrolled) .cart-toggle,
