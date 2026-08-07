@@ -1493,7 +1493,7 @@ select {
 .product-detail-image {
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .product-detail-nav {
@@ -4042,14 +4042,13 @@ select {
 
 .product-card-main-image {
   transition: opacity var(--transition-base), transform var(--transition-base);
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
-  padding: clamp(12px, 1.6vw, 18px);
   box-sizing: border-box;
 }
 
 .product-card-gallery-image {
-  object-fit: contain;
+  object-fit: cover;
 }
 
 .product-card-secondary-image {
@@ -4057,12 +4056,11 @@ select {
   inset: 0;
   width: 100%;
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
   opacity: 0;
   transition: opacity var(--transition-base), transform var(--transition-base);
   pointer-events: none;
-  padding: clamp(12px, 1.6vw, 18px);
   box-sizing: border-box;
 }
 

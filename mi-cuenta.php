@@ -75,7 +75,7 @@ if ($verifiedState === 'success') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
     <title>Mi cuenta | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260805-5">
+    <link rel="stylesheet" href="css/styles.css?v=20260806-1">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';
