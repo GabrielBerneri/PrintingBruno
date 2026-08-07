@@ -4218,7 +4218,8 @@ select {
   font-family: var(--font-heading);
   font-size: 1.15rem;
   font-weight: 800;
-  color: var(--text-primary);
+  /* La barra siempre tiene fondo oscuro fijo, independiente del tema */
+  color: #ffffff;
 }
 
 .product-mobile-bar .btn {
@@ -4245,5 +4246,12 @@ select {
 
   .product-detail-thumb {
     scroll-snap-align: start;
+  }
+
+  /* La barra sticky de "Agregar al carrito" tapaba el final del footer
+     al hacer scroll hasta abajo. Le damos aire al footer cuando la
+     barra está presente en la página. */
+  body:has(.product-mobile-bar) .footer {
+    padding-bottom: 5.5rem;
   }
 }
