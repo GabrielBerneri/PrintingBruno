@@ -39,7 +39,7 @@
                 <button type="button" class="catalog-world active" data-mundo="productos" role="tab" aria-selected="true">
                     <span class="catalog-world-emoji">🎨</span>
                     <span class="catalog-world-text">
-                        <strong>Productos 3D</strong>
+                        <strong>Productos</strong>
                         <small>Figuras, mates, deco, llaveros y más</small>
                     </span>
                 </button>
