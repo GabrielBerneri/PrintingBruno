@@ -996,6 +996,49 @@
                 max-width: 100% !important;
             }
 
+            /* ===== Header compacto en mobile ===== */
+            .header .admin-header-user {
+                display: none;
+            }
+            .header .logo {
+                font-size: 1.05rem;
+                gap: 6px;
+            }
+            .header .logo .logo-icon {
+                width: 30px;
+                height: 30px;
+            }
+            .header .container > div {
+                gap: var(--space-sm) !important;
+            }
+            #logoutBtn {
+                padding: 0.45rem 0.7rem;
+                white-space: nowrap;
+            }
+
+            /* ===== Editar producto: una sola columna, prolijo ===== */
+            .product-modal-overlay {
+                padding: var(--space-sm);
+            }
+            .product-modal {
+                padding: var(--space-lg);
+                max-height: 94vh;
+            }
+            .pf-col-image {
+                width: 100% !important;
+            }
+            .pf-col-data {
+                grid-template-columns: 1fr !important;
+                min-width: 0 !important;
+            }
+            .pf-row-2 {
+                grid-template-columns: 1fr !important;
+            }
+            /* Imagen de portada más grande y centrada */
+            #imagePreview {
+                max-height: 220px !important;
+            }
+
         }
     </style>
 </head>
@@ -1161,9 +1204,9 @@
                         </div>
                         <form id="productForm">
                             <input type="hidden" id="productId">
-                            <div style="display:flex;gap:var(--space-xl);align-items:flex-start;flex-wrap:wrap">
+                            <div class="pf-layout" style="display:flex;gap:var(--space-xl);align-items:flex-start;flex-wrap:wrap">
                                 <!-- Left Column: Image -->
-                                <div style="width: 220px;flex-shrink:0;display:flex;flex-direction:column;gap:var(--space-md)">
+                                <div class="pf-col-image" style="width: 220px;flex-shrink:0;display:flex;flex-direction:column;gap:var(--space-md)">
                                     <div id="imageUploadArea" style="border:2px dashed var(--border-subtle);border-radius:var(--border-radius);padding:var(--space-lg) var(--space-sm);text-align:center;cursor:pointer;transition:border-color 0.2s;position:relative;background:var(--bg-card)">
                                         <img id="imagePreview" src="" alt="Preview" style="max-height:160px;max-width:100%;display:none;margin:0 auto var(--space-sm);border-radius:var(--border-radius);object-fit:cover">
                                         <div id="imageUploadPlaceholder">
@@ -1197,9 +1240,9 @@
                                 </div>
 
                                 <!-- Right Column: Data -->
-                                <div style="flex:1;min-width:300px;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
+                                <div class="pf-col-data" style="flex:1;min-width:300px;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
                                     <div class="form-group" style="grid-column:1/-1"><label class="form-label">Nombre *</label><input type="text" class="form-input" id="pName" required></div>
-                                    <div class="form-group" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
+                                    <div class="form-group pf-row-2" style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:var(--space-md)">
                                         <div><label class="form-label">Precio de venta *</label><input type="number" class="form-input" id="pPrice" step="0.01" required></div>
                                         <div><label class="form-label">Costo proveedor</label><input type="number" class="form-input" id="pCostPrice" step="1" min="0" placeholder="Ej: 800000"></div>
                                     </div>
