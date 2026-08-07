@@ -1298,7 +1298,7 @@
                                         <tbody id="priceAnalysisBody"></tbody>
                                     </table>
                                 </div>
-                                <div style="padding:6px 16px;font-size:0.73rem;color:var(--text-muted);border-top:1px solid var(--border-subtle)">Comisiones MP totales: 1 pago ~7%, 2c ~14.79% (7+7.79), 3c ~17.49% (7+10.49), 6c ~25.69% (7+18.69). Valores orientativos.</div>
+                                <div style="padding:6px 16px;font-size:0.73rem;color:var(--text-muted);border-top:1px solid var(--border-subtle)">Costos MP totales (con IVA + IIBB 3%): 1 pago ~11%, 2c ~20,4%, 3c ~23,7%, 6c ~33,6%. Valores orientativos.</div>
                             </div>
                             <div class="form-group" style="margin-top:var(--space-md)"><label class="form-label">Descripción</label><textarea class="form-textarea" id="pDescription" rows="4"></textarea></div>
                             <div class="form-group" style="margin-top:var(--space-xl)">
@@ -2344,12 +2344,29 @@
             if (e.target === e.currentTarget) closeProductModal();
         });
 
-        const MP_SINGLE_RATE = 7; // comisión MP 1 pago crédito
-        const MP_COMMISSIONS = [
-            { label: '2 cuotas', cuotas: 2, rate: 7.79 },
-            { label: '3 cuotas', cuotas: 3, rate: 10.49 },
-            { label: '6 cuotas', cuotas: 6, rate: 18.69 },
-        ];
+        // ===== Costos MercadoPago =====
+        // Editá SOLO estos valores cuando MP actualice sus tarifas.
+        // Los % "sin IVA" son los que muestra la calculadora de MP.
+        // Acá se les suma el IVA (no recuperable) y la retención de
+        // Ingresos Brutos, porque en la práctica son costo real.
+        const MP_IVA = 21;             // % IVA sobre las comisiones
+        const MP_IIBB = 3;            // % retención Ingresos Brutos (SIRTAC)
+        const MP_COBRO_SIN_IVA = 6.60; // comisión de cobro 1 pago, sin IVA
+        const MP_CUOTAS_SIN_IVA = {    // costo financiero de cuotas, sin IVA
+            2: 7.79,
+            3: 10.49,
+            6: 18.69,
+        };
+
+        const _conIva = r => r * (1 + MP_IVA / 100);
+        // Base que MP + IIBB descuentan en 1 pago (cobro con IVA + IIBB)
+        const MP_SINGLE_RATE = +(_conIva(MP_COBRO_SIN_IVA) + MP_IIBB).toFixed(2);
+        // Costo adicional de cada plan de cuotas (con IVA), se suma a la base
+        const MP_COMMISSIONS = Object.entries(MP_CUOTAS_SIN_IVA).map(([c, r]) => ({
+            label: `${c} cuotas`,
+            cuotas: +c,
+            rate: +_conIva(r).toFixed(2),
+        }));
 
         function fmtARS(n) {
             return '$' + Math.round(n).toLocaleString('es-AR');
