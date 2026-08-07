@@ -2589,6 +2589,14 @@ select {
   padding: 0 0 var(--space-3xl);
 }
 
+/* Los ítems de grid tienen min-width:auto por defecto: si algo adentro
+   (ej. un link largo) no puede achicarse, empuja toda la columna a
+   desbordar el contenedor. min-width:0 permite que se ajusten bien. */
+.contact-form,
+.contact-side-stack {
+  min-width: 0;
+}
+
 .contact-form {
   background:
     radial-gradient(circle at top right, rgba(255, 107, 53, 0.08), transparent 36%),
@@ -2939,8 +2947,8 @@ select {
   gap: var(--space-md);
   padding: 1rem;
   border-radius: var(--border-radius-md);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated);
   margin-bottom: var(--space-md);
   transition: transform var(--transition-fast), border-color var(--transition-fast), background var(--transition-fast);
 }
