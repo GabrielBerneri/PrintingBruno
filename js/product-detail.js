@@ -479,8 +479,8 @@
             <label class="pay-option" data-price="${opt.price}">
               <input type="radio" name="installmentOption" value="${opt.price}" data-method="${opt.method}" data-cuotas="${opt.cuotas ?? ''}">
               <span class="pay-option-name">${opt.label}</span>
-              <span class="pay-option-total">Total ${fmt(opt.price)}</span>
               ${meta.length ? `<span class="pay-option-meta">${meta.join('')}</span>` : ''}
+              <span class="pay-option-total">Total ${fmt(opt.price)}</span>
             </label>`;
           }).join('')}
         </div>`;
