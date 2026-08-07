@@ -488,7 +488,8 @@
           const cuotas = r.dataset.cuotas ? Number(r.dataset.cuotas) : null;
           updatePriceDisplay(Number(r.value), method, cuotas);
           badge.querySelectorAll('label[data-price]').forEach(l => {
-            const sel = l.dataset.price === r.value;
+            const input = l.querySelector('input[type="radio"]');
+            const sel = input === r;
             l.style.borderColor = sel ? 'var(--accent)' : 'var(--border-light)';
             l.style.background = sel ? 'color-mix(in srgb, var(--accent) 8%, transparent)' : '';
           });

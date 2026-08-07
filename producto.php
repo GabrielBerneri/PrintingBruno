@@ -81,7 +81,7 @@
     <script src="js/cart.js?v=20260805-1"></script>
     <script src="js/products.js?v=20260805-2"></script>
     <script src="js/main.js?v=20260803-2"></script>
-    <script src="js/product-detail.js?v=20260805-18"></script>
+    <script src="js/product-detail.js?v=20260805-19"></script>
 </body>
 
 </html>
