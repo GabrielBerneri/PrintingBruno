@@ -31,6 +31,17 @@ function pbEnsureCategoriesTable(PDO $db): void {
             UNIQUE KEY uq_slug (slug)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4
     ");
+
+    // Si la tabla quedó vacía, importar las categorías que ya existen en products
+    $count = (int)$db->query('SELECT COUNT(*) FROM product_categories')->fetchColumn();
+    if ($count === 0) {
+        $slugs = $db->query("SELECT DISTINCT category FROM products WHERE category IS NOT NULL AND category != '' ORDER BY category ASC")->fetchAll(PDO::FETCH_COLUMN);
+        $stmt = $db->prepare('INSERT IGNORE INTO product_categories (name, slug, sort_order) VALUES (?, ?, ?)');
+        foreach ($slugs as $i => $slug) {
+            $name = ucfirst(str_replace(['-', '_'], ' ', $slug));
+            $stmt->execute([$name, $slug, $i * 10]);
+        }
+    }
 }
 
 function pbCategorySlug(string $value): string {
