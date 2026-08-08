@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Conocé a PrintingBruno - Impresión 3D de alta calidad.">
     <title>Nosotros | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260807-4">
+    <link rel="stylesheet" href="css/styles.css?v=20260808-1">
     <link rel="icon" type="image/jpeg" href="assets/logo/logo.png">
     <?php
     require_once __DIR__ . '/partials/site-chrome.php';

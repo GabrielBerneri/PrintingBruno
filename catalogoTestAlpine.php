@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Catálogo de productos de impresión 3D de PrintingBruno. [Alpine.js test]">
     <title>Catálogo Alpine | PrintingBruno</title>
-    <link rel="stylesheet" href="css/styles.css?v=20260331-1">
+    <link rel="stylesheet" href="css/styles.css?v=20260808-1">
     <link rel="icon" type="image/png" href="assets/logo/logo.png">
     <!-- Alpine.js CDN — sin build step -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

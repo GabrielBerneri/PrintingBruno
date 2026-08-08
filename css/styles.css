@@ -1529,9 +1529,9 @@ select {
   width: 38px;
   height: 38px;
   border-radius: 999px;
-  border: 1px solid var(--border-light);
-  background: rgba(10, 10, 15, 0.65);
-  color: var(--text-primary);
+  border: 1.5px solid rgba(255, 255, 255, 0.55);
+  background: rgba(0, 0, 0, 0.52);
+  color: #ffffff;
   font-size: 1.6rem;
   line-height: 1;
   display: inline-flex;
@@ -1544,8 +1544,8 @@ select {
 
 .product-detail-nav:hover {
   border-color: var(--accent);
-  color: var(--accent-light);
-  background: rgba(10, 10, 15, 0.85);
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.75);
 }
 
 .product-detail-nav.prev {
